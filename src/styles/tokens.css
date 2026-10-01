@@ -1,0 +1,70 @@
+:root {
+  /* ==========================================================================
+     Paleta de Cores Principais (Flat UI / Aussie Palette)
+     ========================================================================== */
+
+  /* Reds & Corals */
+  --color-fusion-red: #fc5c65;
+  --color-desire: #eb3b5a;
+
+  /* Oranges & Bronzes */
+  --color-orange-hibiscus: #fd9644;
+  --color-beniukon-bronze: #fa8231;
+
+  /* Yellows & Ambers */
+  --color-flirtatious: #fed330;
+  --color-nyc-taxi: #f7b731;
+
+  /* Greens & Emeralds */
+  --color-reptile-green: #26de81;
+  --color-algal-fuel: #20bf6b;
+
+  /* Teals & Turquoises */
+  --color-maximum-blue-green: #2bcbba;
+  --color-turquoise-topaz: #0fb9b1;
+
+  /* ==========================================================================
+     Tokens Semânticos da Aplicação (Categorias Culturais)
+     ========================================================================== */
+  --color-category-cinema: var(--color-fusion-red);
+  --color-category-literatura: var(--color-orange-hibiscus);
+  --color-category-musica: var(--color-flirtatious);
+  --color-category-ensaios: var(--color-maximum-blue-green);
+  --color-category-artes: var(--color-reptile-green);
+
+  /* ==========================================================================
+     Tokens de Tema (Claro / Escuro)
+     ========================================================================== */
+  --color-bg: #fdfbf7;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f4efe6;
+  --color-text: #1a1a1a;
+  --color-text-muted: #666666;
+  --color-border: #e8e2d8;
+
+  --color-primary: var(--color-fusion-red);
+  --color-accent: var(--color-orange-hibiscus);
+  --color-highlight: var(--color-flirtatious);
+
+  /* Tipografia */
+  --font-serif: "Newsreader", "Merriweather", "Georgia", serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Espaçamentos & Layout */
+  --content-max-width: 780px;
+  --site-max-width: 1200px;
+}
+
+[data-theme="dark"] {
+  --color-bg: #0f1115;
+  --color-surface: #181b22;
+  --color-surface-hover: #222630;
+  --color-text: #f0f0f2;
+  --color-text-muted: #9ba1ad;
+  --color-border: #292e3b;
+
+  --color-primary: var(--color-fusion-red);
+  --color-accent: var(--color-orange-hibiscus);
+  --color-highlight: var(--color-flirtatious);
+}

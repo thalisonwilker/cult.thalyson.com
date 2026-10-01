@@ -18,7 +18,7 @@ alwaysApply: true
 - 2026-10-01: Conclusão do Kickoff (Lean Inception + 5 eixos técnicos) — [overview.md](architecture/overview.md)
 - 2026-10-01: [ADR-0002](architecture/adr/0002-tech-stack-astro-typescript.md) — Adoção do Astro (SSG) e TypeScript.
 - 2026-10-01: [ADR-0003](architecture/adr/0003-conteudo-local-content-collections.md) — Gestão de conteúdo local em Markdown/MDX com Content Collections.
-- 2026-10-01: [ADR-0004](architecture/adr/0004-design-system-vanilla-css-editorial.md) — Design System editorial em Vanilla CSS com Custom Properties e temas Dark/Light.
+- 2026-10-01: [ADR-0004](architecture/adr/0004-design-system-vanilla-css-editorial.md) — Design System editorial em Vanilla CSS atualizado com a paleta oficial de cores vibrantes (Fusion Red, Orange Hibiscus, Flirtatious, Reptile Green, Maximum Blue Green e variações) e tokens em `src/styles/tokens.css`.
 - 2026-10-01: [ADR-0005](architecture/adr/0005-infra-docker-flyio.md) — Infraestrutura e deploy conteinerizado via Docker no Fly.io.
 
 ## Bloqueios
