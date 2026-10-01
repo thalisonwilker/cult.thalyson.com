@@ -1,0 +1,21 @@
+# Build & Dist
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Logs & Cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment
+.env
+.env.production
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
