@@ -3,6 +3,7 @@ title: "A Geografia dos Labirintos e a Eternidade em Jorge Luis Borges"
 description: "Como o escritor argentino transformou a biblioteca, o espelho e o infinito nos tijolos metafísicos de sua ficção incomparável."
 pubDate: 2026-09-29
 category: "literatura"
+territory: "global"
 author: "Thalyson"
 tags: ["literatura", "borges", "labirinto", "metafisica"]
 draft: false

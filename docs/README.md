@@ -42,7 +42,8 @@ alwaysApply: false
 ## 📐 Specs — o contrato de cada feature
 > A pasta [`specs/`](../specs/) é a fonte viva das features do sistema.
 - [`specs/0001-exemplo-cota-de-uso/`](../specs/0001-exemplo-cota-de-uso/spec.md) — spec de referência/exemplo
-- [`specs/0002-fundacao-editorial-astro/`](../specs/0002-fundacao-editorial-astro/spec.md) — Fundação Editorial Astro, Design System & Content Collections (ativa)
+- [`specs/0002-fundacao-editorial-astro/`](../specs/0002-fundacao-editorial-astro/spec.md) — Fundação Editorial Astro, Design System & Content Collections (implementada)
+- [`specs/0003-portal-cultura-paraense/`](../specs/0003-portal-cultura-paraense/spec.md) — Portal & Home da Cultura Paraense e Belém (implementada)
 
 ## 📖 Linguagem & convenções
 - **Glossário** (linguagem ubíqua) → [glossary.md](glossary.md)

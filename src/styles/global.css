@@ -102,6 +102,14 @@ h1, h2, h3, h4, h5, h6 {
   border-left: 4px solid var(--color-category-artes);
 }
 
+.badge-category[data-category="patrimonio"] {
+  border-left: 4px solid var(--color-category-patrimonio);
+}
+
+.badge-category[data-category="gastronomia"] {
+  border-left: 4px solid var(--color-category-gastronomia);
+}
+
 /* Corpo de Leitura do Artigo */
 .prose {
   font-family: var(--font-serif);

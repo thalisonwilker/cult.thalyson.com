@@ -3,6 +3,7 @@ title: "O Tempo Esculpido: A Poética da Duração no Cinema de Tarkovsky"
 description: "Uma investigação sobre como Andrei Tarkovsky transformou o fluxo temporal em matéria cinematográfica viva, desafiando a montagem convencional."
 pubDate: 2026-09-28
 category: "cinema"
+territory: "global"
 author: "Thalyson"
 tags: ["cinema", "tarkovsky", "estetica", "filosofia"]
 draft: false

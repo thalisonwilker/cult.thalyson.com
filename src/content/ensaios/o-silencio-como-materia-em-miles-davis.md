@@ -3,6 +3,7 @@ title: "A Arquitetura do Silêncio em Kind of Blue de Miles Davis"
 description: "A revolução do jazz modal e a arte de tocar apenas as notas que realmente importam no clássico seminal de 1959."
 pubDate: 2026-10-01
 category: "musica"
+territory: "global"
 author: "Thalyson"
 tags: ["musica", "jazz", "miles-davis", "improvisacao"]
 draft: false

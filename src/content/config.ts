@@ -10,9 +10,19 @@ const ensaiosCollection = defineCollection({
       required_error: 'A descrição/lead do ensaio é obrigatória'
     }),
     pubDate: z.coerce.date(),
-    category: z.enum(['cinema', 'literatura', 'musica', 'ensaios', 'artes'], {
-      required_error: 'A categoria deve ser cinema, literatura, musica, ensaios ou artes'
+    category: z.enum([
+      'cinema',
+      'literatura',
+      'musica',
+      'ensaios',
+      'artes',
+      'patrimonio',
+      'gastronomia'
+    ], {
+      required_error: 'Categoria cultural inválida'
     }),
+    territory: z.enum(['para', 'nacional', 'global']).default('para'),
+    locality: z.string().optional(),
     author: z.string().default('Thalyson'),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),

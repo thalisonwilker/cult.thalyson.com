@@ -24,8 +24,16 @@ const categoryLabels: Record<string, string> = {
   cinema: 'Cinema',
   literatura: 'Literatura',
   musica: 'Música',
-  ensaios: 'Ensaios',
-  artes: 'Artes Visuais'
+  ensaios: 'Ensaios & Crítica',
+  artes: 'Artes Visuais',
+  patrimonio: 'Patrimônio Vivo',
+  gastronomia: 'Gastronomia & Saberes'
+};
+
+const territoryLabels: Record<string, string> = {
+  para: 'Cultura Paraense',
+  nacional: 'Arte Nacional',
+  global: 'Mundo'
 };
 ---
 
@@ -37,9 +45,17 @@ const categoryLabels: Record<string, string> = {
   <article class="essay-article">
     <header class="article-header">
       <div class="article-meta-top">
-        <a href={`/?categoria=${essay.data.category}`} class="badge-category" data-category={essay.data.category}>
-          {categoryLabels[essay.data.category] || essay.data.category}
-        </a>
+        <div class="badges-row">
+          <a href={`/?categoria=${essay.data.category}`} class="badge-category" data-category={essay.data.category}>
+            {categoryLabels[essay.data.category] || essay.data.category}
+          </a>
+          {essay.data.locality ? (
+            <span class="badge-locality">📍 {essay.data.locality}</span>
+          ) : (
+            <span class="badge-territory">{territoryLabels[essay.data.territory]}</span>
+          )}
+        </div>
+
         <span class="reading-meta">
           <time datetime={essay.data.pubDate.toISOString()}>
             {formatDate(essay.data.pubDate)}
@@ -78,7 +94,7 @@ const categoryLabels: Record<string, string> = {
     <footer class="article-footer">
       <div class="back-nav">
         <a href="/" class="back-link">
-          ← Voltar para todos os ensaios
+          ← Voltar para o acervo cultural
         </a>
       </div>
     </footer>
@@ -102,6 +118,34 @@ const categoryLabels: Record<string, string> = {
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
     gap: 0.75rem;
+  }
+
+  .badges-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .badge-locality {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-beniukon-bronze);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .badge-territory {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-sm);
   }
 
   .reading-meta {

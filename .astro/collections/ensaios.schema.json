@@ -33,8 +33,22 @@
             "literatura",
             "musica",
             "ensaios",
-            "artes"
+            "artes",
+            "patrimonio",
+            "gastronomia"
           ]
+        },
+        "territory": {
+          "type": "string",
+          "enum": [
+            "para",
+            "nacional",
+            "global"
+          ],
+          "default": "para"
+        },
+        "locality": {
+          "type": "string"
         },
         "author": {
           "type": "string",

@@ -9,10 +9,11 @@ interface Props {
 const { currentCategory } = Astro.props;
 
 const categories = [
+  { slug: 'musica', label: 'Música & Ritmos', color: 'var(--color-category-musica)' },
+  { slug: 'patrimonio', label: 'Círio & Patrimônio', color: 'var(--color-category-patrimonio)' },
   { slug: 'cinema', label: 'Cinema', color: 'var(--color-category-cinema)' },
   { slug: 'literatura', label: 'Literatura', color: 'var(--color-category-literatura)' },
-  { slug: 'musica', label: 'Música', color: 'var(--color-category-musica)' },
-  { slug: 'ensaios', label: 'Ensaios', color: 'var(--color-category-ensaios)' }
+  { slug: 'artes', label: 'Artes Visuais', color: 'var(--color-category-artes)' }
 ];
 ---
 
@@ -23,7 +24,7 @@ const categories = [
         <span class="brand-title">CULT</span>
         <span class="brand-domain">.thalyson.com</span>
       </a>
-      <span class="brand-tagline">Acervo & Curadoria Cultural</span>
+      <span class="brand-tagline">Cultura do Pará, Belém & Artes</span>
     </div>
 
     <div class="nav-wrapper">
