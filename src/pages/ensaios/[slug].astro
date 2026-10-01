@@ -85,6 +85,16 @@ const territoryLabels: Record<string, string> = {
           </div>
         )}
       </div>
+
+      {essay.data.coverImage && (
+        <div class="article-cover-wrapper">
+          <img
+            src={essay.data.coverImage}
+            alt={`Ilustração artística para o ensaio ${essay.data.title}`}
+            class="article-cover-img"
+          />
+        </div>
+      )}
     </header>
 
     <div class="article-divider"></div>
@@ -207,6 +217,23 @@ const territoryLabels: Record<string, string> = {
     background-color: var(--color-surface-hover);
     padding: 0.15rem 0.45rem;
     border-radius: var(--radius-sm);
+  }
+
+  .article-cover-wrapper {
+    margin-top: 2rem;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-artistic);
+    border: 2px solid var(--color-border);
+    background-color: var(--color-cosmic-night);
+  }
+
+  .article-cover-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
   }
 
   .article-divider {

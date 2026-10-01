@@ -7,6 +7,7 @@ territory: "para"
 locality: "Belém / Igarapé-Miri"
 author: "Thalyson"
 tags: ["carimbo", "dona-onete", "musica-paraense", "belem", "cultura-popular"]
+coverImage: "/images/carimbo-guitarrada-noite.jpg"
 draft: false
 ---
 

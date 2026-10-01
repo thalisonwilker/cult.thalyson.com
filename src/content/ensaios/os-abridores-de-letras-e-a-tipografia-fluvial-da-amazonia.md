@@ -7,6 +7,7 @@ territory: "para"
 locality: "Belém / Barcarena / Ilha das Onças"
 author: "Thalyson"
 tags: ["abridores-de-letras", "tipografia", "design-vernacular", "amazonia", "letras-que-flutuam"]
+coverImage: "/images/belem-noite-estrelada.jpg"
 draft: false
 ---
 
