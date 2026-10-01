@@ -1,0 +1,93 @@
+---
+// src/components/Footer.astro
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-manifesto">
+      <span class="manifesto-title">CULT</span>
+      <p class="manifesto-text">
+        Espaço dedicado à reflexão e curadoria crítica sobre cinema, literatura, música e artes visuais.
+        Publicações artesanais e perenes, construídas sem algoritmos de distração.
+      </p>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="copyright">
+        © {year} <strong>cult.thalyson.com</strong> — Criado com Spec-Driven Development (SDD) & Astro.
+      </p>
+      <div class="footer-links">
+        <a href="/" class="link">Início</a>
+        <a href="/?categoria=cinema" class="link">Cinema</a>
+        <a href="/?categoria=literatura" class="link">Literatura</a>
+        <a href="/?categoria=musica" class="link">Música</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    margin-top: auto;
+    padding: 3.5rem 1.5rem 2.5rem;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .footer-container {
+    max-width: var(--site-max-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .footer-manifesto {
+    max-width: 600px;
+  }
+
+  .manifesto-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--color-fusion-red);
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 0.6rem;
+  }
+
+  .manifesto-text {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--color-border);
+    padding-top: 1.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .link {
+    color: var(--color-text-muted);
+    transition: color 0.2s ease;
+  }
+
+  .link:hover {
+    color: var(--color-text);
+  }
+</style>

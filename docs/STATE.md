@@ -11,10 +11,11 @@ alwaysApply: true
 **Última atualização:** 2026-10-01 por Antigravity
 
 ## Em andamento / próximo passo
-- **Feature ativa:** [`specs/0002-fundacao-editorial-astro/`](../specs/0002-fundacao-editorial-astro/spec.md) — Fase de implementação das Tasks
-- **Próximo passo:** Executar a Task 1 (Setup inicial de dependências do Astro e TypeScript) e Task 2 (Design System e tipografia).
+- **Feature ativa:** [`specs/0002-fundacao-editorial-astro/`](../specs/0002-fundacao-editorial-astro/spec.md) — Implementada e validada (todos os gates verdes).
+- **Próximo passo:** Subir ambiente de desenvolvimento (`npm run dev`) ou avançar para as próximas features do roadmap (ex.: Feed RSS/Sitemap ou Container Docker/Deploy no Fly.io).
 
 ## Decisões recentes
+- 2026-10-01: Implementação completa da spec `0002-fundacao-editorial-astro` (Astro SSG, Design System Vanilla CSS com paleta vibrante e fontes Google Rye/Newsreader/Inter, Content Collections tipadas e rotas dinâmicas).
 - 2026-10-01: Conclusão do Kickoff (Lean Inception + 5 eixos técnicos) — [overview.md](architecture/overview.md)
 - 2026-10-01: [ADR-0002](architecture/adr/0002-tech-stack-astro-typescript.md) — Adoção do Astro (SSG) e TypeScript.
 - 2026-10-01: [ADR-0003](architecture/adr/0003-conteudo-local-content-collections.md) — Gestão de conteúdo local em Markdown/MDX com Content Collections.

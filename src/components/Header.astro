@@ -1,0 +1,175 @@
+---
+// src/components/Header.astro
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  currentCategory?: string;
+}
+
+const { currentCategory } = Astro.props;
+
+const categories = [
+  { slug: 'cinema', label: 'Cinema', color: 'var(--color-category-cinema)' },
+  { slug: 'literatura', label: 'Literatura', color: 'var(--color-category-literatura)' },
+  { slug: 'musica', label: 'Música', color: 'var(--color-category-musica)' },
+  { slug: 'ensaios', label: 'Ensaios', color: 'var(--color-category-ensaios)' }
+];
+---
+
+<header class="site-header">
+  <div class="header-container">
+    <div class="brand-section">
+      <a href="/" class="brand-link">
+        <span class="brand-title">CULT</span>
+        <span class="brand-domain">.thalyson.com</span>
+      </a>
+      <span class="brand-tagline">Acervo & Curadoria Cultural</span>
+    </div>
+
+    <div class="nav-wrapper">
+      <nav class="category-nav" aria-label="Navegação por categorias">
+        {categories.map((cat) => (
+          <a
+            href={`/?categoria=${cat.slug}`}
+            class={`nav-item ${currentCategory === cat.slug ? 'active' : ''}`}
+            data-category={cat.slug}
+          >
+            <span class="dot" style={`background-color: ${cat.color};`}></span>
+            {cat.label}
+          </a>
+        ))}
+      </nav>
+
+      <div class="header-actions">
+        <ThemeToggle />
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--color-header-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .header-container {
+    max-width: var(--site-max-width);
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .brand-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.2rem;
+    text-decoration: none;
+  }
+
+  .brand-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--color-fusion-red);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    text-shadow: 1px 1px 0px var(--color-beniukon-bronze);
+    transition: transform 0.2s ease;
+  }
+
+  .brand-link:hover .brand-title {
+    transform: scale(1.03);
+  }
+
+  .brand-domain {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  .brand-tagline {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+    margin-top: 0.2rem;
+  }
+
+  .nav-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .category-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-sm);
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    color: var(--color-text);
+    background-color: var(--color-surface-hover);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .header-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .nav-wrapper {
+      width: 100%;
+      justify-content: space-between;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .category-nav {
+      gap: 0.25rem;
+    }
+  }
+</style>

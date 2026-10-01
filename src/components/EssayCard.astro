@@ -1,0 +1,136 @@
+---
+// src/components/EssayCard.astro
+import { formatDate } from '../domain/reading-time';
+
+interface Props {
+  title: string;
+  description: string;
+  slug: string;
+  pubDate: Date | string;
+  category: 'cinema' | 'literatura' | 'musica' | 'ensaios' | 'artes';
+  readingTimeMinutes: number;
+  tags?: string[];
+}
+
+const { title, description, slug, pubDate, category, readingTimeMinutes, tags = [] } = Astro.props;
+
+const categoryLabels: Record<string, string> = {
+  cinema: 'Cinema',
+  literatura: 'Literatura',
+  musica: 'Música',
+  ensaios: 'Ensaios',
+  artes: 'Artes Visuais'
+};
+---
+
+<article class="essay-card" data-category={category}>
+  <div class="card-header">
+    <span class="badge-category" data-category={category}>
+      {categoryLabels[category] || category}
+    </span>
+    <span class="reading-meta">
+      <time datetime={typeof pubDate === 'string' ? pubDate : pubDate.toISOString()}>
+        {formatDate(pubDate)}
+      </time>
+      <span class="meta-separator">·</span>
+      <span>{readingTimeMinutes} min de leitura</span>
+    </span>
+  </div>
+
+  <h2 class="card-title">
+    <a href={`/ensaios/${slug}`} class="card-title-link">
+      {title}
+    </a>
+  </h2>
+
+  <p class="card-description">
+    {description}
+  </p>
+
+  {tags.length > 0 && (
+    <div class="card-tags">
+      {tags.map((tag) => (
+        <span class="tag">#{tag}</span>
+      ))}
+    </div>
+  )}
+</article>
+
+<style>
+  .essay-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .essay-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .reading-meta {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .meta-separator {
+    opacity: 0.6;
+  }
+
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+
+  .card-title-link {
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .card-title-link:hover {
+    color: var(--color-primary);
+  }
+
+  .card-description {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    background-color: var(--color-bg);
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-sm);
+  }
+</style>

@@ -1,0 +1,199 @@
+---
+// src/pages/ensaios/[slug].astro
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { calculateReadingTime, formatDate } from '../../domain/reading-time';
+
+export async function getStaticPaths() {
+  const ensaios = await getCollection('ensaios');
+  return ensaios.map((essay) => ({
+    params: { slug: essay.slug },
+    props: { essay }
+  }));
+}
+
+interface Props {
+  essay: CollectionEntry<'ensaios'>;
+}
+
+const { essay } = Astro.props;
+const { Content } = await essay.render();
+const readingTime = calculateReadingTime(essay.body);
+
+const categoryLabels: Record<string, string> = {
+  cinema: 'Cinema',
+  literatura: 'Literatura',
+  musica: 'Música',
+  ensaios: 'Ensaios',
+  artes: 'Artes Visuais'
+};
+---
+
+<BaseLayout
+  title={`${essay.data.title} — CULT`}
+  description={essay.data.description}
+  currentCategory={essay.data.category}
+>
+  <article class="essay-article">
+    <header class="article-header">
+      <div class="article-meta-top">
+        <a href={`/?categoria=${essay.data.category}`} class="badge-category" data-category={essay.data.category}>
+          {categoryLabels[essay.data.category] || essay.data.category}
+        </a>
+        <span class="reading-meta">
+          <time datetime={essay.data.pubDate.toISOString()}>
+            {formatDate(essay.data.pubDate)}
+          </time>
+          <span class="separator">·</span>
+          <span>{readingTime} min de leitura</span>
+        </span>
+      </div>
+
+      <h1 class="article-title">
+        {essay.data.title}
+      </h1>
+
+      <p class="article-lead">
+        {essay.data.description}
+      </p>
+
+      <div class="article-author-bar">
+        <span class="author-label">Por <strong>{essay.data.author}</strong></span>
+        {essay.data.tags.length > 0 && (
+          <div class="article-tags">
+            {essay.data.tags.map((tag) => (
+              <span class="tag">#{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <div class="article-divider"></div>
+
+    <div class="article-content prose">
+      <Content />
+    </div>
+
+    <footer class="article-footer">
+      <div class="back-nav">
+        <a href="/" class="back-link">
+          ← Voltar para todos os ensaios
+        </a>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .essay-article {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+  }
+
+  .article-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .article-meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .reading-meta {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .separator {
+    opacity: 0.6;
+  }
+
+  .article-title {
+    font-family: var(--font-serif);
+    font-size: 2.75rem;
+    line-height: 1.15;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  .article-lead {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin-bottom: 2rem;
+  }
+
+  .article-author-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .article-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    background-color: var(--color-surface-hover);
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .article-divider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 2rem 0 3rem;
+  }
+
+  .article-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .back-link {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
+
+  .back-link:hover {
+    transform: translateX(-3px);
+  }
+
+  @media (max-width: 768px) {
+    .article-title {
+      font-size: 2.1rem;
+    }
+    .article-lead {
+      font-size: 1.15rem;
+    }
+  }
+</style>
