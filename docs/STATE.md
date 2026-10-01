@@ -11,8 +11,8 @@ alwaysApply: true
 **Última atualização:** 2026-10-01 por Antigravity
 
 ## Em andamento / próximo passo
-- **Fase atual:** Kickoff concluído. Constituição do projeto e roadmap do MVP estabelecidos.
-- **Próximo passo:** Criar a primeira spec de implementação (`/nova-feature`) para o setup da estrutura base da aplicação (Astro + TypeScript + Design System Vanilla CSS e Content Collections).
+- **Feature ativa:** [`specs/0002-fundacao-editorial-astro/`](../specs/0002-fundacao-editorial-astro/spec.md) — Fase de implementação das Tasks
+- **Próximo passo:** Executar a Task 1 (Setup inicial de dependências do Astro e TypeScript) e Task 2 (Design System e tipografia).
 
 ## Decisões recentes
 - 2026-10-01: Conclusão do Kickoff (Lean Inception + 5 eixos técnicos) — [overview.md](architecture/overview.md)
