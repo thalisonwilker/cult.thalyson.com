@@ -5,6 +5,7 @@ const paraPillars = [
     title: 'Carimbó & Tradição',
     desc: 'O tambor curimbó, a ginga cabocla de Dona Onete e Mestre Verequete.',
     tag: 'Música',
+    icon: 'fa-solid fa-drum',
     color: 'var(--color-fusion-red)',
     link: '/ensaios/o-banzeiro-do-carimbo-e-a-voz-de-dona-onete'
   },
@@ -12,6 +13,7 @@ const paraPillars = [
     title: 'Guitarrada Elétrica',
     desc: 'O som amazônico das cordas de Mestre Vieira e o merengue das marés.',
     tag: 'Instrumental',
+    icon: 'fa-solid fa-guitar',
     color: 'var(--color-orange-hibiscus)',
     link: '/ensaios/mestre-vieira-e-a-invencao-da-guitarrada-eletrica'
   },
@@ -19,6 +21,7 @@ const paraPillars = [
     title: 'O Círio & O Sagrado',
     desc: 'Dois milhões de vozes sob as mangueiras, a corda e os brinquedos de miriti.',
     tag: 'Patrimônio',
+    icon: 'fa-solid fa-hands-praying',
     color: 'var(--color-flirtatious)',
     link: '/ensaios/o-cirio-de-nazare-e-a-estetica-do-sagrado-ribeirinho'
   },
@@ -26,6 +29,7 @@ const paraPillars = [
     title: 'Abridores de Letras',
     desc: 'A tipografia vernacular pintada nos barcos fluviais que cruzam o Guajará.',
     tag: 'Artes Visuais',
+    icon: 'fa-solid fa-paintbrush',
     color: 'var(--color-maximum-blue-green)',
     link: '/ensaios/os-abridores-de-letras-e-a-tipografia-fluvial-da-amazonia'
   }
@@ -35,7 +39,7 @@ const paraPillars = [
 <section class="para-hero">
   <div class="para-hero-header">
     <div class="location-badge">
-      <span class="flag-icon">🛶</span>
+      <i class="fa-solid fa-water location-icon" aria-hidden="true"></i>
       <span>Belém do Pará · Amazônia Atlântica</span>
     </div>
     <h1 class="para-hero-title">
@@ -49,10 +53,15 @@ const paraPillars = [
   <div class="pillars-grid">
     {paraPillars.map((pillar) => (
       <a href={pillar.link} class="pillar-card" style={`--accent-color: ${pillar.color};`}>
-        <div class="pillar-tag">{pillar.tag}</div>
+        <div class="pillar-header-row">
+          <div class="pillar-tag">{pillar.tag}</div>
+          <i class={`pillar-icon ${pillar.icon}`} aria-hidden="true"></i>
+        </div>
         <h3 class="pillar-title">{pillar.title}</h3>
         <p class="pillar-desc">{pillar.desc}</p>
-        <span class="pillar-link">Ler ensaio →</span>
+        <span class="pillar-link">
+          Ler ensaio <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </span>
       </a>
     ))}
   </div>
@@ -148,6 +157,24 @@ const paraPillars = [
     transform: translateY(-3px);
     border-color: var(--accent-color);
     box-shadow: var(--shadow-md);
+  }
+
+  .location-icon {
+    color: var(--color-beniukon-bronze);
+    font-size: 0.85rem;
+  }
+
+  .pillar-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .pillar-icon {
+    font-size: 0.95rem;
+    color: var(--accent-color);
+    opacity: 0.85;
   }
 
   .pillar-tag {

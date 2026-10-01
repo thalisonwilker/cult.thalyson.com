@@ -50,7 +50,9 @@ const territoryLabels: Record<string, string> = {
         {categoryLabels[category] || category}
       </span>
       {locality ? (
-        <span class="badge-locality">📍 {locality}</span>
+        <span class="badge-locality">
+          <i class="fa-solid fa-location-dot" aria-hidden="true"></i> {locality}
+        </span>
       ) : (
         <span class={`badge-territory badge-territory-${territory}`}>
           {territoryLabels[territory]}

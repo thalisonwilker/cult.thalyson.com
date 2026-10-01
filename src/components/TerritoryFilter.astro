@@ -8,10 +8,10 @@ interface Props {
 const { currentTerritory, currentCategory } = Astro.props;
 
 const territories = [
-  { id: 'all', label: 'Todo o Acervo', icon: '✦' },
-  { id: 'para', label: 'Cultura Paraense & Belém', icon: '🛶' },
-  { id: 'nacional', label: 'Arte Nacional', icon: '🇧🇷' },
-  { id: 'global', label: 'Mundo & Clássicos', icon: '🌍' }
+  { id: 'all', label: 'Todo o Acervo', icon: 'fa-solid fa-layer-group' },
+  { id: 'para', label: 'Cultura Paraense & Belém', icon: 'fa-solid fa-water' },
+  { id: 'nacional', label: 'Arte Nacional', icon: 'fa-solid fa-landmark' },
+  { id: 'global', label: 'Mundo & Clássicos', icon: 'fa-solid fa-earth-americas' }
 ];
 
 function buildUrl(territoryId: string) {
@@ -40,7 +40,7 @@ function buildUrl(territoryId: string) {
           href={buildUrl(t.id)}
           class={`tab-button ${isActive ? 'active' : ''} ${t.id === 'para' ? 'tab-para' : ''}`}
         >
-          <span class="tab-icon">{t.icon}</span>
+          <i class={`tab-icon ${t.icon}`} aria-hidden="true"></i>
           <span class="tab-text">{t.label}</span>
         </a>
       );

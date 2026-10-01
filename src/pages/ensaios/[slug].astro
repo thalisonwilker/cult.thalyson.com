@@ -50,7 +50,9 @@ const territoryLabels: Record<string, string> = {
             {categoryLabels[essay.data.category] || essay.data.category}
           </a>
           {essay.data.locality ? (
-            <span class="badge-locality">📍 {essay.data.locality}</span>
+            <span class="badge-locality">
+              <i class="fa-solid fa-location-dot" aria-hidden="true"></i> {essay.data.locality}
+            </span>
           ) : (
             <span class="badge-territory">{territoryLabels[essay.data.territory]}</span>
           )}
