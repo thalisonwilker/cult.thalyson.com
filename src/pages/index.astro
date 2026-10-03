@@ -2,8 +2,11 @@
 // src/pages/index.astro
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import EditorialHero from '../components/EditorialHero.astro';
+import FeaturedStories from '../components/FeaturedStories.astro';
+import CategoryNavigation from '../components/CategoryNavigation.astro';
+import ParaSection from '../components/ParaSection.astro';
 import EssayCard from '../components/EssayCard.astro';
-import ParaHighlightHero from '../components/ParaHighlightHero.astro';
 import TerritoryFilter from '../components/TerritoryFilter.astro';
 import { calculateReadingTime } from '../domain/reading-time';
 
@@ -11,13 +14,13 @@ const allEssays = await getCollection('ensaios', ({ data }) => {
   return import.meta.env.PROD ? !data.draft : true;
 });
 
-// Ordena por data de publicação decrescente
+// Ordena por data decrescente
 allEssays.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
 const currentCategory = Astro.url.searchParams.get('categoria') || undefined;
 const currentTerritory = Astro.url.searchParams.get('territorio') || undefined;
 
-// Filtragem combinada (território e categoria)
+// Filtragem
 const filteredEssays = allEssays.filter((essay) => {
   const matchCategory = currentCategory ? essay.data.category === currentCategory : true;
   const matchTerritory = currentTerritory && currentTerritory !== 'all'
@@ -26,107 +29,301 @@ const filteredEssays = allEssays.filter((essay) => {
   return matchCategory && matchTerritory;
 });
 
-// Separação em seções quando na visão padrão (sem filtro ativo)
-const isDefaultView = !currentCategory && (!currentTerritory || currentTerritory === 'all');
+const isFilterActive = Boolean(currentCategory || (currentTerritory && currentTerritory !== 'all'));
+
+// Seleção de histórias para os blocos da Home padrão
+const featuredPrimary = allEssays.find((e) => e.slug === 'o-banzeiro-do-carimbo-e-a-voz-de-dona-onete') || allEssays[0];
+const secondaryStories = allEssays.filter((e) => e.slug !== featuredPrimary.slug).slice(0, 3);
+const paraEssays = allEssays.filter((e) => e.data.territory === 'para');
 ---
 
 <BaseLayout
-  title="CULT — Acervo & Curadoria da Cultura do Pará, Belém e Artes"
-  description="Polo agregador de ensaios e curadoria sobre a música, cinema, literatura cabocla, Círio, gastronomia e tradições do Pará, em diálogo com o Brasil e o Mundo."
+  title="CULT — Compartilhando a Cultura do Pará, Belém & Artes"
+  description="Espaço pessoal para compartilhar a música, tradições, literatura cabocla, cinema e artes visuais do Pará e de Belém com o mundo."
   currentCategory={currentCategory}
+  fullBleed={!isFilterActive}
 >
-  <ParaHighlightHero />
+  {isFilterActive ? (
+    <section class="filtered-view-section">
+      <div class="filtered-header">
+        <div class="filtered-breadcrumbs">
+          <a href="/" class="crumb-link">Início</a>
+          <span class="crumb-divider">/</span>
+          <span class="crumb-current">
+            {currentCategory ? `Categoria: ${currentCategory}` : ''}
+            {currentCategory && currentTerritory ? ' · ' : ''}
+            {currentTerritory ? `Território: ${currentTerritory}` : ''}
+          </span>
+        </div>
 
-  <section class="feed-section">
-    <TerritoryFilter
-      currentTerritory={currentTerritory}
-      currentCategory={currentCategory}
-    />
+        <h1 class="filtered-title">
+          {currentTerritory === 'para' && 'Acervo do Pará & Belém'}
+          {currentTerritory === 'nacional' && 'Arte Nacional Contemporânea'}
+          {currentTerritory === 'global' && 'Mundo & Clássicos Universais'}
+          {currentCategory && !currentTerritory && `Vertente: ${currentCategory.toUpperCase()}`}
+        </h1>
 
-    <div class="feed-header">
-      <h2 class="feed-title">
-        {currentTerritory === 'para' && 'Acervo do Pará & Belém'}
-        {currentTerritory === 'nacional' && 'Arte & Cultura Nacional'}
-        {currentTerritory === 'global' && 'Mundo & Clássicos Universais'}
-        {isDefaultView && 'Todas as Publicações Recentes'}
-        {currentCategory && !currentTerritory && `Categoria: ${currentCategory}`}
-      </h2>
-      <span class="feed-count">
-        {filteredEssays.length} {filteredEssays.length === 1 ? 'ensaio' : 'ensaios'}
-      </span>
-    </div>
+        <span class="filtered-count">
+          {filteredEssays.length} {filteredEssays.length === 1 ? 'ensaio encontrado' : 'ensaios encontrados'}
+        </span>
+      </div>
 
-    {filteredEssays.length > 0 ? (
-      <div class="essays-grid">
-        {filteredEssays.map((essay) => (
-          <EssayCard
-            title={essay.data.title}
-            description={essay.data.description}
-            slug={essay.slug}
-            pubDate={essay.data.pubDate}
-            category={essay.data.category}
-            territory={essay.data.territory}
-            locality={essay.data.locality}
-            readingTimeMinutes={calculateReadingTime(essay.body)}
-            tags={essay.data.tags}
+      <TerritoryFilter
+        currentTerritory={currentTerritory}
+        currentCategory={currentCategory}
+      />
+
+      {filteredEssays.length > 0 ? (
+        <div class="editorial-cards-grid">
+          {filteredEssays.map((essay) => (
+            <EssayCard
+              title={essay.data.title}
+              description={essay.data.description}
+              slug={essay.slug}
+              pubDate={essay.data.pubDate}
+              category={essay.data.category}
+              territory={essay.data.territory}
+              locality={essay.data.locality}
+              readingTimeMinutes={calculateReadingTime(essay.body)}
+              coverImage={essay.data.coverImage}
+              coverImagePosition={essay.data.coverImagePosition}
+              tags={essay.data.tags}
+            />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state-editorial">
+          <i class="fa-solid fa-compass empty-icon" aria-hidden="true"></i>
+          <h2 class="empty-title">Nenhum ensaio localizado para estes filtros</h2>
+          <p class="empty-text">Experimente explorar outra vertente ou retorne ao acervo completo da revista.</p>
+          <a href="/" class="empty-action-btn">Ver todo o acervo</a>
+        </div>
+      )}
+    </section>
+  ) : (
+    <div class="magazine-home-layout">
+      {/* 1. Editorial Hero Cinematográfico Full-Width */}
+      <EditorialHero
+        headline="Belém entre arte, música e memória amazônica"
+        lead="Das margens caudalosas do Guajará aos acordes elétricos das periferias: um mergulho nas sonoridades, saberes ribeirinhos e vanguardas estéticas do Pará."
+        coverImage="/images/docas-belem-noite-estrelada.jpg"
+        ctaLink="#em-destaque"
+        ctaText="Explorar histórias"
+      />
+
+      <div class="site-container">
+        {/* 2. Bloco Em Destaque (Composição 2fr / 1fr) */}
+        <FeaturedStories
+          featured={featuredPrimary}
+          secondary={secondaryStories}
+        />
+
+        {/* 3. Bloco Explore a Cultura (Vertentes Editoriais) */}
+        <CategoryNavigation />
+
+        {/* 4. Bloco Temático Especial Belém & Pará */}
+        <ParaSection
+          paraEssays={paraEssays}
+        />
+
+        {/* 5. Bloco Últimas Histórias com Filtro Territorial */}
+        <section id="todas-historias" class="latest-stories-section" aria-label="Todas as Histórias Recentes">
+          <div class="section-header-editorial">
+            <div class="header-title-wrap">
+              <span class="section-tag-editorial">Arquivo Aberto</span>
+              <h2 class="section-title-editorial">Últimas Histórias</h2>
+            </div>
+            <span class="section-note">Crítica &amp; Ensaios</span>
+          </div>
+
+          <TerritoryFilter
+            currentTerritory={currentTerritory}
+            currentCategory={currentCategory}
           />
-        ))}
+
+          <div class="editorial-cards-grid">
+            {allEssays.map((essay) => (
+              <EssayCard
+                title={essay.data.title}
+                description={essay.data.description}
+                slug={essay.slug}
+                pubDate={essay.data.pubDate}
+                category={essay.data.category}
+                territory={essay.data.territory}
+                locality={essay.data.locality}
+                readingTimeMinutes={calculateReadingTime(essay.body)}
+                coverImage={essay.data.coverImage}
+                coverImagePosition={essay.data.coverImagePosition}
+                tags={essay.data.tags}
+              />
+            ))}
+          </div>
+        </section>
       </div>
-    ) : (
-      <div class="empty-state">
-        <p>Nenhum ensaio encontrado para os filtros selecionados.</p>
-        <a href="/" class="empty-link">Ver todo o acervo</a>
-      </div>
-    )}
-  </section>
+    </div>
+  )}
 </BaseLayout>
 
 <style>
-  .feed-section {
+  /* ============================================================
+     Layout Geral da Revista Contemporânea
+     Espaçamento sistemático entre seções (80px - 100px)
+     ============================================================ */
+  .magazine-home-layout {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    width: 100%;
   }
 
-  .feed-header {
+  .site-container {
+    max-width: var(--site-max-width);
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .latest-stories-section {
+    margin-bottom: var(--space-24);
+  }
+
+  .header-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .section-note {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--color-cult-text-dim);
+  }
+
+  /* Grid dos Cards Editoriais */
+  .editorial-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-6);
+  }
+
+  /* ============================================================
+     Visualização Filtrada
+     ============================================================ */
+  .filtered-view-section {
+    padding-top: var(--space-8);
+    margin-bottom: var(--space-24);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .filtered-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
     border-bottom: 1px solid var(--color-border);
-    padding-bottom: 0.75rem;
+    padding-bottom: var(--space-6);
   }
 
-  .feed-title {
+  .filtered-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--color-cult-text-dim);
+  }
+
+  .crumb-link {
+    color: var(--color-cult-turquoise);
+    text-decoration: none;
+  }
+
+  .crumb-link:hover {
+    color: var(--color-cult-text);
+  }
+
+  .crumb-divider {
+    color: var(--color-cult-border-strong);
+  }
+
+  .filtered-title {
     font-family: var(--font-serif);
-    font-size: 1.6rem;
+    font-size: clamp(1.8rem, 3.2vw, 2.5rem);
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--color-cult-text);
   }
 
-  .feed-count {
+  .filtered-count {
     font-family: var(--font-sans);
     font-size: 0.85rem;
-    color: var(--color-text-muted);
+    color: var(--color-cult-text-muted);
   }
 
-  .essays-grid {
+  /* Empty State Editorial */
+  .empty-state-editorial {
+    padding: var(--space-16) var(--space-8);
+    text-align: center;
+    background-color: var(--color-cult-surface);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    align-items: center;
+    gap: var(--space-3);
   }
 
-  .empty-state {
-    padding: 4rem 2rem;
-    text-align: center;
-    background-color: var(--color-surface);
-    border: 1px dashed var(--color-border);
-    border-radius: var(--radius-md);
+  .empty-icon {
+    font-size: 2.5rem;
+    color: var(--color-cult-turquoise);
+    margin-bottom: var(--space-2);
   }
 
-  .empty-link {
-    display: inline-block;
-    margin-top: 1rem;
+  .empty-title {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    color: var(--color-cult-text);
+  }
+
+  .empty-text {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--color-cult-text-muted);
+    max-width: 480px;
+  }
+
+  .empty-action-btn {
+    display: inline-flex;
+    align-items: center;
+    margin-top: var(--space-4);
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
     font-weight: 600;
-    color: var(--color-primary);
+    color: #FFFFFF;
+    background-color: var(--color-cult-coral);
+    padding: 0.6rem 1.4rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+  }
+
+  .empty-action-btn:hover {
+    background-color: var(--color-cult-orange);
+  }
+
+  /* ============================================================
+     Responsividade
+     ============================================================ */
+  @media (max-width: 768px) {
+    .editorial-cards-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    .magazine-home-layout {
+      gap: var(--space-4);
+    }
   }
 </style>

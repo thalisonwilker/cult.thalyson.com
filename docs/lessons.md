@@ -30,7 +30,8 @@ alwaysApply: false
 > Formato: `- <YYYY-MM-DD> · <área/arquivo> · o gotcha em 1 linha · como evitar/mitigar`.
 > Mantenha acionável e curto. Se não é acionável, não é uma lição — é desabafo.
 
-- <YYYY-MM-DD> · <área> · <o que mordeu> · <como não morder de novo>
+- 2026-10-02 · Astro SSG / Editor Dev · Em projetos Astro com `output: 'static'`, endpoints `.ts` em `src/pages/api/` descartam streams de request POST/query params no dev server · Usar plugin Vite com `configureServer` e `server.ssrLoadModule` como middleware nativo Connect, garantindo streams Node HTTP íntegros em dev e zero código residual no build estático de produção.
+- 2026-10-02 · Astro Content Layer / File Lock · Dois processos concorrentes de dev ou build acessando `.astro` geram conflito atômico em `data-store.json.tmp` resultando em `UnknownFilesystemError` (ENOENT no `fs.rename`) · Manter apenas uma instância ativa de `astro dev` e rodar `npx astro sync` caso haja corrupção transitória.
 
 ## Promovidas (histórico curto)
 > Rastro de para onde foram as lições podadas — só o link, sem reexplicar. Poda este histórico também.

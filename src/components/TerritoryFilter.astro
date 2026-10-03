@@ -23,106 +23,119 @@ function buildUrl(territoryId: string) {
     params.set('categoria', currentCategory);
   }
   const qs = params.toString();
-  return qs ? `/?${qs}` : '/';
+  return qs ? `/?${qs}#todas-historias` : '/#todas-historias';
 }
 ---
 
-<div class="territory-filter">
-  <div class="filter-header">
-    <span class="filter-label">Filtro por Escopo Cultural:</span>
+<div class="territory-filter-bar">
+  <div class="filter-lead">
+    <span class="filter-label">Escopo Territorial:</span>
   </div>
 
-  <div class="tabs-container">
+  <nav class="territory-pills" aria-label="Filtrar ensaios por território">
     {territories.map((t) => {
       const isActive = (currentTerritory === t.id) || (!currentTerritory && t.id === 'all');
       return (
         <a
           href={buildUrl(t.id)}
-          class={`tab-button ${isActive ? 'active' : ''} ${t.id === 'para' ? 'tab-para' : ''}`}
+          class={`territory-pill ${isActive ? 'active' : ''} ${t.id === 'para' ? 'pill-para' : ''}`}
+          aria-current={isActive ? 'true' : undefined}
         >
-          <i class={`tab-icon ${t.icon}`} aria-hidden="true"></i>
-          <span class="tab-text">{t.label}</span>
+          <i class={`pill-icon ${t.icon}`} aria-hidden="true"></i>
+          <span>{t.label}</span>
         </a>
       );
     })}
-  </div>
+  </nav>
 </div>
 
 <style>
-  .territory-filter {
+  .territory-filter-bar {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-cult-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
   }
 
-  .filter-header {
+  .filter-lead {
     display: flex;
     align-items: center;
   }
 
   .filter-label {
     font-family: var(--font-sans);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--color-text-muted);
+    letter-spacing: 0.1em;
+    color: var(--color-cult-text-dim);
   }
 
-  .tabs-container {
+  .territory-pills {
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: var(--space-2);
     flex-wrap: wrap;
-    background-color: var(--color-surface);
-    padding: 0.35rem;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
   }
 
-  .tab-button {
+  .territory-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.5rem 0.9rem;
-    border-radius: var(--radius-sm);
     font-family: var(--font-sans);
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-weight: 500;
-    color: var(--color-text-muted);
+    color: var(--color-cult-text-muted);
     text-decoration: none;
-    transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
   }
 
-  .tab-button:hover {
-    color: var(--color-text);
-    background-color: var(--color-surface-hover);
+  .territory-pill:hover {
+    color: var(--color-cult-text);
+    background-color: var(--color-cult-surface-hover);
   }
 
-  .tab-button.active {
-    background-color: var(--color-bg);
-    color: var(--color-text);
+  .territory-pill.active {
+    background-color: var(--color-cult-surface-raised);
+    color: var(--color-cult-text);
+    border-color: var(--color-border-strong);
     font-weight: 600;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border);
   }
 
-  .tab-button.tab-para.active {
-    border-color: var(--color-orange-hibiscus);
-    color: var(--color-beniukon-bronze);
+  .territory-pill.pill-para.active {
+    border-color: var(--color-cult-turquoise);
+    color: var(--color-cult-turquoise);
   }
 
-  .tab-icon {
-    font-size: 0.95rem;
+  .pill-icon {
+    font-size: 0.8rem;
   }
 
   @media (max-width: 768px) {
-    .tabs-container {
+    .territory-filter-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3);
+    }
+
+    .territory-pills {
       overflow-x: auto;
       flex-wrap: nowrap;
-      padding-bottom: 0.5rem;
+      width: 100%;
+      padding-bottom: 0.2rem;
     }
-    .tab-button {
+
+    .territory-pill {
       white-space: nowrap;
     }
   }

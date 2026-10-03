@@ -18,20 +18,31 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  overflow-x: hidden;
+}
+
+/* Acessibilidade — Foco Visível Elegante */
+:focus-visible {
+  outline: 2px solid var(--color-cult-turquoise);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
 }
 
 /* Links */
 a {
   color: inherit;
   text-decoration: none;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition: color var(--transition-fast), opacity var(--transition-fast);
 }
 
 /* Imagens */
@@ -41,16 +52,33 @@ img, picture, video, canvas, svg {
   height: auto;
 }
 
-/* Tipografia Editorial */
+/* Tipografia Editorial com Fraunces & Clamp */
 h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
   color: var(--color-text);
-  line-height: 1.25;
+  line-height: 1.18;
   font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+}
+
+h3 {
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+}
+
+h4 {
+  font-size: 1.1rem;
 }
 
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: 0.04em;
 }
 
 .font-serif {
@@ -65,84 +93,145 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-mono);
 }
 
-/* Categorias Badges */
+.font-vernacular {
+  font-family: var(--font-vernacular);
+}
+
+/* Assinatura Visual Discreta */
+.signature-bar {
+  height: 3px;
+  width: 100%;
+  background: var(--gradient-cult-signature);
+  opacity: 0.9;
+}
+
+/* Section Header Editorial */
+.section-header-editorial {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-3);
+  position: relative;
+}
+
+.section-header-editorial::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 48px;
+  height: 2px;
+  background: var(--gradient-cult-signature);
+}
+
+.section-title-editorial {
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.section-tag-editorial {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-cult-turquoise);
+}
+
+/* Categorias Badges Sutis */
 .badge-category {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-1);
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.55rem;
   border-radius: var(--radius-sm);
-  background-color: var(--color-surface);
+  background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--color-border);
-  color: var(--color-text);
-  transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.badge-category[data-category="cinema"] {
-  border-left: 4px solid var(--color-category-cinema);
-}
-
-.badge-category[data-category="literatura"] {
-  border-left: 4px solid var(--color-category-literatura);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
 }
 
 .badge-category[data-category="musica"] {
-  border-left: 4px solid var(--color-category-musica);
-}
-
-.badge-category[data-category="ensaios"] {
-  border-left: 4px solid var(--color-category-ensaios);
-}
-
-.badge-category[data-category="artes"] {
-  border-left: 4px solid var(--color-category-artes);
+  border-left: 3px solid var(--color-cult-gold);
 }
 
 .badge-category[data-category="patrimonio"] {
-  border-left: 4px solid var(--color-category-patrimonio);
+  border-left: 3px solid var(--color-cult-coral);
 }
 
-.badge-category[data-category="gastronomia"] {
-  border-left: 4px solid var(--color-category-gastronomia);
+.badge-category[data-category="cinema"] {
+  border-left: 3px solid var(--color-cult-orange);
 }
 
-/* Corpo de Leitura do Artigo */
+.badge-category[data-category="literatura"] {
+  border-left: 3px solid var(--color-cult-turquoise);
+}
+
+.badge-category[data-category="artes"] {
+  border-left: 3px solid var(--color-cult-cobalt);
+}
+
+/* Badges de Localidade */
+.badge-locality {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-text-dim);
+}
+
+.badge-locality i {
+  color: var(--color-cult-turquoise);
+  font-size: 0.75rem;
+}
+
+/* Corpo de Leitura do Artigo (Prose) */
 .prose {
   font-family: var(--font-serif);
-  font-size: 1.2rem;
-  line-height: 1.85;
+  font-size: 1.15rem;
+  line-height: 1.8;
   color: var(--color-text);
   max-width: var(--content-max-width);
   margin: 0 auto;
 }
 
 .prose p {
-  margin-bottom: 1.75rem;
+  margin-bottom: var(--space-6);
+  max-width: var(--reading-line-length);
 }
 
 .prose h2 {
-  font-family: var(--font-sans);
-  font-size: 1.8rem;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-4);
   letter-spacing: -0.01em;
 }
 
 .prose h3 {
-  font-family: var(--font-sans);
-  font-size: 1.4rem;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-3);
 }
 
 .prose blockquote {
-  border-left: 4px solid var(--color-primary);
-  padding-left: 1.25rem;
-  margin: 2rem 0;
+  border-left: 3px solid var(--color-cult-coral);
+  padding-left: var(--space-4);
+  margin: var(--space-8) 0;
   font-style: italic;
   color: var(--color-text-muted);
 }
@@ -150,14 +239,14 @@ h1, h2, h3, h4, h5, h6 {
 .prose hr {
   border: none;
   border-top: 1px solid var(--color-border);
-  margin: 3rem 0;
+  margin: var(--space-12) 0;
 }
 
 .prose ul, .prose ol {
-  margin: 1.5rem 0;
-  padding-left: 1.5rem;
+  margin: var(--space-6) 0;
+  padding-left: var(--space-6);
 }
 
 .prose li {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
 }

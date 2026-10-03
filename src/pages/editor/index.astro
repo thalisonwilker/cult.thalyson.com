@@ -1,0 +1,1743 @@
+---
+// ============================================================
+// EDITOR DE CONTEÚDO LOCAL — DEV ONLY (AC-1, AC-2)
+// Esta rota não é emitida no build de produção graças ao
+// guard abaixo. O Astro SSG (output: 'static') não emite
+// rotas que retornam Response 404 durante a build.
+// ============================================================
+import '../../styles/tokens.css';
+import '../../styles/editor.css';
+
+import initialCategories from '../../data/categories.json';
+
+// Guard de ambiente: retorna 404 em build/produção
+if (!import.meta.env.DEV) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const categories = initialCategories;
+
+const territories = [
+  { value: 'para', label: 'Pará & Belém' },
+  { value: 'nacional', label: 'Nacional' },
+  { value: 'global', label: 'Global' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor de Conteúdo — cult.thalyson.com [DEV]</title>
+  <!-- marked.js para preview de Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+  <!-- DOMPurify para sanitizar o HTML do preview -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+</head>
+<body>
+<div class="editor-root">
+
+  <!-- =====================================================================
+       HEADER
+       ===================================================================== -->
+  <header class="editor-header">
+    <div class="editor-header-brand">
+      <span class="editor-header-badge">DEV ONLY</span>
+      <span class="editor-header-title">Editor de Conteúdo</span>
+      <div class="editor-header-divider" aria-hidden="true"></div>
+      <a href="/admin/" class="editor-header-back-btn" title="Ir para o Painel Administrativo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Painel Admin</span>
+      </a>
+    </div>
+
+    <!-- Indicador de Modo (Nova Publicação vs Editando) -->
+    <div class="editor-header-mode-container">
+      <span id="editor-header-mode-badge" class="editor-header-mode-badge new">Nova Publicação</span>
+      <span id="editor-editing-indicator" class="editor-editing-badge" style="display:none;"></span>
+    </div>
+
+    <div class="editor-header-actions">
+      <button id="btn-delete-local" class="btn btn-danger" style="display:none;" title="Excluir esta publicação do disco local">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        <span>Excluir</span>
+      </button>
+      <button id="btn-save-local" class="btn btn-success" title="Salvar diretamente em src/content/ensaios/">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        <span id="btn-save-label">Salvar Publicação</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       LAYOUT PRINCIPAL: FORMULÁRIO | PREVIEW
+       ===================================================================== -->
+  <main class="editor-main">
+
+    <!-- =================================================================
+         PAINEL ESQUERDO — Formulário
+         ================================================================= -->
+    <section class="editor-form-panel" aria-label="Formulário de conteúdo">
+
+      <!-- Feedback global -->
+      <div id="feedback-global" class="editor-feedback editor-feedback-error" role="alert" aria-live="polite">
+        <svg class="editor-feedback-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="feedback-text"></span>
+      </div>
+
+      <!-- ------------------------------------------------------------------
+           SEÇÃO 1: Metadados da Publicação
+           ------------------------------------------------------------------ -->
+      <div class="editor-section">
+        <h2 class="editor-section-title">Metadados</h2>
+
+        <!-- Título -->
+        <div class="editor-field">
+          <label class="editor-label" for="field-title">
+            Título <span class="required">*</span>
+          </label>
+          <input
+            id="field-title"
+            class="editor-input"
+            type="text"
+            placeholder="O título principal da publicação…"
+            autocomplete="off"
+            spellcheck="true"
+            lang="pt"
+          />
+        </div>
+
+        <!-- Descrição / Lead -->
+        <div class="editor-field">
+          <label class="editor-label" for="field-description">
+            Lead / Descrição <span class="required">*</span>
+          </label>
+          <textarea
+            id="field-description"
+            class="editor-textarea"
+            rows="3"
+            placeholder="Um parágrafo introdutório que resume a publicação e convida à leitura…"
+            spellcheck="true"
+            lang="pt"
+            style="min-height: 80px; resize: vertical;"
+          ></textarea>
+        </div>
+
+        <!-- Categoria + Território -->
+        <div class="editor-field-row">
+          <div class="editor-field">
+            <div class="editor-label-header">
+              <label class="editor-label" for="field-category">
+                Categoria <span class="required">*</span>
+              </label>
+              <a
+                href="/admin/#categories"
+                target="_blank"
+                class="editor-text-btn"
+                title="Gerenciar categorias no painel administrativo"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <span>Gerenciar Categorias ↗</span>
+              </a>
+            </div>
+            <select id="field-category" class="editor-select">
+              <option value="">Selecionar…</option>
+              {categories.map(cat => (
+                <option value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
+          </div>
+          <div class="editor-field">
+            <label class="editor-label" for="field-territory">
+              Território
+            </label>
+            <select id="field-territory" class="editor-select">
+              {territories.map(t => (
+                <option value={t.value}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <!-- Localidade + Autor -->
+        <div class="editor-field-row">
+          <div class="editor-field">
+            <label class="editor-label" for="field-locality">
+              Localidade
+            </label>
+            <input
+              id="field-locality"
+              class="editor-input"
+              type="text"
+              placeholder="Ex: Belém, Pará"
+              autocomplete="off"
+            />
+          </div>
+          <div class="editor-field">
+            <label class="editor-label" for="field-author">
+              Autor
+            </label>
+            <input
+              id="field-author"
+              class="editor-input"
+              type="text"
+              value="Thalyson"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <!-- Data de Publicação (Automática - AC-10) -->
+        <div class="editor-field">
+          <label class="editor-label">Data de Publicação</label>
+          <div class="editor-auto-date-card">
+            <div class="editor-auto-date-info">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span id="display-pubdate">Automática </span>
+            </div>
+            </div>
+          <input id="field-pubdate" type="hidden" />
+        </div>
+
+        <!-- Tags -->
+        <div class="editor-field">
+          <label class="editor-label">Tags</label>
+          <div class="editor-tags-wrapper" id="tags-wrapper" role="group" aria-label="Tags da publicação">
+            <input
+              id="tags-input"
+              class="editor-tags-input"
+              type="text"
+              placeholder="Digite uma tag e pressione Enter…"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <!-- Draft -->
+        <div class="editor-field" style="flex-direction: row; align-items: center; gap: var(--space-3);">
+          <input id="field-draft" type="checkbox" style="width: 16px; height: 16px; accent-color: var(--color-cult-cobalt); cursor: pointer;" />
+          <label class="editor-label" for="field-draft" style="cursor: pointer; margin: 0;">
+            Marcar como rascunho (draft: true)
+          </label>
+        </div>
+      </div>
+
+      <!-- ------------------------------------------------------------------
+           SEÇÃO 2: Imagem em Destaque
+           ------------------------------------------------------------------ -->
+      <div class="editor-section">
+        <h2 class="editor-section-title">Imagem em Destaque</h2>
+
+        <div class="editor-image-upload">
+          <!-- Preview da imagem selecionada -->
+          <div class="editor-image-preview" id="image-preview">
+            <div class="editor-image-preview-header">
+              <div class="editor-image-name" id="image-preview-name"></div>
+              <div class="editor-image-actions">
+                <button class="editor-image-btn edit" id="btn-open-crop" type="button" title="Ajustar enquadramento e corte">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+                  <span>Ajustar Corte / Posição</span>
+                </button>
+                <button class="editor-image-btn remove" id="btn-remove-image" type="button" title="Remover imagem">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  <span>Remover</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Moldura 16:9 que reflete o enquadramento real -->
+            <div class="editor-image-frame" id="image-frame-container">
+              <img id="image-preview-img" src="" alt="Preview da imagem de destaque" />
+              <div class="image-frame-badge">Formato 16:9</div>
+            </div>
+
+            <!-- Barra de Ajuste Rápido de Enquadramento Vertical -->
+            <div class="editor-image-quick-controls">
+              <div class="quick-controls-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M12 2l4 4M12 2L8 6M12 22l4-4M12 22l-4-4"/></svg>
+                <span>Enquadramento Vertical:</span>
+              </div>
+              <div class="quick-pos-presets">
+                <button type="button" class="btn-pos-preset" data-pos-y="0">Topo (0%)</button>
+                <button type="button" class="btn-pos-preset active" data-pos-y="50">Centro (50%)</button>
+                <button type="button" class="btn-pos-preset" data-pos-y="100">Base (100%)</button>
+              </div>
+              <div class="quick-slider-wrapper">
+                <input
+                  type="range"
+                  id="slider-quick-pos-y"
+                  class="quick-pos-slider"
+                  min="0"
+                  max="100"
+                  value="50"
+                  step="1"
+                  aria-label="Posicionamento vertical da imagem"
+                />
+                <span class="quick-pos-val" id="text-quick-pos-y">50%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dropzone (visível quando não há imagem) -->
+          <div class="editor-image-dropzone" id="image-dropzone">
+            <span class="editor-image-dropzone-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </span>
+            <p class="editor-image-dropzone-text">
+              <strong>Clique para selecionar</strong> ou arraste a imagem aqui
+            </p>
+            <p class="editor-image-dropzone-hint">JPG, PNG, WebP ou AVIF · Máx. 5 MB</p>
+            <input
+              id="field-cover-image"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              aria-label="Selecionar imagem em destaque"
+            />
+          </div>
+        </div>
+
+        <!-- Campos auxiliares de caminho e posição -->
+        <div class="editor-field-row" style="display: flex; gap: var(--space-4); margin-top: var(--space-2); flex-wrap: wrap;">
+          <div class="editor-field" style="flex: 2; min-width: 200px;">
+            <label class="editor-label" for="field-cover-path">
+              Caminho da imagem (preenchido automaticamente)
+            </label>
+            <input
+              id="field-cover-path"
+              class="editor-input"
+              type="text"
+              placeholder="/images/nome-do-arquivo.jpg"
+              readonly
+              style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-text-dim);"
+            />
+          </div>
+          <div class="editor-field" style="flex: 1; min-width: 140px;">
+            <label class="editor-label" for="field-cover-position">
+              Posição Focal (CSS)
+            </label>
+            <input
+              id="field-cover-position"
+              class="editor-input"
+              type="text"
+              placeholder="50% 50%"
+              readonly
+              style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-text-dim);"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- ------------------------------------------------------------------
+           SEÇÃO 3: Corpo da Publicação
+           ------------------------------------------------------------------ -->
+      <div class="editor-section">
+        <h2 class="editor-section-title">Corpo da Publicação</h2>
+
+        <!-- Toolbar de atalhos Markdown -->
+        <div class="editor-toolbar" role="toolbar" aria-label="Atalhos de formatação Markdown">
+          <button class="editor-toolbar-btn" data-action="bold" type="button" title="Negrito (Ctrl+B)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 15.5H10v-3h3.5a1.5 1.5 0 010 3zm-3.5-9h3a1.5 1.5 0 010 3H10V6.5zM5 18V6h5.5a4 4 0 013.167 6.5A4 4 0 0113.5 18H5z"/></svg>
+            Bold
+          </button>
+          <button class="editor-toolbar-btn" data-action="italic" type="button" title="Itálico (Ctrl+I)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4v3h2.21l-3.42 10H6v3h8v-3h-2.21l3.42-10H18V4z"/></svg>
+            Italic
+          </button>
+          <button class="editor-toolbar-btn" data-action="h2" type="button">
+            H2
+          </button>
+          <button class="editor-toolbar-btn" data-action="h3" type="button">
+            H3
+          </button>
+          <button class="editor-toolbar-btn" data-action="quote" type="button" title="Bloco de citação">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            Quote
+          </button>
+          <button class="editor-toolbar-btn" data-action="code" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            Code
+          </button>
+          <button class="editor-toolbar-btn" data-action="ul" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            Lista
+          </button>
+          <button class="editor-toolbar-btn" data-action="hr" type="button">
+            — Divisor
+          </button>
+          <button class="editor-toolbar-btn" data-action="link" id="btn-insert-link" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            Inserir Link
+          </button>
+        </div>
+
+        <!-- Textarea do corpo -->
+        <div class="editor-field">
+          <textarea
+            id="field-body"
+            class="editor-textarea editor-textarea-body"
+            placeholder="Escreva a publicação em Markdown…
+
+## Exemplo de subtítulo
+
+Parágrafo com **negrito**, *itálico* e [links](https://exemplo.com).
+
+> Uma citação inspiradora do autor ou tema abordado.
+
+---
+
+Continua o texto aqui..."
+            spellcheck="true"
+            lang="pt"
+          ></textarea>
+          <div class="editor-char-count" id="char-count">0 caracteres</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =================================================================
+         PAINEL DIREITO — Preview em Tempo Real
+         ================================================================= -->
+    <section class="editor-preview-panel" aria-label="Preview do conteúdo">
+
+      <div class="editor-preview-label">Preview em tempo real</div>
+
+      <!-- Cover da preview -->
+      <img id="preview-cover" class="editor-preview-cover" src="" alt="Imagem de destaque" />
+
+      <!-- Meta badges -->
+      <div class="editor-preview-meta" id="preview-meta" style="display:none;">
+        <span id="preview-badge-category" class="editor-preview-badge"></span>
+        <span id="preview-badge-territory" class="editor-preview-badge"></span>
+        <span id="preview-badge-author" class="editor-preview-badge"></span>
+        <span id="preview-badge-date" class="editor-preview-badge"></span>
+      </div>
+
+      <!-- Conteúdo renderizado -->
+      <div id="preview-content" class="editor-preview-content">
+        <div class="editor-preview-empty">
+          <span class="editor-preview-empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+          </span>
+          <span>O preview aparece aqui enquanto você escreve.</span>
+        </div>
+      </div>
+
+      <!-- Frontmatter gerado -->
+      <div class="editor-output-section" id="output-section" style="display:none;">
+        <div class="editor-output-label">Frontmatter gerado</div>
+        <div class="editor-output-code" id="output-frontmatter"></div>
+      </div>
+
+    </section>
+  </main>
+
+</div>
+
+<!-- =====================================================================
+     DIALOG DE INSERÇÃO DE LINK (AC-5)
+     ===================================================================== -->
+<div class="editor-dialog-overlay" id="link-dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="link-dialog-title">
+  <div class="editor-dialog">
+    <div class="editor-dialog-title" id="link-dialog-title">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+      Inserir Link
+    </div>
+    <div class="editor-field">
+      <label class="editor-label" for="link-text">Texto do link</label>
+      <input id="link-text" class="editor-input" type="text" placeholder="Texto que será exibido" />
+    </div>
+    <div class="editor-field">
+      <label class="editor-label" for="link-url">URL</label>
+      <input id="link-url" class="editor-input" type="url" placeholder="https://exemplo.com" />
+    </div>
+    <div class="editor-dialog-actions">
+      <button class="btn btn-ghost" id="btn-cancel-link" type="button">Cancelar</button>
+      <button class="btn btn-primary" id="btn-confirm-link" type="button">Inserir</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+
+
+<!-- =====================================================================
+     DIALOG DE CONFIRMAÇÃO DE EXCLUSÃO (AC-13)
+     ===================================================================== -->
+<div class="editor-dialog-overlay" id="delete-dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+  <div class="editor-dialog">
+    <div class="editor-dialog-title" id="delete-dialog-title" style="color: var(--color-cult-coral);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      Excluir Publicação
+    </div>
+    <p class="editor-dialog-description">
+      Tem certeza de que deseja excluir a publicação <strong id="delete-dialog-target-title"></strong>?
+    </p>
+    <p class="editor-dialog-description" style="font-size: 0.82rem; color: var(--color-text-muted);">
+      Esta ação removerá permanentemente o arquivo correspondente em <code id="delete-dialog-target-path">src/content/ensaios/</code> do disco local.
+    </p>
+    <div class="editor-dialog-actions">
+      <button class="btn btn-ghost" id="btn-cancel-delete" type="button">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirm-delete" type="button">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     DIALOG DE CORTE E ENQUADRAMENTO DE IMAGEM
+     ===================================================================== -->
+<div class="editor-dialog-overlay" id="crop-dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="crop-dialog-title">
+  <div class="editor-dialog editor-dialog-crop">
+    <div class="editor-dialog-title" id="crop-dialog-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+      Ajustar Enquadramento e Corte da Imagem
+    </div>
+    <p class="editor-dialog-description">
+      Enquadre a área principal na proporção editorial de <strong>16:9</strong>. Arraste a imagem ou ajuste os controles abaixo.
+    </p>
+
+    <!-- Área de Enquadramento Interativo -->
+    <div class="crop-viewport-container">
+      <div class="crop-viewport" id="crop-viewport">
+        <img id="crop-source-img" src="" alt="Imagem para recorte" draggable="false" />
+        <div class="crop-grid-overlay" aria-hidden="true">
+          <div class="crop-grid-line h1"></div>
+          <div class="crop-grid-line h2"></div>
+          <div class="crop-grid-line v1"></div>
+          <div class="crop-grid-line v2"></div>
+        </div>
+        <div class="crop-ratio-badge">16 : 9 (Capa Editorial)</div>
+      </div>
+      <div class="crop-drag-hint">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+        <span>Clique e arraste a imagem para reposicionar livremente</span>
+      </div>
+    </div>
+
+    <!-- Controles do Modal -->
+    <div class="crop-controls-grid">
+      <!-- Posição Vertical -->
+      <div class="crop-control-group">
+        <div class="crop-control-header">
+          <label for="crop-slider-y">Posicionamento Vertical (Y)</label>
+          <span class="crop-control-val" id="crop-val-y">50%</span>
+        </div>
+        <input type="range" id="crop-slider-y" min="0" max="100" value="50" step="1" />
+        <div class="crop-preset-buttons">
+          <button type="button" class="btn-crop-preset" data-crop-y="0">Topo (0%)</button>
+          <button type="button" class="btn-crop-preset active" data-crop-y="50">Centro (50%)</button>
+          <button type="button" class="btn-crop-preset" data-crop-y="100">Base (100%)</button>
+        </div>
+      </div>
+
+      <!-- Zoom / Escala -->
+      <div class="crop-control-group">
+        <div class="crop-control-header">
+          <label for="crop-slider-zoom">Zoom / Escala</label>
+          <span class="crop-control-val" id="crop-val-zoom">1.0x</span>
+        </div>
+        <input type="range" id="crop-slider-zoom" min="100" max="250" value="100" step="5" />
+        <div class="crop-preset-buttons">
+          <button type="button" class="btn-crop-zoom active" data-zoom="100">1x (Original)</button>
+          <button type="button" class="btn-crop-zoom" data-zoom="125">1.25x</button>
+          <button type="button" class="btn-crop-zoom" data-zoom="160">1.6x</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-dialog-actions" style="margin-top: var(--space-4); justify-content: space-between; flex-wrap: wrap; gap: var(--space-2);">
+      <button class="btn btn-ghost" id="btn-cancel-crop" type="button">Cancelar</button>
+      <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+        <button class="btn btn-secondary" id="btn-apply-focal" type="button" title="Aplica o ponto focal sem reprocessar o arquivo">
+          Aplicar Enquadramento
+        </button>
+        <button class="btn btn-primary" id="btn-save-crop-file" type="button" title="Gera um arquivo cortado em 16:9 de alta resolução">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+          Recortar & Salvar Imagem
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     TOAST DE FEEDBACK
+     ===================================================================== -->
+<div class="editor-toast" id="toast" role="status" aria-live="polite">
+  <span class="editor-toast-icon">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </span>
+  <span id="toast-text"></span>
+</div>
+
+<!-- =====================================================================
+     SCRIPTS CLIENT-SIDE
+     ===================================================================== -->
+<script is:inline>
+// ============================================================
+// ESTADO CENTRAL DO EDITOR
+// ============================================================
+const state = {
+  currentSlug: null,
+  originalSlug: null,
+  pubDate: '',
+  categories: [],
+  tags: [],
+  coverImageFile: null,
+  coverImagePath: '',
+  coverImagePosition: '50% 50%',
+  bodySelection: { start: 0, end: 0 }
+};
+
+// ============================================================
+// UTILITÁRIOS
+// ============================================================
+
+function getTodayDate() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatDisplayDate(isoStr) {
+  if (!isoStr) return '';
+  const parts = isoStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return isoStr;
+}
+
+function updatePubDateDisplay() {
+  const display = document.getElementById('display-pubdate');
+  const hidden = document.getElementById('field-pubdate');
+  if (!state.pubDate) {
+    state.pubDate = getTodayDate();
+  }
+  if (hidden) hidden.value = state.pubDate;
+  if (display) {
+    const isToday = state.pubDate === getTodayDate();
+    display.textContent = `${formatDisplayDate(state.pubDate)}${isToday ? ' (hoje)' : ''}`;
+  }
+}
+
+/** Mostra um toast temporário */
+function showToast(msg, duration = 2500) {
+  const toast = /** @type {HTMLElement} */ (document.getElementById('toast'));
+  const toastText = document.getElementById('toast-text');
+  if (!toast || !toastText) return;
+  toastText.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+/** Exibe ou oculta o feedback global */
+function showFeedback(msg, type = 'error') {
+  const fb = /** @type {HTMLElement} */ (document.getElementById('feedback-global'));
+  const ft = document.getElementById('feedback-text');
+  if (!fb || !ft) return;
+  ft.textContent = msg;
+  fb.className = `editor-feedback editor-feedback-${type} visible`;
+}
+
+function clearFeedback() {
+  const fb = /** @type {HTMLElement} */ (document.getElementById('feedback-global'));
+  if (fb) fb.className = 'editor-feedback editor-feedback-error';
+}
+
+/** Retorna o valor de um input por ID */
+function getVal(id) {
+  const el = /** @type {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} */ (document.getElementById(id));
+  return el ? el.value.trim() : '';
+}
+
+/** Define o valor de um input por ID */
+function setVal(id, value) {
+  const el = /** @type {HTMLInputElement|HTMLTextAreaElement} */ (document.getElementById(id));
+  if (el) el.value = value;
+}
+
+// ============================================================
+// PERSISTÊNCIA — localStorage (AC-8)
+// ============================================================
+const STORAGE_KEY = 'cult_editor_draft_v1';
+
+function saveDraft() {
+  const draft = {
+    title: getVal('field-title'),
+    description: getVal('field-description'),
+    category: getVal('field-category'),
+    territory: getVal('field-territory'),
+    locality: getVal('field-locality'),
+    author: getVal('field-author'),
+    pubdate: getVal('field-pubdate'),
+    tags: [...state.tags],
+    body: getVal('field-body'),
+    draft: (/** @type {HTMLInputElement} */ (document.getElementById('field-draft')))?.checked || false,
+    coverPath: state.coverImagePath,
+    coverPosition: state.coverImagePosition,
+  };
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+  } catch (e) {
+    // localStorage indisponível — silencioso
+  }
+}
+
+function restoreDraft() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const draft = JSON.parse(raw);
+    setVal('field-title', draft.title || '');
+    setVal('field-description', draft.description || '');
+    setVal('field-category', draft.category || '');
+    setVal('field-territory', draft.territory || 'para');
+    setVal('field-locality', draft.locality || '');
+    setVal('field-author', draft.author || 'Thalyson');
+    setVal('field-pubdate', draft.pubdate || '');
+    setVal('field-body', draft.body || '');
+    const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
+    if (draftCheck) draftCheck.checked = draft.draft || false;
+    // Restaurar tags
+    state.tags = draft.tags || [];
+    renderTags();
+    // Restaurar caminho e posição de imagem
+    if (draft.coverPath) {
+      state.coverImagePath = draft.coverPath;
+      setVal('field-cover-path', draft.coverPath);
+      applyImagePosition(draft.coverPosition || '50% 50%');
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function clearDraft() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+// Salva rascunho automaticamente com debounce
+let saveTimer;
+function debouncedSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveDraft, 800);
+}
+
+// ============================================================
+// TAGS (AC-3)
+// ============================================================
+function renderTags() {
+  const wrapper = document.getElementById('tags-wrapper');
+  const input = document.getElementById('tags-input');
+  if (!wrapper || !input) return;
+
+  // Remove tags antigas, preserva o input
+  wrapper.querySelectorAll('.editor-tag').forEach(t => t.remove());
+
+  state.tags.forEach((tag, i) => {
+    const span = document.createElement('span');
+    span.className = 'editor-tag';
+    span.innerHTML = `${tag} <button class="editor-tag-remove" data-idx="${i}" type="button" aria-label="Remover tag ${tag}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>`;
+    wrapper.insertBefore(span, input);
+  });
+
+  // Listener para remover tag
+  wrapper.querySelectorAll('.editor-tag-remove').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt((/** @type {HTMLElement} */ (e.currentTarget)).dataset.idx || '0');
+      state.tags.splice(idx, 1);
+      renderTags();
+      debouncedSave();
+    });
+  });
+}
+
+document.getElementById('tags-wrapper')?.addEventListener('click', () => {
+  document.getElementById('tags-input')?.focus();
+});
+
+document.getElementById('tags-input')?.addEventListener('keydown', (e) => {
+  const input = /** @type {HTMLInputElement} */ (e.target);
+  if ((e.key === 'Enter' || e.key === ',') && input.value.trim()) {
+    e.preventDefault();
+    const tag = input.value.trim().replace(/,/g, '').toLowerCase();
+    if (tag && !state.tags.includes(tag)) {
+      state.tags.push(tag);
+      renderTags();
+      debouncedSave();
+    }
+    input.value = '';
+  }
+  if (e.key === 'Backspace' && !input.value && state.tags.length > 0) {
+    state.tags.pop();
+    renderTags();
+    debouncedSave();
+  }
+});
+
+// ============================================================
+// UPLOAD, ENQUADRAMENTO E CORTE DE IMAGEM (AC-4, AC-8)
+// ============================================================
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+function applyImagePosition(pos) {
+  state.coverImagePosition = pos || '50% 50%';
+  setVal('field-cover-position', state.coverImagePosition);
+  const img = /** @type {HTMLImageElement} */ (document.getElementById('image-preview-img'));
+  const previewCover = /** @type {HTMLImageElement} */ (document.getElementById('preview-cover'));
+  if (img) img.style.objectPosition = state.coverImagePosition;
+  if (previewCover) previewCover.style.objectPosition = state.coverImagePosition;
+
+  // Sincroniza slider e presets rápidos
+  let yVal = 50;
+  const match = state.coverImagePosition.match(/(\d+)%/g);
+  if (match && match.length >= 2) {
+    yVal = parseInt(match[1], 10);
+  } else if (match && match.length === 1) {
+    yVal = parseInt(match[0], 10);
+  } else if (state.coverImagePosition.includes('top')) {
+    yVal = 0;
+  } else if (state.coverImagePosition.includes('bottom')) {
+    yVal = 100;
+  }
+
+  const slider = /** @type {HTMLInputElement} */ (document.getElementById('slider-quick-pos-y'));
+  const textVal = document.getElementById('text-quick-pos-y');
+  if (slider) slider.value = String(yVal);
+  if (textVal) textVal.textContent = `${yVal}%`;
+
+  document.querySelectorAll('.btn-pos-preset').forEach(btn => {
+    const btnY = parseInt(btn.getAttribute('data-pos-y') || '50', 10);
+    btn.classList.toggle('active', btnY === yVal);
+  });
+}
+
+function setExistingImagePreview(imagePath, imagePosition) {
+  if (!imagePath) return;
+  state.coverImagePath = imagePath;
+  setVal('field-cover-path', imagePath);
+  applyImagePosition(imagePosition || '50% 50%');
+
+  const img = /** @type {HTMLImageElement} */ (document.getElementById('image-preview-img'));
+  const name = document.getElementById('image-preview-name');
+  const preview = document.getElementById('image-preview');
+  const dropzone = document.getElementById('image-dropzone');
+  const previewCover = /** @type {HTMLImageElement} */ (document.getElementById('preview-cover'));
+
+  if (img) img.src = imagePath;
+  const filename = imagePath.split('/').pop() || imagePath;
+  if (name) name.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> <span>${filename}</span>`;
+  if (preview) preview.classList.add('active');
+  if (dropzone) {
+    dropzone.style.display = 'none';
+    dropzone.classList.add('hidden');
+  }
+  if (previewCover) {
+    previewCover.src = imagePath;
+    previewCover.classList.add('active');
+  }
+}
+
+function setImagePreview(file) {
+  if (file.size > MAX_IMAGE_SIZE) {
+    showFeedback('Imagem muito grande (máx. 5 MB). Escolha outro arquivo.', 'error');
+    return;
+  }
+  clearFeedback();
+  state.coverImageFile = file;
+  const safeName = file.name.replace(/\s+/g, '-').toLowerCase();
+  state.coverImagePath = `/images/${safeName}`;
+  setVal('field-cover-path', state.coverImagePath);
+
+  // Upload local automático para public/images/ via dev server
+  fetch('/api/editor/upload-image', {
+    method: 'POST',
+    headers: { 'x-filename': encodeURIComponent(file.name) },
+    body: file
+  }).then(r => r.json()).then(res => {
+    if (res && res.path) {
+      state.coverImagePath = res.path;
+      setVal('field-cover-path', res.path);
+      debouncedSave();
+    }
+  }).catch(() => {});
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = String(e.target?.result || '');
+    const img = /** @type {HTMLImageElement} */ (document.getElementById('image-preview-img'));
+    const name = document.getElementById('image-preview-name');
+    const preview = document.getElementById('image-preview');
+    const dropzone = document.getElementById('image-dropzone');
+    const previewCover = /** @type {HTMLImageElement} */ (document.getElementById('preview-cover'));
+
+    applyImagePosition('50% 50%');
+    if (img) img.src = dataUrl;
+    if (name) name.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> <span>${file.name} · ${(file.size / 1024).toFixed(0)} KB</span>`;
+    if (preview) preview.classList.add('active');
+    if (dropzone) {
+      dropzone.style.display = 'none';
+      dropzone.classList.add('hidden');
+    }
+    if (previewCover) {
+      previewCover.src = dataUrl;
+      previewCover.classList.add('active');
+    }
+    updatePreview();
+    debouncedSave();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  state.coverImageFile = null;
+  state.coverImagePath = '';
+  state.coverImagePosition = '50% 50%';
+  setVal('field-cover-path', '');
+  setVal('field-cover-position', '');
+  setVal('field-cover-image', '');
+
+  const preview = document.getElementById('image-preview');
+  const dropzone = document.getElementById('image-dropzone');
+  const previewCover = /** @type {HTMLImageElement} */ (document.getElementById('preview-cover'));
+
+  if (preview) preview.classList.remove('active');
+  if (dropzone) {
+    dropzone.style.display = '';
+    dropzone.classList.remove('hidden');
+  }
+  if (previewCover) {
+    previewCover.src = '';
+    previewCover.classList.remove('active');
+  }
+  updatePreview();
+  debouncedSave();
+}
+
+document.getElementById('field-cover-image')?.addEventListener('change', (e) => {
+  const input = /** @type {HTMLInputElement} */ (e.target);
+  const file = input.files?.[0];
+  if (file) setImagePreview(file);
+});
+
+document.getElementById('btn-remove-image')?.addEventListener('click', removeImage);
+
+// Controles rápidos de posição
+document.getElementById('slider-quick-pos-y')?.addEventListener('input', (e) => {
+  const val = (/** @type {HTMLInputElement} */ (e.target)).value;
+  applyImagePosition(`50% ${val}%`);
+  updatePreview();
+  debouncedSave();
+});
+
+document.querySelectorAll('.btn-pos-preset').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const val = btn.getAttribute('data-pos-y') || '50';
+    applyImagePosition(`50% ${val}%`);
+    updatePreview();
+    debouncedSave();
+  });
+});
+
+// ============================================================
+// MODAL DE CORTE E ENQUADRAMENTO DA IMAGEM
+// ============================================================
+const cropState = {
+  posX: 50,
+  posY: 50,
+  zoom: 100,
+  isDragging: false,
+  dragStartX: 0,
+  dragStartY: 0,
+  initialPosX: 50,
+  initialPosY: 50
+};
+
+function updateCropView() {
+  const cropImg = /** @type {HTMLImageElement} */ (document.getElementById('crop-source-img'));
+  const sliderY = /** @type {HTMLInputElement} */ (document.getElementById('crop-slider-y'));
+  const sliderZoom = /** @type {HTMLInputElement} */ (document.getElementById('crop-slider-zoom'));
+  const valY = document.getElementById('crop-val-y');
+  const valZoom = document.getElementById('crop-val-zoom');
+
+  if (sliderY) sliderY.value = String(cropState.posY);
+  if (sliderZoom) sliderZoom.value = String(cropState.zoom);
+  if (valY) valY.textContent = `${cropState.posY}%`;
+  if (valZoom) valZoom.textContent = `${(cropState.zoom / 100).toFixed(1)}x`;
+
+  if (cropImg) {
+    cropImg.style.objectPosition = `${cropState.posX}% ${cropState.posY}%`;
+    cropImg.style.transform = `scale(${cropState.zoom / 100})`;
+  }
+
+  document.querySelectorAll('.btn-crop-preset').forEach(btn => {
+    const pY = parseInt(btn.getAttribute('data-crop-y') || '50', 10);
+    btn.classList.toggle('active', pY === cropState.posY);
+  });
+
+  document.querySelectorAll('.btn-crop-zoom').forEach(btn => {
+    const pZ = parseInt(btn.getAttribute('data-zoom') || '100', 10);
+    btn.classList.toggle('active', pZ === cropState.zoom);
+  });
+}
+
+function openCropModal() {
+  const overlay = document.getElementById('crop-dialog-overlay');
+  const cropImg = /** @type {HTMLImageElement} */ (document.getElementById('crop-source-img'));
+  const previewImg = /** @type {HTMLImageElement} */ (document.getElementById('image-preview-img'));
+  if (!previewImg || !previewImg.src || !overlay || !cropImg) return;
+
+  cropImg.src = previewImg.src;
+
+  let curY = 50;
+  const match = state.coverImagePosition.match(/(\d+)%/g);
+  if (match && match.length >= 2) {
+    curY = parseInt(match[1], 10);
+  } else if (match && match.length === 1) {
+    curY = parseInt(match[0], 10);
+  } else if (state.coverImagePosition.includes('top')) {
+    curY = 0;
+  } else if (state.coverImagePosition.includes('bottom')) {
+    curY = 100;
+  }
+
+  cropState.posX = 50;
+  cropState.posY = curY;
+  cropState.zoom = 100;
+
+  updateCropView();
+  overlay.classList.add('open');
+}
+
+function closeCropModal() {
+  document.getElementById('crop-dialog-overlay')?.classList.remove('open');
+}
+
+document.getElementById('btn-open-crop')?.addEventListener('click', openCropModal);
+document.getElementById('btn-cancel-crop')?.addEventListener('click', closeCropModal);
+document.getElementById('crop-dialog-overlay')?.addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeCropModal();
+});
+
+// Controles deslizantes do modal de corte
+document.getElementById('crop-slider-y')?.addEventListener('input', (e) => {
+  cropState.posY = parseInt((/** @type {HTMLInputElement} */ (e.target)).value, 10);
+  updateCropView();
+});
+
+document.getElementById('crop-slider-zoom')?.addEventListener('input', (e) => {
+  cropState.zoom = parseInt((/** @type {HTMLInputElement} */ (e.target)).value, 10);
+  updateCropView();
+});
+
+document.querySelectorAll('.btn-crop-preset').forEach(btn => {
+  btn.addEventListener('click', () => {
+    cropState.posY = parseInt(btn.getAttribute('data-crop-y') || '50', 10);
+    updateCropView();
+  });
+});
+
+document.querySelectorAll('.btn-crop-zoom').forEach(btn => {
+  btn.addEventListener('click', () => {
+    cropState.zoom = parseInt(btn.getAttribute('data-zoom') || '100', 10);
+    updateCropView();
+  });
+});
+
+// Arraste para reposicionar no viewport
+const cropViewport = document.getElementById('crop-viewport');
+function startDrag(clientX, clientY) {
+  cropState.isDragging = true;
+  cropState.dragStartX = clientX;
+  cropState.dragStartY = clientY;
+  cropState.initialPosX = cropState.posX;
+  cropState.initialPosY = cropState.posY;
+  cropViewport?.classList.add('grabbing');
+}
+
+function moveDrag(clientX, clientY) {
+  if (!cropState.isDragging || !cropViewport) return;
+  const dx = clientX - cropState.dragStartX;
+  const dy = clientY - cropState.dragStartY;
+  const rect = cropViewport.getBoundingClientRect();
+  const scale = cropState.zoom / 100;
+
+  const percentDeltaX = (dx / (rect.width * scale)) * 100;
+  const percentDeltaY = (dy / (rect.height * scale)) * 100;
+
+  cropState.posX = Math.max(0, Math.min(100, Math.round(cropState.initialPosX - percentDeltaX)));
+  cropState.posY = Math.max(0, Math.min(100, Math.round(cropState.initialPosY - percentDeltaY)));
+  updateCropView();
+}
+
+function endDrag() {
+  if (cropState.isDragging) {
+    cropState.isDragging = false;
+    cropViewport?.classList.remove('grabbing');
+  }
+}
+
+cropViewport?.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+window.addEventListener('mouseup', endDrag);
+
+cropViewport?.addEventListener('touchstart', (e) => {
+  if (e.touches && e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+window.addEventListener('touchmove', (e) => {
+  if (e.touches && e.touches.length === 1) moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+window.addEventListener('touchend', endDrag);
+
+// Botão 1: Aplicar Enquadramento (sem alterar arquivo)
+document.getElementById('btn-apply-focal')?.addEventListener('click', () => {
+  applyImagePosition(`50% ${cropState.posY}%`);
+  closeCropModal();
+  updatePreview();
+  debouncedSave();
+  showToast('Enquadramento e posição focal aplicados com sucesso!');
+});
+
+// Botão 2: Recortar Imagem em 16:9 de Alta Definição e Salvar Arquivo
+document.getElementById('btn-save-crop-file')?.addEventListener('click', async () => {
+  const cropImg = /** @type {HTMLImageElement} */ (document.getElementById('crop-source-img'));
+  if (!cropImg || !cropImg.src) return;
+
+  const btn = /** @type {HTMLButtonElement} */ (document.getElementById('btn-save-crop-file'));
+  const originalHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Recortando…';
+  }
+
+  try {
+    const fullImg = new Image();
+    fullImg.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      fullImg.onload = resolve;
+      fullImg.onerror = reject;
+      fullImg.src = cropImg.src;
+    });
+
+    const nw = fullImg.naturalWidth;
+    const nh = fullImg.naturalHeight;
+    const targetAspect = 16 / 9;
+    const imgAspect = nw / nh;
+    const zoom = cropState.zoom / 100;
+
+    let cropWidth, cropHeight;
+    if (imgAspect > targetAspect) {
+      cropHeight = nh / zoom;
+      cropWidth = cropHeight * targetAspect;
+    } else {
+      cropWidth = nw / zoom;
+      cropHeight = cropWidth / targetAspect;
+    }
+
+    const maxSx = Math.max(0, nw - cropWidth);
+    const maxSy = Math.max(0, nh - cropHeight);
+    const sx = maxSx * (cropState.posX / 100);
+    const sy = maxSy * (cropState.posY / 100);
+
+    const outWidth = Math.min(1920, Math.max(1280, Math.round(cropWidth)));
+    const outHeight = Math.round(outWidth / targetAspect);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = outWidth;
+    canvas.height = outHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Não foi possível inicializar canvas 2D.');
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(fullImg, sx, sy, cropWidth, cropHeight, 0, 0, outWidth, outHeight);
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+    if (!blob) throw new Error('Falha ao exportar recorte da imagem.');
+
+    const curPath = state.coverImagePath || 'imagem.jpg';
+    const rawName = curPath.split('/').pop()?.replace(/\.[^.]+$/, '') || 'imagem';
+    const cleanName = rawName.replace(/-corte-\d+$/, '');
+    const newFileName = `${cleanName}-corte-${Date.now().toString().slice(-4)}.jpg`;
+
+    const res = await fetch('/api/editor/upload-image', {
+      method: 'POST',
+      headers: { 'x-filename': encodeURIComponent(newFileName) },
+      body: blob
+    });
+    const data = await res.json();
+    if (!data.ok || !data.path) {
+      throw new Error(data.error || 'Erro no upload da imagem recortada.');
+    }
+
+    setExistingImagePreview(data.path, '50% 50%');
+    closeCropModal();
+    updatePreview();
+    debouncedSave();
+    showToast(`Imagem recortada em 16:9 e salva em ${data.path}!`);
+  } catch (err) {
+    showToast(`Erro ao recortar: ${err.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+    }
+  }
+});
+
+// Drag & Drop
+const dropzone = document.getElementById('image-dropzone');
+dropzone?.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropzone.classList.add('drag-over');
+});
+dropzone?.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+dropzone?.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('drag-over');
+  const file = e.dataTransfer?.files?.[0];
+  if (file && file.type.startsWith('image/')) setImagePreview(file);
+});
+
+// ============================================================
+// TOOLBAR DE FORMATAÇÃO (AC-5)
+// ============================================================
+function insertAtCursor(textarea, before, after = '') {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selected = textarea.value.substring(start, end);
+  const newText = before + (selected || 'texto') + after;
+  textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+  // Reposiciona o cursor
+  const newStart = start + before.length;
+  const newEnd = newStart + (selected || 'texto').length;
+  textarea.setSelectionRange(newStart, newEnd);
+  textarea.focus();
+  updatePreview();
+  debouncedSave();
+}
+
+function insertLinePrefix(textarea, prefix) {
+  const start = textarea.selectionStart;
+  const lineStart = textarea.value.lastIndexOf('\n', start - 1) + 1;
+  const before = textarea.value.substring(0, lineStart);
+  const after = textarea.value.substring(lineStart);
+  textarea.value = before + prefix + after;
+  const newPos = lineStart + prefix.length;
+  textarea.setSelectionRange(newPos, newPos);
+  textarea.focus();
+  updatePreview();
+  debouncedSave();
+}
+
+document.querySelectorAll('.editor-toolbar-btn[data-action]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const textarea = /** @type {HTMLTextAreaElement} */ (document.getElementById('field-body'));
+    if (!textarea) return;
+    const action = btn.getAttribute('data-action');
+    switch (action) {
+      case 'bold':   insertAtCursor(textarea, '**', '**'); break;
+      case 'italic': insertAtCursor(textarea, '_', '_'); break;
+      case 'h2':     insertLinePrefix(textarea, '## '); break;
+      case 'h3':     insertLinePrefix(textarea, '### '); break;
+      case 'quote':  insertLinePrefix(textarea, '> '); break;
+      case 'code':   insertAtCursor(textarea, '`', '`'); break;
+      case 'ul':     insertLinePrefix(textarea, '- '); break;
+      case 'hr':
+        const curPos = textarea.selectionStart;
+        const ins = '\n\n---\n\n';
+        textarea.value = textarea.value.substring(0, curPos) + ins + textarea.value.substring(curPos);
+        textarea.setSelectionRange(curPos + ins.length, curPos + ins.length);
+        textarea.focus();
+        updatePreview();
+        debouncedSave();
+        break;
+      case 'link':
+        openLinkDialog();
+        break;
+    }
+  });
+});
+
+// ============================================================
+// DIALOG DE LINK (AC-5)
+// ============================================================
+let linkInsertTarget = 0;
+let linkInsertEnd = 0;
+
+function openLinkDialog() {
+  const textarea = /** @type {HTMLTextAreaElement} */ (document.getElementById('field-body'));
+  if (textarea) {
+    linkInsertTarget = textarea.selectionStart;
+    linkInsertEnd = textarea.selectionEnd;
+    const selected = textarea.value.substring(linkInsertTarget, linkInsertEnd);
+    setVal('link-text', selected || '');
+    setVal('link-url', '');
+  }
+  const overlay = document.getElementById('link-dialog-overlay');
+  if (overlay) overlay.classList.add('open');
+  document.getElementById('link-text')?.focus();
+}
+
+function closeLinkDialog() {
+  const overlay = document.getElementById('link-dialog-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+document.getElementById('btn-cancel-link')?.addEventListener('click', closeLinkDialog);
+document.getElementById('link-dialog-overlay')?.addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeLinkDialog();
+});
+// Também abre via toolbar
+document.getElementById('btn-insert-link')?.addEventListener('click', openLinkDialog);
+
+document.getElementById('btn-confirm-link')?.addEventListener('click', () => {
+  const text = getVal('link-text') || 'link';
+  const url = getVal('link-url') || '#';
+  const textarea = /** @type {HTMLTextAreaElement} */ (document.getElementById('field-body'));
+  if (textarea) {
+    const markdown = `[${text}](${url})`;
+    textarea.value =
+      textarea.value.substring(0, linkInsertTarget) +
+      markdown +
+      textarea.value.substring(linkInsertEnd);
+    const newPos = linkInsertTarget + markdown.length;
+    textarea.setSelectionRange(newPos, newPos);
+    textarea.focus();
+    updatePreview();
+    debouncedSave();
+  }
+  closeLinkDialog();
+});
+
+// ============================================================
+// PREVIEW EM TEMPO REAL (AC-7)
+// ============================================================
+let previewTimer;
+
+function updatePreview() {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => {
+    const title = getVal('field-title');
+    const body = getVal('field-body');
+    const category = getVal('field-category');
+    const territory = getVal('field-territory');
+    const author = getVal('field-author') || 'Thalyson';
+    const pubdate = getVal('field-pubdate');
+
+    const previewContent = document.getElementById('preview-content');
+    const previewMeta = /** @type {HTMLElement} */ (document.getElementById('preview-meta'));
+    const outputSection = /** @type {HTMLElement} */ (document.getElementById('output-section'));
+    const outputFrontmatter = document.getElementById('output-frontmatter');
+
+    // Atualizar contador de caracteres
+    const charCount = document.getElementById('char-count');
+    if (charCount) charCount.textContent = `${body.length.toLocaleString('pt-BR')} caracteres`;
+
+    // Atualizar meta badges
+    if (previewMeta) {
+      if (category || territory || author || pubdate) {
+        previewMeta.style.display = 'flex';
+        const catBadge = document.getElementById('preview-badge-category');
+        const terBadge = document.getElementById('preview-badge-territory');
+        const autBadge = document.getElementById('preview-badge-author');
+        const datBadge = document.getElementById('preview-badge-date');
+        const ICONS = {
+          category: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
+          territory: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+          author: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>',
+          date: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+        };
+        if (catBadge) {
+          catBadge.style.display = category ? 'inline-flex' : 'none';
+          catBadge.innerHTML = category ? `${ICONS.category}<span>${category}</span>` : '';
+        }
+        if (terBadge) {
+          terBadge.style.display = territory ? 'inline-flex' : 'none';
+          terBadge.innerHTML = territory ? `${ICONS.territory}<span>${territory}</span>` : '';
+        }
+        if (autBadge) {
+          autBadge.style.display = author ? 'inline-flex' : 'none';
+          autBadge.innerHTML = author ? `${ICONS.author}<span>${author}</span>` : '';
+        }
+        if (datBadge) {
+          datBadge.style.display = pubdate ? 'inline-flex' : 'none';
+          datBadge.innerHTML = pubdate ? `${ICONS.date}<span>${pubdate}</span>` : '';
+        }
+      } else {
+        previewMeta.style.display = 'none';
+      }
+    }
+
+    // Renderizar markdown
+    if (previewContent) {
+      const hasContent = title || body;
+      if (!hasContent) {
+        previewContent.innerHTML = `
+          <div class="editor-preview-empty">
+            <span class="editor-preview-empty-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+            </span>
+            <span>O preview aparece aqui enquanto você escreve.</span>
+          </div>`;
+      } else {
+        // @ts-ignore — marked é carregado via CDN
+        const rendered = typeof marked !== 'undefined'
+          // @ts-ignore
+          ? marked.parse((title ? `# ${title}\n\n` : '') + body)
+          : `<h1>${title}</h1><p>${body}</p>`;
+        // @ts-ignore — DOMPurify é carregado via CDN
+        const clean = typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(rendered) : rendered;
+        previewContent.innerHTML = clean;
+      }
+    }
+
+    // Gerar frontmatter
+    if (title && outputSection && outputFrontmatter) {
+      outputSection.style.display = 'block';
+      outputFrontmatter.textContent = generateFrontmatter();
+    } else if (outputSection) {
+      outputSection.style.display = 'none';
+    }
+  }, 200);
+}
+
+// ============================================================
+// GERAÇÃO DE FRONTMATTER YAML (AC-3, AC-6)
+// ============================================================
+function generateFrontmatter() {
+  const title = getVal('field-title');
+  const description = getVal('field-description');
+  const category = getVal('field-category');
+  const territory = getVal('field-territory') || 'para';
+  const locality = getVal('field-locality');
+  const author = getVal('field-author') || 'Thalyson';
+  const pubdate = getVal('field-pubdate') || new Date().toISOString().split('T')[0];
+  const draft = (/** @type {HTMLInputElement} */ (document.getElementById('field-draft')))?.checked || false;
+  const tags = state.tags;
+  const coverImage = state.coverImagePath;
+
+  let fm = `---\n`;
+  fm += `title: "${title.replace(/"/g, '\\"')}"\n`;
+  fm += `description: "${description.replace(/"/g, '\\"')}"\n`;
+  fm += `pubDate: ${pubdate}\n`;
+  fm += `category: ${category || 'ensaios'}\n`;
+  fm += `territory: ${territory}\n`;
+  if (locality) fm += `locality: "${locality}"\n`;
+  fm += `author: ${author}\n`;
+  fm += `tags: [${tags.map(t => `"${t}"`).join(', ')}]\n`;
+  fm += `draft: ${draft}\n`;
+  if (coverImage) fm += `coverImage: "${coverImage}"\n`;
+  if (state.coverImagePosition && state.coverImagePosition !== '50% 50%') {
+    fm += `coverImagePosition: "${state.coverImagePosition}"\n`;
+  }
+  fm += `---`;
+  return fm;
+}
+
+
+// ============================================================
+// SALVAR DIRETAMENTE EM DISCO (AC-11)
+// ============================================================
+async function saveLocalPublication() {
+  clearFeedback();
+  const title = getVal('field-title');
+  if (!title) {
+    showFeedback('Título obrigatório — preencha o título antes de salvar.', 'error');
+    document.getElementById('field-title')?.focus();
+    return;
+  }
+  const category = getVal('field-category');
+  if (!category) {
+    showFeedback('Categoria obrigatória — selecione uma categoria.', 'error');
+    document.getElementById('field-category')?.focus();
+    return;
+  }
+
+  const saveBtn = document.getElementById('btn-save-local');
+  const saveLabel = document.getElementById('btn-save-label');
+  if (saveBtn) saveBtn.setAttribute('disabled', 'true');
+  if (saveLabel) saveLabel.textContent = 'Salvando…';
+
+  const payload = {
+    title,
+    description: getVal('field-description'),
+    category,
+    territory: getVal('field-territory') || 'para',
+    locality: getVal('field-locality'),
+    author: getVal('field-author') || 'Thalyson',
+    pubDate: state.pubDate || getTodayDate(),
+    tags: [...state.tags],
+    draft: (/** @type {HTMLInputElement} */ (document.getElementById('field-draft')))?.checked || false,
+    coverImage: state.coverImagePath,
+    coverImagePosition: state.coverImagePosition || '50% 50%',
+    body: getVal('field-body'),
+    slug: state.currentSlug || '',
+    originalSlug: state.originalSlug || ''
+  };
+
+  try {
+    const res = await fetch('/api/editor/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || 'Falha ao salvar no filesystem.');
+    }
+
+    state.currentSlug = data.slug;
+    state.originalSlug = data.slug;
+
+    // Atualiza indicador de edição e exibe botão de exclusão
+    const indicator = document.getElementById('editor-editing-indicator');
+    if (indicator) {
+      indicator.textContent = `Editando: ${data.slug}`;
+      indicator.style.display = 'inline-block';
+    }
+    updateDeleteButtonVisibility();
+
+    // Atualiza lista de publicações e seleciona a atual
+    await loadLocalEssaysList(data.slug);
+
+    // Limpa draft salvo no localStorage pois o conteúdo já está em disco
+    clearDraft();
+
+    showToast(`Publicação salva em ${data.path}!`);
+  } catch (err) {
+    showFeedback(err.message || 'Erro ao salvar a publicação localmente.', 'error');
+  } finally {
+    if (saveBtn) saveBtn.removeAttribute('disabled');
+    if (saveLabel) saveLabel.textContent = 'Salvar Publicação';
+  }
+}
+
+document.getElementById('btn-save-local')?.addEventListener('click', saveLocalPublication);
+
+// ============================================================
+// CARREGAR E GERENCIAR PUBLICAÇÕES LOCAIS (AC-12, AC-13)
+// ============================================================
+function updateDeleteButtonVisibility() {
+  const btnDelete = document.getElementById('btn-delete-local');
+  if (btnDelete) {
+    btnDelete.style.display = state.currentSlug ? 'inline-flex' : 'none';
+  }
+}
+
+async function loadEssayToEdit(slug) {
+  if (!slug) return;
+  try {
+    const res = await fetch(`/api/editor/essay?slug=${encodeURIComponent(slug)}`);
+    const data = await res.json();
+    if (!data.ok || !data.essay) {
+      showFeedback(`Não foi possível carregar a publicação "${slug}".`, 'error');
+      return;
+    }
+
+    const essay = data.essay;
+    state.currentSlug = essay.slug;
+    state.originalSlug = essay.slug;
+    state.pubDate = essay.pubDate;
+    updatePubDateDisplay();
+
+    setVal('field-title', essay.title || '');
+    setVal('field-description', essay.description || '');
+    setVal('field-category', essay.category || '');
+    setVal('field-territory', essay.territory || 'para');
+    setVal('field-locality', essay.locality || '');
+    setVal('field-author', essay.author || 'Thalyson');
+    setVal('field-body', essay.body || '');
+
+    const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
+    if (draftCheck) draftCheck.checked = Boolean(essay.draft);
+
+    state.tags = Array.isArray(essay.tags) ? [...essay.tags] : [];
+    renderTags();
+
+    if (essay.coverImage) {
+      setExistingImagePreview(essay.coverImage, essay.coverImagePosition || '50% 50%');
+    } else {
+      removeImage();
+    }
+
+    const modeBadge = document.getElementById('editor-header-mode-badge');
+    const indicator = document.getElementById('editor-editing-indicator');
+    if (modeBadge) modeBadge.style.display = 'none';
+    if (indicator) {
+      indicator.textContent = `Editando: ${essay.slug}`;
+      indicator.style.display = 'inline-block';
+    }
+
+    updateDeleteButtonVisibility();
+    updatePreview();
+    showToast(`Publicação "${essay.title}" carregada para edição.`);
+  } catch (err) {
+    showFeedback(`Erro ao carregar publicação: ${err.message}`, 'error');
+  }
+}
+
+function resetToNewPublication() {
+  ['field-title','field-description','field-category','field-locality','field-body','field-cover-path'].forEach(id => setVal(id, ''));
+  const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
+  if (draftCheck) draftCheck.checked = false;
+  setVal('field-territory', 'para');
+  setVal('field-author', 'Thalyson');
+  state.tags = [];
+  state.currentSlug = null;
+  state.originalSlug = null;
+  state.pubDate = getTodayDate();
+  updatePubDateDisplay();
+  renderTags();
+  removeImage();
+  clearDraft();
+
+  const modeBadge = document.getElementById('editor-header-mode-badge');
+  const indicator = document.getElementById('editor-editing-indicator');
+  if (modeBadge) modeBadge.style.display = 'inline-block';
+  if (indicator) indicator.style.display = 'none';
+
+  updateDeleteButtonVisibility();
+  updatePreview();
+  showToast('Pronto para criar uma nova publicação.');
+}
+
+// ============================================================
+// EXCLUIR PUBLICAÇÃO LOCAL (AC-13)
+// ============================================================
+const deleteDialogOverlay = document.getElementById('delete-dialog-overlay');
+const btnDeleteLocal = document.getElementById('btn-delete-local');
+const btnCancelDelete = document.getElementById('btn-cancel-delete');
+const btnConfirmDelete = document.getElementById('btn-confirm-delete');
+const deleteTargetTitle = document.getElementById('delete-dialog-target-title');
+const deleteTargetPath = document.getElementById('delete-dialog-target-path');
+
+function openDeleteModal() {
+  if (!state.currentSlug) return;
+  const currentTitle = /** @type {HTMLInputElement} */ (document.getElementById('field-title'))?.value || state.currentSlug;
+  if (deleteTargetTitle) deleteTargetTitle.textContent = `"${currentTitle}"`;
+  if (deleteTargetPath) deleteTargetPath.textContent = `src/content/ensaios/${state.currentSlug}.md`;
+  if (deleteDialogOverlay) deleteDialogOverlay.classList.add('open');
+}
+
+function closeDeleteModal() {
+  if (deleteDialogOverlay) deleteDialogOverlay.classList.remove('open');
+}
+
+btnDeleteLocal?.addEventListener('click', openDeleteModal);
+btnCancelDelete?.addEventListener('click', closeDeleteModal);
+deleteDialogOverlay?.addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeDeleteModal();
+});
+
+btnConfirmDelete?.addEventListener('click', async () => {
+  if (!state.currentSlug) return;
+  const slugToDelete = state.currentSlug;
+  try {
+    if (btnConfirmDelete) btnConfirmDelete.setAttribute('disabled', 'true');
+    const res = await fetch(`/api/editor/essay?slug=${encodeURIComponent(slugToDelete)}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || 'Falha ao excluir publicação.');
+    }
+
+    closeDeleteModal();
+    showToast('Publicação excluída com sucesso.');
+    resetToNewPublication();
+    await loadLocalEssaysList();
+  } catch (err) {
+    showFeedback(err.message || 'Erro ao excluir a publicação.', 'error');
+  } finally {
+    if (btnConfirmDelete) btnConfirmDelete.removeAttribute('disabled');
+  }
+});
+
+
+// ============================================================
+// GERENCIAMENTO DE CATEGORIAS VIA JSON (AC-9)
+// ============================================================
+async function loadCategories() {
+  try {
+    const res = await fetch('/api/editor/categories');
+    const data = await res.json();
+    if (data.ok && Array.isArray(data.categories)) {
+      state.categories = data.categories;
+      renderCategoriesSelect();
+    }
+  } catch {
+    // Silencioso
+  }
+}
+
+function renderCategoriesSelect() {
+  const select = /** @type {HTMLSelectElement} */ (document.getElementById('field-category'));
+  if (!select) return;
+  const currentVal = select.value;
+  select.innerHTML = '<option value="">Selecionar…</option>';
+  state.categories.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat.value;
+    opt.textContent = cat.label;
+    if (cat.value === currentVal) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+// ============================================================
+// LISTENERS DE INPUT — save & preview
+// ============================================================
+const liveInputs = [
+  'field-title','field-description','field-category','field-territory',
+  'field-locality','field-author','field-body','field-draft'
+];
+liveInputs.forEach(id => {
+  const el = document.getElementById(id);
+  el?.addEventListener('input', () => { updatePreview(); debouncedSave(); });
+  el?.addEventListener('change', () => { updatePreview(); debouncedSave(); });
+});
+
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  updatePubDateDisplay();
+
+  // Carrega categorias do arquivo JSON
+  await loadCategories();
+
+  // Verifica se há parâmetro slug na URL para carregar ensaio existente
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetSlug = urlParams.get('slug');
+
+  if (targetSlug) {
+    await loadEssayToEdit(targetSlug);
+  } else {
+    // Restaura rascunho se houver
+    restoreDraft();
+    renderTags();
+    updatePreview();
+  }
+});
+</script>
+
+</body>
+</html>

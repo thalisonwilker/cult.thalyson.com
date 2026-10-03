@@ -4,24 +4,55 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
+  <div class="signature-bar" aria-hidden="true"></div>
+
   <div class="footer-container">
-    <div class="footer-manifesto">
-      <span class="manifesto-title">CULT</span>
-      <p class="manifesto-text">
-        Espaço dedicado à reflexão e curadoria crítica sobre cinema, literatura, música e artes visuais.
-        Publicações artesanais e perenes, construídas sem algoritmos de distração.
-      </p>
+    <div class="footer-top-grid">
+      <div class="footer-manifesto">
+        <div class="footer-brand">
+          <span class="brand-wordmark">CULT</span>
+          <span class="brand-suffix">.thalyson.com</span>
+        </div>
+        <p class="manifesto-text">
+          Espaço pessoal para compartilhar a memória viva, os saberes caboclos,
+          a música, literatura e artes visuais de Belém e da Amazônia Atlântica — em diálogo com o Brasil e o mundo.
+        </p>
+      </div>
+
+      <div class="footer-nav-columns">
+        <div class="nav-col">
+          <span class="col-title">Vertentes</span>
+          <ul class="col-links">
+            <li><a href="/?categoria=musica">Música &amp; Ritmos</a></li>
+            <li><a href="/?categoria=patrimonio">Círio &amp; Patrimônio</a></li>
+            <li><a href="/?categoria=cinema">Cinema</a></li>
+            <li><a href="/?categoria=literatura">Literatura</a></li>
+            <li><a href="/?categoria=artes">Artes Visuais</a></li>
+          </ul>
+        </div>
+
+        <div class="nav-col">
+          <span class="col-title">Territórios</span>
+          <ul class="col-links">
+            <li><a href="/?territorio=para">Belém &amp; Pará</a></li>
+            <li><a href="/?territorio=nacional">Arte Nacional</a></li>
+            <li><a href="/?territorio=global">Mundo &amp; Clássicos</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div class="footer-bottom">
       <p class="copyright">
-        © {year} <strong>cult.thalyson.com</strong> — Criado com Spec-Driven Development (SDD) & Astro.
+        © {year} <strong>CULT.thalyson.com</strong> — Compartilhando a cultura, a música e as histórias do Pará por Thalyson.
       </p>
-      <div class="footer-links">
-        <a href="/" class="link">Início</a>
-        <a href="/?categoria=cinema" class="link">Cinema</a>
-        <a href="/?categoria=literatura" class="link">Literatura</a>
-        <a href="/?categoria=musica" class="link">Música</a>
+      <div class="footer-extra-links">
+        {import.meta.env.DEV && (
+          <a href="/admin/" class="dev-admin-link" title="Acessar Painel Administrativo Local">
+            Painel Admin [DEV]
+          </a>
+        )}
+        <span class="sdd-badge">Construído com Spec-Driven Development (SDD)</span>
       </div>
     </div>
   </div>
@@ -29,39 +60,98 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
+    background-color: var(--color-cult-surface);
     border-top: 1px solid var(--color-border);
-    background-color: var(--color-surface);
     margin-top: auto;
-    padding: 3.5rem 1.5rem 2.5rem;
-    transition: background-color 0.25s ease, border-color 0.25s ease;
+    position: relative;
+    transition: background-color var(--transition-normal);
   }
 
   .footer-container {
     max-width: var(--site-max-width);
     margin: 0 auto;
+    padding: var(--space-12) var(--space-6) var(--space-8);
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: var(--space-8);
   }
 
-  .footer-manifesto {
-    max-width: 600px;
+  .footer-top-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-12);
   }
 
-  .manifesto-title {
+  .footer-brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.15rem;
+    margin-bottom: var(--space-4);
+  }
+
+  .brand-wordmark {
     font-family: var(--font-display);
-    font-size: 1.4rem;
-    color: var(--color-fusion-red);
-    letter-spacing: 0.05em;
-    display: block;
-    margin-bottom: 0.6rem;
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--color-cult-coral);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .brand-suffix {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-cult-text-muted);
   }
 
   .manifesto-text {
-    font-family: var(--font-serif);
-    font-size: 1rem;
-    color: var(--color-text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    color: var(--color-cult-text-muted);
     line-height: 1.7;
+    max-width: 540px;
+  }
+
+  .footer-nav-columns {
+    display: flex;
+    gap: var(--space-12);
+  }
+
+  .nav-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .col-title {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-cult-turquoise);
+  }
+
+  .col-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .col-links a {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-cult-text-muted);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .col-links a:hover {
+    color: var(--color-cult-text);
   }
 
   .footer-bottom {
@@ -69,25 +159,54 @@ const year = new Date().getFullYear();
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid var(--color-border);
-    padding-top: 1.5rem;
+    padding-top: var(--space-6);
     font-family: var(--font-sans);
     font-size: 0.8rem;
-    color: var(--color-text-muted);
+    color: var(--color-cult-text-dim);
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-4);
   }
 
-  .footer-links {
+  .footer-extra-links {
     display: flex;
-    gap: 1.25rem;
+    align-items: center;
+    gap: var(--space-3);
   }
 
-  .link {
-    color: var(--color-text-muted);
-    transition: color 0.2s ease;
+  .dev-admin-link {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-cult-gold);
+    background: rgba(244, 182, 63, 0.1);
+    border: 1px solid rgba(244, 182, 63, 0.25);
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all var(--transition-fast);
   }
 
-  .link:hover {
-    color: var(--color-text);
+  .dev-admin-link:hover {
+    background: rgba(244, 182, 63, 0.2);
+    border-color: var(--color-cult-gold);
+  }
+
+  .sdd-badge {
+    color: var(--color-cult-text-dim);
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .footer-top-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .footer-nav-columns {
+      gap: var(--space-8);
+    }
+
+    .footer-container {
+      padding: var(--space-8) var(--space-4) var(--space-6);
+    }
   }
 </style>

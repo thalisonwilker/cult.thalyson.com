@@ -9,168 +9,512 @@ interface Props {
 const { currentCategory } = Astro.props;
 
 const categories = [
-  { slug: 'musica', label: 'Música & Ritmos', color: 'var(--color-category-musica)' },
-  { slug: 'patrimonio', label: 'Círio & Patrimônio', color: 'var(--color-category-patrimonio)' },
-  { slug: 'cinema', label: 'Cinema', color: 'var(--color-category-cinema)' },
-  { slug: 'literatura', label: 'Literatura', color: 'var(--color-category-literatura)' },
-  { slug: 'artes', label: 'Artes Visuais', color: 'var(--color-category-artes)' }
+  { slug: 'musica', label: 'Música', accent: 'var(--color-cult-gold)' },
+  { slug: 'patrimonio', label: 'Patrimônio', accent: 'var(--color-cult-coral)' },
+  { slug: 'cinema', label: 'Cinema', accent: 'var(--color-cult-orange)' },
+  { slug: 'literatura', label: 'Literatura', accent: 'var(--color-cult-turquoise)' },
+  { slug: 'artes', label: 'Artes', accent: 'var(--color-cult-cobalt)' }
 ];
 ---
 
-<header class="site-header">
-  <div class="header-container">
-    <div class="brand-section">
-      <a href="/" class="brand-link">
-        <span class="brand-title">CULT</span>
-        <span class="brand-domain">.thalyson.com</span>
+<header class="editorial-header">
+  <div class="header-inner">
+    <!-- Unidade de Marca (Logo + Subtítulo juntos) -->
+    <div class="brand-unit">
+      <a href="/" class="brand-link" aria-label="CULT.thalyson.com — Início">
+        <span class="brand-wordmark">CULT</span>
+        <span class="brand-suffix">.thalyson.com</span>
       </a>
-      <span class="brand-tagline">Cultura do Pará, Belém & Artes</span>
+      <span class="brand-divider" aria-hidden="true">|</span>
+      <span class="brand-tagline">Cultura do Pará, Belém &amp; Artes</span>
     </div>
 
-    <div class="nav-wrapper">
-      <nav class="category-nav" aria-label="Navegação por categorias">
-        {categories.map((cat) => (
-          <a
-            href={`/?categoria=${cat.slug}`}
-            class={`nav-item ${currentCategory === cat.slug ? 'active' : ''}`}
-            data-category={cat.slug}
-          >
-            <span class="dot" style={`background-color: ${cat.color};`}></span>
-            {cat.label}
-          </a>
-        ))}
+    <!-- Navegação Editorial Desktop em Linha Única -->
+    <nav class="editorial-nav-desktop" aria-label="Navegação editorial principal">
+      <ul class="nav-list">
+        {categories.map((cat) => {
+          const isActive = currentCategory === cat.slug;
+          return (
+            <li class="nav-item">
+              <a
+                href={`/?categoria=${cat.slug}`}
+                class={`editorial-link ${isActive ? 'active' : ''}`}
+                style={`--nav-accent: ${cat.accent};`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                <span class="accent-dot" aria-hidden="true"></span>
+                <span class="link-label">{cat.label}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    <!-- Ações: Theme Switcher & Menu Hambúrguer Mobile -->
+    <div class="header-actions">
+      <ThemeToggle />
+
+      <button
+        id="mobile-menu-trigger"
+        class="mobile-menu-btn"
+        type="button"
+        aria-label="Abrir menu de navegação"
+        aria-expanded="false"
+        aria-controls="mobile-nav-drawer"
+      >
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Assinatura Visual Discreta da Revista -->
+  <div class="signature-bar" aria-hidden="true"></div>
+
+  <!-- Mobile Drawer / Overlay Acessível -->
+  <div id="mobile-nav-drawer" class="mobile-drawer" aria-hidden="true">
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+    <div class="drawer-content" role="dialog" aria-modal="true" aria-label="Menu de Categorias">
+      <div class="drawer-header">
+        <div class="drawer-brand">
+          <span class="brand-wordmark">CULT</span>
+          <span class="brand-tagline-mobile">Belém &amp; Amazônia</span>
+        </div>
+        <button
+          id="mobile-menu-close"
+          class="drawer-close-btn"
+          type="button"
+          aria-label="Fechar menu"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="drawer-nav" aria-label="Navegação mobile">
+        <ul class="drawer-list">
+          <li>
+            <a href="/" class={`drawer-link ${!currentCategory ? 'active' : ''}`}>
+              <span class="drawer-dot" style="background-color: var(--color-cult-turquoise);"></span>
+              <span>Todo o Acervo</span>
+            </a>
+          </li>
+          {categories.map((cat) => {
+            const isActive = currentCategory === cat.slug;
+            return (
+              <li>
+                <a
+                  href={`/?categoria=${cat.slug}`}
+                  class={`drawer-link ${isActive ? 'active' : ''}`}
+                >
+                  <span class="drawer-dot" style={`background-color: ${cat.accent};`}></span>
+                  <span>{cat.label}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
 
-      <div class="header-actions">
-        <ThemeToggle />
+      <div class="drawer-footer">
+        <p class="drawer-caption">
+          Um portal crítico e afetivo sobre as artes, memórias e saberes da Amazônia Atlântica.
+        </p>
       </div>
     </div>
   </div>
 </header>
 
 <style>
-  .site-header {
+  /* ============================================================
+     Header Editorial Shell
+     ============================================================ */
+  .editorial-header {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 100;
     background-color: var(--color-header-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--color-border);
-    transition: background-color 0.25s ease, border-color 0.25s ease;
+    transition: background-color var(--transition-normal);
   }
 
-  .header-container {
+  .header-inner {
     max-width: var(--site-max-width);
     margin: 0 auto;
-    padding: 1rem 1.5rem;
+    padding: var(--space-4) var(--space-6);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: var(--space-6);
   }
 
-  .brand-section {
+  /* ============================================================
+     Unidade de Marca (Logo + Subtítulo Integrados)
+     ============================================================ */
+  .brand-unit {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
   }
 
   .brand-link {
     display: inline-flex;
     align-items: baseline;
-    gap: 0.2rem;
+    gap: 0.15rem;
     text-decoration: none;
   }
 
-  .brand-title {
+  .brand-wordmark {
     font-family: var(--font-display);
-    font-size: 1.75rem;
-    color: var(--color-fusion-red);
-    letter-spacing: 0.05em;
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--color-cult-coral);
+    letter-spacing: 0.03em;
     line-height: 1;
-    text-shadow: 1px 1px 0px var(--color-beniukon-bronze);
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-fast), color var(--transition-fast);
   }
 
-  .brand-link:hover .brand-title {
-    transform: scale(1.03);
+  .brand-link:hover .brand-wordmark {
+    color: var(--color-cult-orange);
+    transform: translateY(-1px);
   }
 
-  .brand-domain {
+  .brand-suffix {
     font-family: var(--font-sans);
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--color-text-muted);
+    color: var(--color-cult-text-muted);
+    letter-spacing: -0.01em;
+  }
+
+  .brand-divider {
+    color: var(--color-cult-border-strong);
+    font-size: 0.9rem;
+    user-select: none;
   }
 
   .brand-tagline {
     font-family: var(--font-sans);
-    font-size: 0.7rem;
+    font-size: 0.72rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--color-text-muted);
-    margin-top: 0.2rem;
+    letter-spacing: 0.1em;
+    color: var(--color-cult-text-muted);
+    white-space: nowrap;
   }
 
-  .nav-wrapper {
+  /* ============================================================
+     Navegação Editorial Desktop (Linha Única & Discreta)
+     ============================================================ */
+  .editorial-nav-desktop {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    flex: 1;
+    justify-content: center;
   }
 
-  .category-nav {
+  .nav-list {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
   .nav-item {
     display: inline-flex;
+  }
+
+  .editorial-link {
+    display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.45rem;
     font-family: var(--font-sans);
-    font-size: 0.85rem;
+    font-size: 0.86rem;
     font-weight: 500;
-    color: var(--color-text-muted);
-    padding: 0.35rem 0.65rem;
-    border-radius: var(--radius-sm);
-    transition: color 0.2s ease, background-color 0.2s ease;
+    color: var(--color-cult-text-muted);
+    text-decoration: none;
+    padding: var(--space-2) var(--space-2);
+    position: relative;
+    transition: color var(--transition-fast);
   }
 
-  .nav-item:hover, .nav-item.active {
-    color: var(--color-text);
-    background-color: var(--color-surface-hover);
+  .accent-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background-color: var(--nav-accent);
+    opacity: 0.4;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
   }
 
-  .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    display: inline-block;
+  .link-label {
+    letter-spacing: 0.01em;
   }
 
+  .editorial-link:hover {
+    color: var(--color-cult-text);
+  }
+
+  .editorial-link:hover .accent-dot {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+
+  .editorial-link.active {
+    color: var(--color-cult-text);
+    font-weight: 600;
+  }
+
+  .editorial-link.active .accent-dot {
+    opacity: 1;
+    transform: scale(1.4);
+    box-shadow: 0 0 8px var(--nav-accent);
+  }
+
+  /* ============================================================
+     Ações do Header
+     ============================================================ */
   .header-actions {
     display: flex;
     align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
   }
 
-  @media (max-width: 768px) {
-    .header-container {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1rem;
+  .mobile-menu-btn {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--color-cult-text);
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .hamburger-bar {
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    border-radius: 1px;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+  }
+
+  /* ============================================================
+     Mobile Drawer / Overlay Acessível
+     ============================================================ */
+  .mobile-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: none;
+  }
+
+  .mobile-drawer.open {
+    display: block;
+  }
+
+  .drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(3, 7, 18, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .drawer-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(340px, 85vw);
+    background-color: var(--color-cult-surface-raised);
+    border-left: 1px solid var(--color-border-strong);
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-6);
+    box-shadow: var(--shadow-lg);
+    animation: slideInRight var(--transition-normal);
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-6);
+  }
+
+  .drawer-brand {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-tagline-mobile {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-cult-text-muted);
+  }
+
+  .drawer-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-cult-text-muted);
+    cursor: pointer;
+    padding: var(--space-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition-fast);
+  }
+
+  .drawer-close-btn:hover {
+    color: var(--color-cult-text);
+  }
+
+  .drawer-nav {
+    flex: 1;
+  }
+
+  .drawer-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .drawer-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    color: var(--color-cult-text-muted);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  .drawer-link:hover,
+  .drawer-link.active {
+    color: var(--color-cult-text);
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .drawer-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-pill);
+  }
+
+  .drawer-footer {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .drawer-caption {
+    font-size: 0.8rem;
+    color: var(--color-cult-text-dim);
+    line-height: 1.5;
+  }
+
+  /* ============================================================
+     Responsividade
+     ============================================================ */
+  @media (max-width: 960px) {
+    .brand-divider,
+    .brand-tagline {
+      display: none;
     }
 
-    .nav-wrapper {
-      width: 100%;
-      justify-content: space-between;
-      overflow-x: auto;
-      padding-bottom: 0.25rem;
+    .nav-list {
+      gap: var(--space-4);
+    }
+  }
+
+  @media (max-width: 860px) {
+    .editorial-nav-desktop {
+      display: none;
     }
 
-    .category-nav {
-      gap: 0.25rem;
+    .mobile-menu-btn {
+      display: flex;
+    }
+
+    .header-inner {
+      padding: var(--space-3) var(--space-4);
     }
   }
 </style>
+
+<script is:inline>
+  const menuTrigger = document.getElementById('mobile-menu-trigger');
+  const menuClose = document.getElementById('mobile-menu-close');
+  const drawer = document.getElementById('mobile-nav-drawer');
+  const backdrop = document.getElementById('drawer-backdrop');
+
+  function openMenu() {
+    if (drawer && menuTrigger) {
+      drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden', 'false');
+      menuTrigger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      if (menuClose) menuClose.focus();
+    }
+  }
+
+  function closeMenu() {
+    if (drawer && menuTrigger) {
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
+      menuTrigger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      menuTrigger.focus();
+    }
+  }
+
+  if (menuTrigger) {
+    menuTrigger.addEventListener('click', openMenu);
+  }
+
+  if (menuClose) {
+    menuClose.addEventListener('click', closeMenu);
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener('click', closeMenu);
+  }
+
+  // Teclado acessível: fechar com Escape
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer && drawer.classList.contains('open')) {
+      closeMenu();
+    }
+  });
+</script>

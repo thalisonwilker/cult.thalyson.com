@@ -1,107 +1,164 @@
 /* ==========================================================================
    Google Fonts Import
-   - Rye: Estilo Abridores de Letras / Logotipo Display
-   - Newsreader: Tipografia Editorial Serifada para Leitura Longa
-   - Inter: Tipografia Sans-Serif para Navegação e UI
-   - JetBrains Mono: Código e metadados
+   - Fraunces: Tipografia Editorial Contemporânea de Revista (Display / Headings)
+   - Noto Sans: Tipografia Sans-Serif Neutra de Alta Legibilidade (UI & Body)
+   - Rye: Referência vernacular histórica aos Abridores de Letras fluviais
+   - JetBrains Mono: Metadados, tags e código
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Rye&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Rye&display=swap');
 
 :root {
   /* ==========================================================================
-     Paleta de Cores Principais (Flat UI / Aussie Palette)
+     Paleta de Revista Cultural Contemporânea (Inspirada na Noite Amazônica)
+     Distribuição Cromática:
+     - 75% Tons Escuros e Azul-Marinho Profundo
+     - 15% Neutros Claros para Leitura
+     - 10% Acentos Vibrantes do Norte
      ========================================================================== */
 
-  /* Reds & Corals */
-  --color-fusion-red: #fc5c65;
-  --color-desire: #eb3b5a;
+  /* 75% — Superfícies e Profundidade */
+  --color-cult-navy-deep: #070D22;
+  --color-cult-surface: #0B1739;
+  --color-cult-surface-raised: #122046;
+  --color-cult-surface-subtle: #0E1A3D;
+  --color-cult-surface-hover: #162654;
 
-  /* Oranges & Bronzes */
-  --color-orange-hibiscus: #fd9644;
-  --color-beniukon-bronze: #fa8231;
+  /* Bordas Refinadas */
+  --color-cult-border: rgba(155, 176, 214, 0.16);
+  --color-cult-border-strong: rgba(155, 176, 214, 0.32);
+  --color-cult-border-subtle: rgba(155, 176, 214, 0.08);
 
-  /* Yellows & Ambers */
-  --color-flirtatious: #fed330;
-  --color-nyc-taxi: #f7b731;
+  /* 15% — Neutros Claros e Tipografia */
+  --color-cult-text: #E8EDF7;
+  --color-cult-text-muted: #9BB0D6;
+  --color-cult-text-dim: #6B7C9E;
+  --color-cult-text-inverse: #070D22;
 
-  /* Greens & Emeralds */
-  --color-reptile-green: #26de81;
-  --color-algal-fuel: #20bf6b;
+  /* 10% — Acentos Vibrantes da Cultura Amazônica */
+  --color-cult-cobalt: #2457A6;
+  --color-cult-turquoise: #17A9B8;
+  --color-cult-gold: #F4B63F;
+  --color-cult-orange: #F27A32;
+  --color-cult-coral: #EC5B5B;
 
-  /* Teals & Turquoises */
-  --color-maximum-blue-green: #2bcbba;
-  --color-turquoise-topaz: #0fb9b1;
+  /* Assinatura Visual Discreta — Gradiente Editorial */
+  --gradient-cult-signature: linear-gradient(
+    90deg,
+    #EC5B5B 0%,
+    #F27A32 25%,
+    #F4B63F 50%,
+    #17A9B8 75%,
+    #2457A6 100%
+  );
+
+  --gradient-hero-overlay: linear-gradient(
+    180deg,
+    rgba(7, 13, 34, 0.15) 0%,
+    rgba(7, 13, 34, 0.65) 50%,
+    rgba(7, 13, 34, 0.95) 100%
+  );
+
+  --gradient-card-overlay: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(7, 13, 34, 0.8) 100%
+  );
 
   /* ==========================================================================
-     Paleta Noite Estrelada & Águas Amazônicas (Van Gogh Impasto Palette)
+     Tokens Semânticos por Categoria Cultural
      ========================================================================== */
-  --color-cosmic-night: #0a1128;
-  --color-cobalt-swirl: #1c3d72;
-  --color-electric-cyan: #00d2d3;
-  --color-twilight-magenta: #e056fd;
-  --color-sun-glow: #f9ca24;
-  --color-fire-orange: #ff5e36;
+  --color-category-musica: var(--color-cult-gold);
+  --color-category-patrimonio: var(--color-cult-coral);
+  --color-category-cinema: var(--color-cult-orange);
+  --color-category-literatura: var(--color-cult-turquoise);
+  --color-category-artes: var(--color-cult-cobalt);
+  --color-category-ensaios: var(--color-cult-turquoise);
+  --color-category-gastronomia: var(--color-cult-orange);
 
   /* ==========================================================================
-     Tokens Semânticos da Aplicação (Categorias Culturais)
+     Mapeamento de Tema (Dark é o padrão imersivo da Revista)
      ========================================================================== */
-  --color-category-cinema: var(--color-fusion-red);
-  --color-category-literatura: var(--color-orange-hibiscus);
-  --color-category-musica: var(--color-sun-glow);
-  --color-category-ensaios: var(--color-electric-cyan);
-  --color-category-artes: var(--color-twilight-magenta);
-  --color-category-patrimonio: var(--color-beniukon-bronze);
-  --color-category-gastronomia: var(--color-algal-fuel);
+  --color-bg: var(--color-cult-navy-deep);
+  --color-surface: var(--color-cult-surface);
+  --color-surface-hover: var(--color-cult-surface-hover);
+  --color-surface-raised: var(--color-cult-surface-raised);
+  --color-text: var(--color-cult-text);
+  --color-text-muted: var(--color-cult-text-muted);
+  --color-text-dim: var(--color-cult-text-dim);
+  --color-border: var(--color-cult-border);
+  --color-border-strong: var(--color-cult-border-strong);
+  --color-header-bg: rgba(7, 13, 34, 0.85);
 
-  /* ==========================================================================
-     Tokens de Tema (Claro)
-     ========================================================================== */
-  --color-bg: #fcfaf7;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f5f0e6;
-  --color-text: #14171d;
-  --color-text-muted: #585f6e;
-  --color-border: #e4dcd0;
-  --color-header-bg: rgba(252, 250, 247, 0.92);
+  --color-primary: var(--color-cult-coral);
+  --color-accent: var(--color-cult-turquoise);
+  --color-highlight: var(--color-cult-gold);
 
-  --color-primary: var(--color-fusion-red);
-  --color-accent: var(--color-orange-hibiscus);
-  --color-highlight: var(--color-sun-glow);
-
-  /* Tipografia */
-  --font-display: "Rye", cursive, serif;
-  --font-serif: "Newsreader", Georgia, Cambria, serif;
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Tipografia Editorial */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-vernacular: "Rye", cursive, serif;
 
-  /* Dimensões & Layout */
+  /* Escala de Espaçamento Sistemática */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* Dimensões do Layout */
+  --site-max-width: 1280px;
   --content-max-width: 760px;
-  --site-max-width: 1120px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 14px;
+  --reading-line-length: 68ch;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.09);
-  --shadow-artistic: 0 8px 30px rgba(28, 61, 114, 0.18);
-  --shadow-editorial: 3px 3px 0px var(--color-border);
+  /* Raios de Borda */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Sombras Editoriais */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 4px 20px rgba(3, 7, 18, 0.4);
+
+  /* Transições Microinterativas */
+  --transition-fast: 150ms ease;
+  --transition-normal: 220ms ease;
+  --transition-slow: 320ms ease;
 }
 
-[data-theme="dark"] {
-  --color-bg: #070d1e;
-  --color-surface: #0f1833;
-  --color-surface-hover: #17244a;
-  --color-text: #f0f4fc;
-  --color-text-muted: #9bb0d6;
-  --color-border: #1e2e5c;
-  --color-header-bg: rgba(7, 13, 30, 0.92);
+/* ==========================================================================
+   Modo Claro Preservado
+   ========================================================================== */
+[data-theme="light"] {
+  --color-bg: #F5F7FB;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #EEF2F8;
+  --color-surface-raised: #FFFFFF;
+  --color-text: #0E172E;
+  --color-text-muted: #4B5A79;
+  --color-text-dim: #7C8BA8;
+  --color-border: rgba(75, 90, 121, 0.18);
+  --color-border-strong: rgba(75, 90, 121, 0.35);
+  --color-header-bg: rgba(245, 247, 251, 0.9);
 
-  --color-primary: var(--color-fusion-red);
-  --color-accent: var(--color-orange-hibiscus);
-  --color-highlight: var(--color-sun-glow);
+  --gradient-hero-overlay: linear-gradient(
+    180deg,
+    rgba(14, 23, 46, 0.2) 0%,
+    rgba(14, 23, 46, 0.7) 50%,
+    rgba(14, 23, 46, 0.95) 100%
+  );
 
-  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 18px rgba(0, 0, 0, 0.5);
-  --shadow-artistic: 0 8px 32px rgba(0, 210, 211, 0.15);
-  --shadow-editorial: 3px 3px 0px var(--color-border);
+  --shadow-sm: 0 2px 8px rgba(14, 23, 46, 0.06);
+  --shadow-md: 0 8px 24px rgba(14, 23, 46, 0.08);
+  --shadow-lg: 0 16px 48px rgba(14, 23, 46, 0.12);
+  --shadow-card: 0 4px 18px rgba(14, 23, 46, 0.07);
 }

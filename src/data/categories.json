@@ -1,0 +1,34 @@
+[
+  {
+    "value": "cinema",
+    "label": "Cinema"
+  },
+  {
+    "value": "literatura",
+    "label": "Literatura"
+  },
+  {
+    "value": "musica",
+    "label": "Música"
+  },
+  {
+    "value": "ensaios",
+    "label": "Ensaios"
+  },
+  {
+    "value": "artes",
+    "label": "Artes"
+  },
+  {
+    "value": "patrimonio",
+    "label": "Patrimônio"
+  },
+  {
+    "value": "gastronomia",
+    "label": "Gastronomia"
+  },
+  {
+    "value": "cultura",
+    "label": "Cultura"
+  }
+]

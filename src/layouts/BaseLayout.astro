@@ -8,12 +8,14 @@ interface Props {
   title?: string;
   description?: string;
   currentCategory?: string;
+  fullBleed?: boolean;
 }
 
 const {
-  title = 'CULT — Acervo & Curadoria Cultural',
-  description = 'Reflexões e ensaios críticos sobre cinema, literatura, música e artes visuais por Thalyson.',
-  currentCategory
+  title = 'CULT — Cultura do Pará, Memórias e Artes',
+  description = 'Espaço pessoal para compartilhar a cultura, a música, tradições e artes de Belém e do Pará por Thalyson.',
+  currentCategory,
+  fullBleed = false
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://cult.thalyson.com');
@@ -61,7 +63,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://cult.tha
   </head>
   <body>
     <Header currentCategory={currentCategory} />
-    <main class="site-main">
+    <main class:list={['site-main', { 'site-main--full-bleed': fullBleed }]}>
       <slot />
     </main>
     <Footer />
@@ -74,12 +76,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://cult.tha
     max-width: var(--site-max-width);
     width: 100%;
     margin: 0 auto;
-    padding: 2.5rem 1.5rem 4rem;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .site-main--full-bleed {
+    max-width: 100%;
+    padding: 0;
   }
 
   @media (max-width: 768px) {
     .site-main {
-      padding: 1.5rem 1rem 3rem;
+      padding: 0 1rem 3rem;
+    }
+
+    .site-main--full-bleed {
+      padding: 0;
     }
   }
 </style>
