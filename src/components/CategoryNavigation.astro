@@ -50,10 +50,11 @@ const categories: CategoryItem[] = [
 <section class="explore-culture-section" aria-label="Explore as Vertentes Culturais">
   <div class="section-header-editorial">
     <div class="header-title-wrap">
-      <span class="section-tag-editorial">Horizontes Editoriais</span>
+      <span class="section-tag-editorial">
+        <i class="fa-solid fa-compass" aria-hidden="true"></i> Horizontes Editoriais
+      </span>
       <h2 class="section-title-editorial">Explore a Cultura</h2>
     </div>
-    <span class="section-note">Vertentes &amp; Expressões</span>
   </div>
 
   <div class="categories-grid">
@@ -137,8 +138,10 @@ const categories: CategoryItem[] = [
   }
 
   .category-editorial-card:hover {
-    transform: translateY(-2px);
+    transform: translate(-2px, -2px);
     border-color: var(--card-accent);
+    border-bottom: 3px solid var(--card-accent);
+    box-shadow: 4px 4px 0 var(--card-accent);
     background-color: var(--color-cult-surface-hover);
   }
 

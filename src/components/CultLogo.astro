@@ -1,0 +1,105 @@
+---
+// src/components/CultLogo.astro
+interface Props {
+  variant?: 'header' | 'footer' | 'compact';
+  class?: string;
+  href?: string;
+}
+
+const {
+  variant = 'header',
+  class: className = '',
+  href = '/'
+} = Astro.props;
+---
+
+<a
+  href={href}
+  class={`cult-fluvial-logo cult-fluvial-logo--${variant} ${className}`}
+  aria-label="CULT .thalyson.com — Início (Revista Cultural do Pará & Amazônia)"
+>
+  <img
+    src="/images/cult-logo-fluvial.png"
+    alt="Logo CULT .thalyson.com — Pintura vernacular dos abridores de letras dos barcos da Amazônia paraense"
+    width="1015"
+    height="567"
+    loading="eager"
+    decoding="async"
+    class="cult-logo-img"
+  />
+</a>
+
+<style>
+  .cult-fluvial-logo {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    line-height: 1;
+    position: relative;
+    transition: transform var(--transition-fast), filter var(--transition-fast);
+  }
+
+  .cult-fluvial-logo:hover {
+    transform: translateY(-1.5px) scale(1.02);
+    filter: drop-shadow(0 3px 10px rgba(23, 169, 184, 0.45));
+  }
+
+  .cult-logo-img {
+    display: block;
+    height: auto;
+    object-fit: contain;
+    aspect-ratio: 1015 / 567;
+    transition: height 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Variante Header (Desktop): proporção moderada e refinada */
+  .cult-fluvial-logo--header .cult-logo-img {
+    height: clamp(40px, 4.2vw, 52px);
+    width: auto;
+  }
+
+  /* Efeito de Diminuir a Logo do Navbar Durante a Navegação (Scroll) */
+  :global(.editorial-header.is-scrolled) .cult-fluvial-logo--header .cult-logo-img {
+    height: clamp(32px, 3.2vw, 40px);
+  }
+
+  /* Variante Compact (Mobile drawer) */
+  .cult-fluvial-logo--compact .cult-logo-img {
+    height: 42px;
+    width: auto;
+  }
+
+  /* Variante Footer (Centralizada e destacada com máxima evidência) */
+  .cult-fluvial-logo--footer .cult-logo-img {
+    height: clamp(74px, 8vw, 108px);
+    width: auto;
+  }
+
+  @media (max-width: 860px) {
+    .cult-fluvial-logo--header .cult-logo-img {
+      height: 38px;
+    }
+
+    :global(.editorial-header.is-scrolled) .cult-fluvial-logo--header .cult-logo-img {
+      height: 32px;
+    }
+
+    .cult-fluvial-logo--footer .cult-logo-img {
+      height: 76px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .cult-fluvial-logo--header .cult-logo-img {
+      height: 34px;
+    }
+
+    :global(.editorial-header.is-scrolled) .cult-fluvial-logo--header .cult-logo-img {
+      height: 28px;
+    }
+
+    .cult-fluvial-logo--footer .cult-logo-img {
+      height: 66px;
+    }
+  }
+</style>

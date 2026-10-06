@@ -16,32 +16,41 @@
      - 10% Acentos Vibrantes do Norte
      ========================================================================== */
 
-  /* 75% — Superfícies e Profundidade */
+  /* 75% — Superfícies e Profundidade do Guajará */
   --color-cult-navy-deep: #070D22;
   --color-cult-surface: #0B1739;
   --color-cult-surface-raised: #122046;
   --color-cult-surface-subtle: #0E1A3D;
   --color-cult-surface-hover: #162654;
 
-  /* Bordas Refinadas */
+  /* Bordas e Filetes Náuticos */
   --color-cult-border: rgba(155, 176, 214, 0.16);
   --color-cult-border-strong: rgba(155, 176, 214, 0.32);
   --color-cult-border-subtle: rgba(155, 176, 214, 0.08);
+  --color-cult-border-fluvial: #FFF6E5;
 
-  /* 15% — Neutros Claros e Tipografia */
+  /* 15% — Neutros Claros, Branco-Vela / Creme e Tipografia */
+  --color-cult-cream: #FFF6E5;
+  --color-cult-cream-muted: #F8F3E8;
   --color-cult-text: #E8EDF7;
   --color-cult-text-muted: #9BB0D6;
   --color-cult-text-dim: #6B7C9E;
   --color-cult-text-inverse: #070D22;
 
-  /* 10% — Acentos Vibrantes da Cultura Amazônica */
+  /* 10% — Acentos Vibrantes da Pintura Vernacular dos Barcos */
   --color-cult-cobalt: #2457A6;
   --color-cult-turquoise: #17A9B8;
   --color-cult-gold: #F4B63F;
   --color-cult-orange: #F27A32;
   --color-cult-coral: #EC5B5B;
 
-  /* Assinatura Visual Discreta — Gradiente Editorial */
+  /* Sombras Duras Fluviais e Chanfros dos Barcos */
+  --shadow-fluvial-hard: 5px 5px 0 #17A9B8;
+  --shadow-fluvial-pressed: 3px 3px 0 #17A9B8;
+  --shadow-card-fluvial: 4px 4px 0 rgba(7, 13, 34, 0.7);
+  --shadow-card-fluvial-hover: 5px 5px 0 #17A9B8;
+
+  /* Assinatura Visual Discreta — Gradiente Editorial com Cores Fluviais */
   --gradient-cult-signature: linear-gradient(
     90deg,
     #EC5B5B 0%,
@@ -51,11 +60,13 @@
     #2457A6 100%
   );
 
-  --gradient-hero-overlay: linear-gradient(
-    180deg,
-    rgba(7, 13, 34, 0.15) 0%,
-    rgba(7, 13, 34, 0.65) 50%,
-    rgba(7, 13, 34, 0.95) 100%
+  /* Gradiente Direcional Leve para o Hero */
+  --gradient-hero-fluvial: linear-gradient(
+    90deg,
+    rgba(7, 13, 34, 0.92) 0%,
+    rgba(7, 13, 34, 0.65) 35%,
+    rgba(7, 13, 34, 0.10) 70%,
+    transparent 100%
   );
 
   --gradient-card-overlay: linear-gradient(

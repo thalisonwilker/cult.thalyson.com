@@ -6,7 +6,7 @@ interface Props {
   paraEssays?: CollectionEntry<'ensaios'>[];
 }
 
-const { paraEssays = [] } = Astro.props;
+const { paraEssays: _paraEssays = [] } = Astro.props;
 
 const pillars = [
   {
@@ -47,13 +47,11 @@ const pillars = [
 <section class="belem-para-section" aria-label="Especial Belém e Pará">
   <div class="section-header-editorial">
     <div class="header-title-wrap">
-      <span class="section-tag-editorial">Território &amp; Identidade</span>
+      <span class="section-tag-editorial">
+        <i class="fa-solid fa-anchor" aria-hidden="true"></i> Território &amp; Identidade
+      </span>
       <h2 class="section-title-editorial">Belém &amp; Pará</h2>
     </div>
-    <a href="/?territorio=para" class="view-all-para-link">
-      <span>Ver acervo paraense ({paraEssays.length > 0 ? `${paraEssays.length} ensaios` : 'completo'})</span>
-      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-    </a>
   </div>
 
   <div class="para-editorial-container">
@@ -246,8 +244,10 @@ const pillars = [
   }
 
   .pillar-editorial-card:hover {
-    transform: translateY(-2px);
+    transform: translate(-2px, -2px);
     border-color: var(--pillar-color);
+    border-bottom: 3px solid var(--pillar-color);
+    box-shadow: 4px 4px 0 var(--pillar-color);
     background-color: var(--color-cult-surface-hover);
   }
 

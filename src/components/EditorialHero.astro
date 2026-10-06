@@ -15,13 +15,11 @@ const {
   ctaLink = '#em-destaque',
   ctaText = 'Explorar histórias'
 } = Astro.props;
-
-const isDefaultHeadline = headline === 'Belém entre arte, música e memória amazônica';
 ---
 
 <section class="editorial-hero" aria-label="História Principal da Edição">
   <div class="hero-frame">
-    <!-- Imagem de Fundo em Toda a Largura (Full-Width) -->
+    <!-- Imagem de Fundo de Alto Impacto (Nítida, Cores Vivas, Alta Saturação) -->
     <img
       src={coverImage}
       alt="Pintura expressionista noturna da Estação das Docas com os guindastes históricos amarelos e o céu estrelado em espirais sobre a Baía do Guajará em Belém do Pará"
@@ -30,31 +28,44 @@ const isDefaultHeadline = headline === 'Belém entre arte, música e memória am
       decoding="async"
     />
 
-    <!-- Atmosfera e Scrim Cinematográfico para Leitura Central Sem Caixa -->
+    <!-- Gradient Localizado Exclusivamente para Leitura do Texto (Sem camada escura sobre toda a foto) -->
     <div class="hero-scrim" aria-hidden="true"></div>
 
-    <!-- Conteúdo Editorial Centralizado e Sem Caixa (Fora da Caixa com Destaques) -->
+    <!-- Conteúdo Editorial com Elementos Fluviais dos Abridores de Letras -->
     <div class="hero-content-wrapper">
       <div class="hero-text-content">
+        <!-- Pequeno Filete Ornamental Fluvial Superior -->
+        <div class="hero-fluvial-ornament" aria-hidden="true">
+          <span class="filete-wing filete-wing--left"></span>
+          <svg class="filete-star" width="28" height="18" viewBox="0 0 28 18" fill="none">
+            <path d="M14 1 L16.5 6.5 L23 9 L16.5 11.5 L14 17 L11.5 11.5 L5 9 L11.5 6.5 Z" fill="#F4B63F" stroke="#FFF6E5" stroke-width="0.8"/>
+            <circle cx="2" cy="9" r="2" fill="#17A9B8"/>
+            <circle cx="26" cy="9" r="2" fill="#17A9B8"/>
+          </svg>
+          <span class="filete-wing filete-wing--right"></span>
+        </div>
+
         <h1 class="hero-headline">
-          {isDefaultHeadline ? (
-            <>
-              Belém entre arte, música e memória amazônica
-            </>
-          ) : (
-            headline
-          )}
+          {headline}
         </h1>
 
-        <p class="hero-lead mb-4">
+        <!-- Filete das Águas Fluviais sob o Título -->
+        <div class="hero-river-line" aria-hidden="true">
+          <svg width="120" height="8" viewBox="0 0 120 8" fill="none">
+            <path d="M0 4 Q 30 1, 60 4 T 120 4" stroke="#17A9B8" stroke-width="2" stroke-linecap="round"/>
+            <polygon points="60,0 64,4 60,8 56,4" fill="#F4B63F" stroke="#FFF6E5" stroke-width="0.6"/>
+          </svg>
+        </div>
+
+        <p class="hero-lead">
           {lead}
         </p>
 
-        <!-- Botão de Gancho Centralizado com Efeitos Culturais de Belém -->
+        <!-- CTA Principal: Pequena Placa Pintada em Barco Amazônico -->
         <div class="hero-actions">
-          <a href={ctaLink} class="hero-belem-btn" aria-label="Explorar histórias e saberes do Pará">
-            <span class="btn-label">{ctaText}</span>
-            <span class="btn-arrow" aria-hidden="true">
+          <a href={ctaLink} class="hero-boat-plate-btn" aria-label="Explorar histórias e saberes do Pará">
+            <span class="plate-text">{ctaText}</span>
+            <span class="plate-arrow" aria-hidden="true">
               <i class="fa-solid fa-arrow-down"></i>
             </span>
           </a>
@@ -66,7 +77,7 @@ const isDefaultHeadline = headline === 'Belém entre arte, música e memória am
 
 <style>
   /* ============================================================
-     Editorial Hero — Imagem Full-Width com Textos Fora da Caixa
+     Editorial Hero — Imagem Nítida e Placa Náutica dos Barcos
      ============================================================ */
   .editorial-hero {
     position: relative;
@@ -79,56 +90,45 @@ const isDefaultHeadline = headline === 'Belém entre arte, música e memória am
   .hero-frame {
     position: relative;
     width: 100%;
-    min-height: clamp(560px, 82vh, 820px);
+    min-height: clamp(560px, 80vh, 820px);
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     background-color: var(--color-cult-navy-deep);
     overflow: hidden;
   }
 
-  /* Imagem Nítida e Exuberante Ocupando Toda a Largura */
+  /* Imagem Principal Nítida e Completa, sem cortes excessivos */
   .hero-media {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 30%;
-    filter: saturate(1.12) contrast(1.03);
+    object-position: center center;
+    filter: contrast(1.08) saturate(1.18) brightness(1.02);
     transform: scale(1.0);
     transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .hero-frame:hover .hero-media {
-    transform: scale(1.02);
+    transform: scale(1.01);
   }
 
-  /* Scrim Cinematográfico Suave — Preserva o Céu Estrelado e Garante Contraste Perfeito */
+  /* Scrim 100% Limpo na Base: zero sombreado na parte inferior para mostrar a foto por completo */
   .hero-scrim {
     position: absolute;
     inset: 0;
-    background:
-      /* Iluminação sutil e profunda no centro para leitura dos textos fora da caixa */
-      radial-gradient(
-        ellipse 90% 70% at 50% 50%,
-        rgba(7, 13, 34, 0.76) 0%,
-        rgba(7, 13, 34, 0.5) 55%,
-        transparent 100%
-      ),
-      /* Vinheta de transição suave do topo e fusão perfeita com a base */
-      linear-gradient(
-        180deg,
-        rgba(7, 13, 34, 0.38) 0%,
-        rgba(7, 13, 34, 0.22) 25%,
-        rgba(7, 13, 34, 0.62) 65%,
-        rgba(7, 13, 34, 0.95) 90%,
-        var(--color-bg) 100%
-      );
+    background: linear-gradient(
+      90deg,
+      rgba(7, 13, 34, 0.45) 0%,
+      rgba(7, 13, 34, 0.15) 35%,
+      transparent 65%
+    );
     pointer-events: none;
   }
 
-  /* Conteúdo Editorial Centralizado e Aberto (Sem Caixa) */
+  /* Conteúdo Editorial Posicionado para Ótima Leitura */
   .hero-content-wrapper {
     position: relative;
     z-index: 2;
@@ -137,194 +137,153 @@ const isDefaultHeadline = headline === 'Belém entre arte, música e memória am
     margin: 0 auto;
     padding: var(--space-12) var(--space-6);
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    text-align: center;
   }
 
   .hero-text-content {
-    max-width: 980px;
+    max-width: 740px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-5);
+    align-items: flex-start;
+    text-align: left;
+    gap: var(--space-4);
   }
 
-  /* Headline Dominante com Tipografia Editorial e Destaques Culturais */
+  /* Filete Ornamental Superior dos Abridores de Letras */
+  .hero-fluvial-ornament {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-1);
+  }
+
+  .filete-wing {
+    display: inline-block;
+    width: 38px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #F4B63F);
+  }
+
+  .filete-wing--right {
+    background: linear-gradient(90deg, #F4B63F, transparent);
+  }
+
+  .filete-star {
+    flex-shrink: 0;
+  }
+
+  /* Headline Dominante e Expressiva */
   .hero-headline {
     font-family: var(--font-serif);
-    font-size: clamp(2.4rem, 5.4vw, 4.3rem);
+    font-size: clamp(2.2rem, 4.8vw, 3.8rem);
     font-weight: 700;
     color: #FFFFFF;
-    line-height: 1.14;
+    line-height: 1.15;
     letter-spacing: -0.025em;
-    text-align: center;
-    max-width: 980px;
     margin: 0;
     text-shadow:
-      0 2px 8px rgba(3, 7, 18, 0.95),
-      0 6px 24px rgba(7, 13, 34, 0.95),
-      0 14px 44px rgba(3, 7, 18, 0.85);
+      0 2px 6px rgba(7, 13, 34, 0.95),
+      0 8px 24px rgba(7, 13, 34, 0.9);
   }
 
-  /* Destaques Tipográficos Vivos Inspirados no Pará */
-  .highlight-cyan {
-    background: linear-gradient(135deg, #17A9B8 0%, #68D8D6 60%, #FFFFFF 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-style: italic;
-    font-weight: 600;
-    filter: drop-shadow(0 2px 14px rgba(23, 169, 184, 0.65));
-    display: inline-block;
-    padding: 0 0.08em;
+  /* Linha das Águas Fluviais */
+  .hero-river-line {
+    display: flex;
+    align-items: center;
+    margin-top: calc(-1 * var(--space-1));
   }
 
-  .highlight-gold {
-    background: linear-gradient(135deg, #F4B63F 0%, #F27A32 50%, #EC5B5B 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
-    filter: drop-shadow(0 2px 16px rgba(244, 182, 63, 0.65));
-    display: inline-block;
-    padding: 0 0.08em;
-  }
-
-  /* Descrição Editorial Fluida e Centrada */
+  /* Descrição Editorial Fluida */
   .hero-lead {
     font-family: var(--font-sans);
-    font-size: clamp(1.05rem, 1.45vw, 1.28rem);
-    line-height: 1.68;
-    color: #E2EBF8;
-    max-width: 820px;
-    margin: 0 auto;
-    text-align: center;
+    font-size: clamp(1.02rem, 1.35vw, 1.22rem);
+    line-height: 1.65;
+    color: var(--color-cult-cream);
+    max-width: 660px;
+    margin: 0;
     font-weight: 400;
     text-shadow:
-      0 2px 10px rgba(3, 7, 18, 0.95),
-      0 4px 20px rgba(7, 13, 34, 0.9);
+      0 2px 8px rgba(7, 13, 34, 0.9),
+      0 4px 16px rgba(7, 13, 34, 0.85);
   }
 
-  /* Ações / Botão de Gancho Centralizado */
+  /* Ações / Botão */
   .hero-actions {
     display: flex;
-    justify-content: center;
     align-items: center;
     margin-top: var(--space-4);
   }
 
-  /* Botão de Gancho com Efeitos Culturais de Belém */
-  .hero-belem-btn {
+  /* ============================================================
+     CTA Principal: Placa Pintada em Barco Amazônico
+     - fundo: #F4B63F
+     - texto: #070D22
+     - border: 2px solid #FFF6E5
+     - box-shadow: 5px 5px 0 #17A9B8
+     - cantos levemente chanfrados
+     - peso tipográfico forte
+     - no hover: deslocar 2px baixo/direita, reduzir sombra, transição 180-220ms
+     ============================================================ */
+  .hero-boat-plate-btn {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding: 0.95rem 2.4rem;
-    font-family: var(--font-sans);
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    color: #FFFFFF;
-    background: linear-gradient(135deg, #132a5c 0%, #17548a 45%, #17A9B8 100%);
-    border: 1.5px solid rgba(244, 182, 63, 0.75);
-    border-radius: var(--radius-pill);
+    gap: 0.85rem;
+    padding: 0.95rem 2.2rem;
+    background-color: var(--color-cult-gold);
+    color: var(--color-cult-navy-deep);
+    border: 2px solid var(--color-cult-cream);
+    box-shadow: 5px 5px 0 var(--color-cult-turquoise);
+    border-radius: 4px;
     text-decoration: none;
     cursor: pointer;
-    box-shadow:
-      0 0 25px rgba(23, 169, 184, 0.45),
-      0 0 14px rgba(244, 182, 63, 0.35),
-      0 8px 32px rgba(3, 7, 18, 0.75);
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition:
+      transform 200ms cubic-bezier(0.2, 0, 0, 1),
+      box-shadow 200ms cubic-bezier(0.2, 0, 0, 1),
+      filter 200ms cubic-bezier(0.2, 0, 0, 1);
   }
 
-  /* Pulso e Ondas Culturais de Belém (Banzeiro do Guajará & Carimbó) */
-  .hero-belem-btn::before {
+  /* Filete Interno de Placa Pintada à Mão */
+  .hero-boat-plate-btn::before {
     content: '';
     position: absolute;
-    inset: -4px;
-    border-radius: var(--radius-pill);
-    background: linear-gradient(90deg, #EC5B5B, #F4B63F, #17A9B8, #2457A6);
-    z-index: -1;
-    opacity: 0.45;
-    filter: blur(8px);
-    animation: belemPulse 3.5s ease-in-out infinite;
-  }
-
-  /* Brilho e Reflexo das Águas Fluviais (Water Shimmer) */
-  .hero-belem-btn::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -60%;
-    width: 220%;
-    height: 200%;
-    background: linear-gradient(
-      60deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.28) 50%,
-      transparent 70%
-    );
-    transform: rotate(25deg);
-    animation: waterShimmer 4s ease-in-out infinite;
+    inset: 3px;
+    border: 1px solid rgba(7, 13, 34, 0.35);
+    border-radius: 2px;
     pointer-events: none;
   }
 
-  .hero-belem-btn:hover {
-    transform: translateY(-4px) scale(1.03);
-    background: linear-gradient(135deg, #18387a 0%, #1a68aa 45%, #1cc3d4 100%);
-    border-color: #F4B63F;
-    box-shadow:
-      0 0 35px rgba(23, 169, 184, 0.7),
-      0 0 22px rgba(244, 182, 63, 0.6),
-      0 12px 38px rgba(3, 7, 18, 0.85);
+  /* Efeito Hover dos Abridores de Letras (Deslocamento Físico de 2px e Redução de Sombra) */
+  .hero-boat-plate-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 var(--color-cult-turquoise);
+    filter: saturate(1.18);
   }
 
-  .btn-water-icon {
-    font-size: 1.05rem;
-    color: #68D8D6;
-    filter: drop-shadow(0 0 6px rgba(23, 169, 184, 0.8));
-    transition: transform 0.3s ease;
+  .hero-boat-plate-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 1px 1px 0 var(--color-cult-turquoise);
   }
 
-  .hero-belem-btn:hover .btn-water-icon {
-    transform: scale(1.2) rotate(-8deg);
-    color: #F4B63F;
+  .plate-text {
+    line-height: 1;
   }
 
-  .btn-arrow {
-    font-size: 0.95rem;
-    color: #F4B63F;
-    filter: drop-shadow(0 0 5px rgba(244, 182, 63, 0.8));
-    transition: transform 0.3s ease;
+  .plate-arrow {
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: transform var(--transition-fast);
   }
 
-  .hero-belem-btn:hover .btn-arrow {
-    transform: translateY(4px);
-  }
-
-  @keyframes belemPulse {
-    0%, 100% {
-      opacity: 0.35;
-      transform: scale(0.98);
-    }
-    50% {
-      opacity: 0.75;
-      transform: scale(1.03);
-      filter: blur(12px);
-    }
-  }
-
-  @keyframes waterShimmer {
-    0% {
-      transform: translateX(-100%) rotate(25deg);
-    }
-    35%, 100% {
-      transform: translateX(100%) rotate(25deg);
-    }
+  .hero-boat-plate-btn:hover .plate-arrow {
+    transform: translateY(2px);
   }
 
   /* ============================================================
@@ -333,14 +292,30 @@ const isDefaultHeadline = headline === 'Belém entre arte, música e memória am
   @media (max-width: 900px) {
     .hero-frame {
       min-height: 560px;
+      justify-content: center;
     }
 
     .hero-content-wrapper {
       padding: var(--space-8) var(--space-4);
+      justify-content: center;
+    }
+
+    .hero-text-content {
+      align-items: center;
+      text-align: center;
     }
 
     .hero-headline {
-      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-size: clamp(2rem, 5.5vw, 3rem);
+    }
+
+    .hero-scrim {
+      background: radial-gradient(
+        ellipse 90% 55% at 50% 35%,
+        rgba(7, 13, 34, 0.50) 0%,
+        rgba(7, 13, 34, 0.20) 45%,
+        transparent 75%
+      );
     }
   }
 
@@ -350,11 +325,11 @@ const isDefaultHeadline = headline === 'Belém entre arte, música e memória am
     }
 
     .hero-frame {
-      min-height: 520px;
+      min-height: 500px;
     }
 
     .hero-media {
-      object-position: center 25%;
+      object-position: center center;
     }
 
     .hero-content-wrapper {
@@ -367,13 +342,13 @@ const isDefaultHeadline = headline === 'Belém entre arte, música e memória am
     }
 
     .hero-lead {
-      font-size: 0.95rem;
+      font-size: 0.96rem;
       line-height: 1.55;
     }
 
-    .hero-belem-btn {
+    .hero-boat-plate-btn {
       width: 100%;
-      max-width: 320px;
+      max-width: 300px;
       padding: 0.85rem 1.6rem;
       font-size: 0.95rem;
     }
