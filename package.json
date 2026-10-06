@@ -9,7 +9,10 @@
     "preview": "astro preview",
     "typecheck": "astro check && tsc --noEmit",
     "test:unit": "vitest run",
-    "test": "vitest run"
+    "test": "vitest run",
+    "docker:build": "docker build -t cult-thalyson:latest .",
+    "docker:run": "docker run --rm -p 8080:8080 cult-thalyson:latest",
+    "docker:test": "bash scripts/test-docker.sh"
   },
   "dependencies": {
     "astro": "^5.4.2"
