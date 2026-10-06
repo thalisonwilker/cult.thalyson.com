@@ -18,41 +18,6 @@ const year = new Date().getFullYear();
       </p>
     </div>
 
-    <!-- Navegação Editorial do Rodapé Centralizada -->
-    <div class="footer-nav-columns">
-      <div class="nav-col">
-        <span class="col-title">Vertentes</span>
-        <ul class="col-links">
-          <li><a href="/?categoria=musica">Música &amp; Ritmos</a></li>
-          <li><a href="/?categoria=patrimonio">Círio &amp; Patrimônio</a></li>
-          <li><a href="/?categoria=cinema">Cinema</a></li>
-          <li><a href="/?categoria=literatura">Literatura</a></li>
-          <li><a href="/?categoria=artes">Artes Visuais</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-col">
-        <span class="col-title">Territórios</span>
-        <ul class="col-links">
-          <li><a href="/?territorio=para">Belém &amp; Pará</a></li>
-          <li><a href="/?territorio=nacional">Arte Nacional</a></li>
-          <li><a href="/?territorio=global">Mundo &amp; Clássicos</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Filete Ornamental Fluvial como Assinatura Final -->
-    <div class="footer-final-filete" aria-hidden="true">
-      <span class="filete-line"></span>
-      <svg width="48" height="14" viewBox="0 0 48 14" fill="none">
-        <path d="M0 7 H16 M32 7 H48" stroke="#17A9B8" stroke-width="1.5" stroke-linecap="round"/>
-        <polygon points="24,1 28,7 24,13 20,7" fill="#F4B63F" stroke="#FFF6E5" stroke-width="0.8"/>
-        <circle cx="16" cy="7" r="1.5" fill="#EC5B5B"/>
-        <circle cx="32" cy="7" r="1.5" fill="#EC5B5B"/>
-      </svg>
-      <span class="filete-line"></span>
-    </div>
-
     <div class="footer-bottom">
       <p class="copyright">
         © {year} <strong>CULT.thalyson.com</strong> — Compartilhando a cultura, a música e as histórias do Pará por Thalyson.
@@ -128,74 +93,6 @@ const year = new Date().getFullYear();
     text-align: center;
   }
 
-  /* Navegação em Colunas Centralizadas */
-  .footer-nav-columns {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-16);
-    border-top: 1px solid var(--color-border);
-    padding-top: var(--space-6);
-  }
-
-  .nav-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-3);
-  }
-
-  .col-title {
-    font-family: var(--font-sans);
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--color-cult-turquoise);
-  }
-
-  .col-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .col-links a {
-    font-family: var(--font-sans);
-    font-size: 0.85rem;
-    color: var(--color-cult-text-muted);
-    text-decoration: none;
-    transition: color var(--transition-fast);
-  }
-
-  .col-links a:hover {
-    color: var(--color-cult-text);
-  }
-
-  /* Filete Ornamental de Assinatura Final */
-  .footer-final-filete {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-4);
-    padding: var(--space-2) 0;
-    opacity: 0.9;
-  }
-
-  .footer-final-filete .filete-line {
-    flex: 1;
-    max-width: 120px;
-    height: 1.5px;
-    background: linear-gradient(90deg, transparent, var(--color-cult-turquoise));
-  }
-
-  .footer-final-filete .filete-line:last-child {
-    background: linear-gradient(90deg, var(--color-cult-turquoise), transparent);
-  }
-
   .footer-bottom {
     display: flex;
     justify-content: space-between;
@@ -238,10 +135,6 @@ const year = new Date().getFullYear();
   }
 
   @media (max-width: 768px) {
-    .footer-nav-columns {
-      gap: var(--space-8);
-    }
-
     .footer-container {
       padding: var(--space-8) var(--space-4) var(--space-6);
     }

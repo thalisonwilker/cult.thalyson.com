@@ -11,12 +11,13 @@ alwaysApply: true
 **Última atualização:** 2026-10-06 por Antigravity
 
 ## Em andamento / próximo passo
-- **Alteração concluída:** **Remoção da Seção "Território & Identidade Belém & Pará"** (2026-10-06):
-  1. Removida a seção temática `ParaSection` da página inicial ([src/pages/index.astro](file:///Users/thalysonwilker/Projects/Thalyson/cult.thalyson.com/src/pages/index.astro)), deixando a Home mais enxuta, focando diretamente em Destaques, Navegação por Categorias e Últimas Histórias.
-  2. Removido o componente não utilizado `src/components/ParaSection.astro`.
+- **Alteração concluída:** **Simplificação do Rodapé (Footer)** (2026-10-06):
+  1. Removido o bloco de links de navegação editorial (colunas "Vertentes" e "Territórios") e o filete ornamental de [src/components/Footer.astro](file:///Users/thalysonwilker/Projects/Thalyson/cult.thalyson.com/src/components/Footer.astro).
+  2. O rodapé agora apresenta visual limpo e direto, preservando a marca fluvial centralizada (`CultLogo`), o manifesto editorial e a linha de copyright com atalho de desenvolvimento para o `/admin/`.
 - **Próximo passo:** Próxima feature do roadmap ou deploy da imagem atualizada no Fly.io.
 
 ## Decisões recentes
+- 2026-10-06: Simplificação do rodapé: remoção das colunas de navegação repetitivas e do filete ornamental conforme solicitação do usuário.
 - 2026-10-06: Remoção da seção "Território & Identidade Belém & Pará" da Home a pedido do usuário.
 - 2026-10-06: Correção de Layout e Resiliência de API no Painel Admin:
   1. **SSR Hydration no Admin (`src/pages/admin/index.astro`):** Injeção de `initialEssays` e `initialCategories` diretamente no template, garantindo renderização instantânea dos cards e da tabela de publicações no primeiro paint.
