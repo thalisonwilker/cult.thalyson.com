@@ -11,14 +11,18 @@ alwaysApply: true
 **Última atualização:** 2026-10-06 por Antigravity
 
 ## Em andamento / próximo passo
-- **Feature concluída:** [`specs/0010-urls-por-categoria-e-correcao-portas/`](../specs/0010-urls-por-categoria-e-correcao-portas/spec.md) — **URLs por Categoria e Correção de Portas em Redirecionamentos**:
-  1. URLs canônicas organizadas pela categoria cultural (`/{category}/{slug}/`, ex: `/patrimonio/as-14-procissoes-do-cirio-de-nazare/`), implementadas em rota dinâmica `src/pages/[category]/[slug].astro` e função de domínio pura `src/domain/routes.ts` com trailing slash.
-  2. Redirecionamento retroativo de URLs legadas (`/ensaios/[slug]/`) com meta-refresh e substituição via script de cliente (`window.location.replace`) preservando links antigos.
-  3. Prevenção de anexação de portas de acesso internas (`:8080`, `:3000`) em produção através das diretivas `port_in_redirect off;` e `absolute_redirect off;` no `nginx.conf` e `trailingSlash: 'always'` no `astro.config.mjs`.
-  4. Todos os links internos e componentes (`EssayCard`, `FeaturedStories`, `/admin/`, `ParaHighlightHero`, `ParaSection`) atualizados com trailing slash e rotas válidas.
+- **Correção concluída:** **Layout do Painel Admin e Normalização de Rotas de API** (2026-10-06):
+  1. Identificada causa raiz da "linha branca" e tabela vazia: com a adição de `trailingSlash: 'always'` no `astro.config.mjs`, requisições internas de API sem barra final (`/api/editor/essays`) eram interceptadas pelo Astro e respondidas com HTML de redirecionamento 404, disparando exceção no parser JSON e travando a interface em "Carregando...".
+  2. Middleware de desenvolvimento (`src/infrastructure/editor-dev-middleware.ts`) e configuração do Vite no `astro.config.mjs` atualizados com `enforce: 'pre'` e normalização de caminho (`pathname.replace(/\/+$/, '')`) para atender com segurança chamadas com ou sem barra final.
+  3. Páginas `/admin/` e `/editor/` atualizadas para chamar endpoints normalizados com barra final (`/api/editor/essays/`, etc.) e `/admin/` agora conta com pré-carregamento imediato via SSR (`initialEssays` e `initialCategories`), garantindo renderização instantânea da tabela sem delay e sem tela em branco.
+  4. Suavizada a linha divisória inferior dos cabeçalhos da tabela (`.admin-table th`) no `src/styles/admin.css` para `rgba(155, 176, 214, 0.12)`, eliminando qualquer sensação de linha branca dura sobre o fundo escuro.
 - **Próximo passo:** Próxima feature do roadmap ou deploy da imagem atualizada no Fly.io.
 
 ## Decisões recentes
+- 2026-10-06: Correção de Layout e Resiliência de API no Painel Admin:
+  1. **SSR Hydration no Admin (`src/pages/admin/index.astro`):** Injeção de `initialEssays` e `initialCategories` diretamente no template, garantindo renderização instantânea dos cards e da tabela de publicações no primeiro paint.
+  2. **Intercepção de API no Vite (`astro.config.mjs`):** Plugin de middleware configurado com `enforce: 'pre'` e `server.middlewares.stack.unshift` para prioridade sobre o roteador estático de trailing slash do Astro.
+  3. **Refinamento Estético da Tabela (`src/styles/admin.css`):** Substituição do divisor de alto contraste por tonalidade translúcida integrada ao tema escuro.
 - 2026-10-06: Implementação de URLs por Categoria e Correção de Portas (spec `0010`):
   1. **Roteamento Canônico por Categoria:** Criação de `src/pages/[category]/[slug].astro` e módulo de domínio `src/domain/routes.ts` com testes unitários em `src/domain/routes.test.ts`.
   2. **Prevenção de Portas no Nginx:** Adicionado `port_in_redirect off;` e `absolute_redirect off;` no bloco `server` de `nginx.conf`, garantindo que diretórios sem barra recebam redirecionamentos relativos sem incluir a porta de escuta interna `:8080`.
