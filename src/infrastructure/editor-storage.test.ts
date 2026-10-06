@@ -169,5 +169,55 @@ Este é o corpo do ensaio com **negrito** e [links](https://exemplo.com).
       await deleteEssay(slug);
     }
   });
+
+  it('deve normalizar fontes a partir de strings ou objetos', async () => {
+    const { normalizeSources } = await import('./editor-storage');
+    const input = [
+      'Iphan Pará - https://gov.br/iphan',
+      'Artigo sem URL',
+      'https://link-direto.com/artigo',
+      { title: 'Livro de Referência', url: 'https://livro.com' },
+      { title: 'Apenas Título em Objeto' },
+      ''
+    ];
+
+    const normalized = normalizeSources(input);
+    expect(normalized).toHaveLength(5);
+    expect(normalized[0]).toEqual({ title: 'Iphan Pará', url: 'https://gov.br/iphan' });
+    expect(normalized[1]).toEqual({ title: 'Artigo sem URL' });
+    expect(normalized[2]).toEqual({ title: 'https://link-direto.com/artigo', url: 'https://link-direto.com/artigo' });
+    expect(normalized[3]).toEqual({ title: 'Livro de Referência', url: 'https://livro.com' });
+    expect(normalized[4]).toEqual({ title: 'Apenas Título em Objeto', url: undefined });
+  });
+
+  it('deve parsear e formatar fontes no frontmatter de publicações', () => {
+    const raw = `---
+title: "Ensaio com Fontes"
+description: "Descrição"
+pubDate: 2026-10-06
+category: "patrimonio"
+territory: "para"
+author: "Thalyson"
+tags: []
+draft: false
+sources:
+  - "Iphan - https://gov.br/iphan"
+  - title: "Basílica Santuário"
+    url: "https://basilica.com.br"
+---
+
+Texto do ensaio
+`;
+
+    const parsed = parseEssayMarkdown(raw, 'ensaio-com-fontes');
+    expect(parsed.sources).toBeDefined();
+    expect(parsed.sources?.length).toBe(2);
+
+    const formatted = formatEssayMarkdown(parsed);
+    expect(formatted).toContain('sources:');
+    expect(formatted).toContain('- "Iphan - https://gov.br/iphan"');
+    expect(formatted).toContain('- title: "Basílica Santuário"');
+    expect(formatted).toContain('url: "https://basilica.com.br"');
+  });
 });
 

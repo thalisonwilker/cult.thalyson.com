@@ -20,7 +20,16 @@ const ensaiosCollection = defineCollection({
     draft: z.boolean().default(false),
     featured: z.boolean().default(false),
     coverImage: z.string().optional(),
-    coverImagePosition: z.string().optional()
+    coverImagePosition: z.string().optional(),
+    sources: z.array(
+      z.union([
+        z.string(),
+        z.object({
+          title: z.string(),
+          url: z.string().optional()
+        })
+      ])
+    ).default([])
   })
 });
 

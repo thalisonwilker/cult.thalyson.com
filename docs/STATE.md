@@ -11,12 +11,16 @@ alwaysApply: true
 **Última atualização:** 2026-10-06 por Antigravity
 
 ## Em andamento / próximo passo
-- **Alteração concluída:** **Simplificação do Rodapé (Footer)** (2026-10-06):
-  1. Removido o bloco de links de navegação editorial (colunas "Vertentes" e "Territórios") e o filete ornamental de [src/components/Footer.astro](file:///Users/thalysonwilker/Projects/Thalyson/cult.thalyson.com/src/components/Footer.astro).
-  2. O rodapé agora apresenta visual limpo e direto, preservando a marca fluvial centralizada (`CultLogo`), o manifesto editorial e a linha de copyright com atalho de desenvolvimento para o `/admin/`.
+- **Feature concluída:** [`specs/0011-alinhamento-links-fontes-editor/`](../specs/0011-alinhamento-links-fontes-editor/spec.md) — **Alinhamento de Texto, Destaque de Links e Seção de Fontes no Editor**:
+  1. **Alinhamento de Texto na Toolbar:** 4 botões dedicados (Esquerda, Centro, Direita e Justificar) inserindo tags com atributos/classes suportados no Markdown, com estilização correspondente no preview e na página final.
+  2. **Destaque Automático de Links Sublinhados:** Links no corpo dos artigos (`.prose a`, `.article-content a`, `.editor-preview-content a`) agora têm destaque visual automático com cor turquesa (`var(--color-cult-turquoise)`), sublinhado com offset de 3px e transição no hover.
+  3. **Seção de Fontes no Editor:** Nova Seção 4 "Fontes & Referências Consultadas" com textarea multi-linhas (uma fonte por linha, com suporte a título e URL), sincronizado com rascunhos em `localStorage` e preenchido na restauração.
+  4. **Persistência no Frontmatter:** Campo `sources` suportado no schema Zod (`src/content/config.ts`), funções de normalização (`normalizeSources`), parse e formatação em `src/infrastructure/editor-storage.ts` com testes unitários.
+  5. **Renderização nos Artigos:** Bloco estruturado "Fontes & Referências" no final dos artigos em `src/pages/[category]/[slug].astro` com ícones e links externos seguros, além de preview instantâneo no editor.
 - **Próximo passo:** Próxima feature do roadmap ou deploy da imagem atualizada no Fly.io.
 
 ## Decisões recentes
+- 2026-10-06: Implementação de Alinhamento, Destaque de Links e Fontes no Editor (spec `0011`).
 - 2026-10-06: Simplificação do rodapé: remoção das colunas de navegação repetitivas e do filete ornamental conforme solicitação do usuário.
 - 2026-10-06: Remoção da seção "Território & Identidade Belém & Pará" da Home a pedido do usuário.
 - 2026-10-06: Correção de Layout e Resiliência de API no Painel Admin:

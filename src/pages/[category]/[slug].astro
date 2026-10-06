@@ -3,6 +3,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { calculateReadingTime, formatDate } from '../../domain/reading-time';
+import { normalizeSources } from '../../infrastructure/editor-storage';
 
 export async function getStaticPaths() {
   const ensaios = await getCollection('ensaios');
@@ -22,6 +23,7 @@ interface Props {
 const { essay } = Astro.props;
 const { Content } = await essay.render();
 const readingTime = calculateReadingTime(essay.body);
+const sources = normalizeSources(essay.data.sources);
 
 const categoryLabels: Record<string, string> = {
   cinema: 'Cinema',
@@ -117,6 +119,34 @@ const territoryLabels: Record<string, string> = {
     <div class="article-content prose">
       <Content />
     </div>
+
+    {sources.length > 0 && (
+      <section class="article-sources" aria-label="Fontes e referências consultadas">
+        <div class="sources-header">
+          <i class="fa-solid fa-book-bookmark" aria-hidden="true"></i>
+          <h2 class="sources-title">Fontes &amp; Referências</h2>
+        </div>
+        <ul class="sources-list">
+          {sources.map((s) => (
+            <li class="source-item">
+              {s.url ? (
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="source-link"
+                >
+                  <span>{s.title}</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                </a>
+              ) : (
+                <span class="source-text">{s.title}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
 
     <footer class="article-footer">
       <div class="back-nav">
@@ -294,6 +324,91 @@ const territoryLabels: Record<string, string> = {
   .dev-edit-btn:hover {
     background: var(--color-cult-turquoise);
     color: var(--color-cult-navy-deep);
+  }
+
+  /* ============================================================
+     Seção de Fontes & Referências (AC-5)
+     ============================================================ */
+  .article-sources {
+    margin-top: 3.5rem;
+    padding: 1.5rem 1.75rem;
+    background: rgba(18, 32, 70, 0.45);
+    border: 1px solid rgba(155, 176, 214, 0.15);
+    border-radius: var(--radius-md);
+  }
+
+  .sources-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    color: var(--color-cult-turquoise);
+  }
+
+  .sources-header i {
+    font-size: 0.95rem;
+  }
+
+  .sources-title {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-cult-turquoise);
+    margin: 0;
+  }
+
+  .sources-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .source-item {
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--color-cult-text-muted);
+    position: relative;
+    padding-left: 1.1rem;
+  }
+
+  .source-item::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--color-cult-turquoise);
+    font-weight: bold;
+  }
+
+  .source-link {
+    color: var(--color-cult-turquoise);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: rgba(23, 169, 184, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+  }
+
+  .source-link:hover {
+    color: #fff;
+    text-decoration-color: var(--color-cult-turquoise);
+  }
+
+  .source-link i {
+    font-size: 0.72rem;
+    opacity: 0.8;
+  }
+
+  .source-text {
+    color: var(--color-cult-text);
   }
 
   @media (max-width: 768px) {

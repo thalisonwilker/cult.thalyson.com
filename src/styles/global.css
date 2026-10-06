@@ -57,6 +57,46 @@ a {
   transition: color var(--transition-fast), opacity var(--transition-fast);
 }
 
+/* Links dentro de artigos e textos de leitura (AC-2) */
+.prose a,
+.article-content a,
+.article-lead a,
+.essay-content a {
+  color: var(--color-cult-turquoise);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(23, 169, 184, 0.55);
+  font-weight: 500;
+  transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+}
+
+.prose a:hover,
+.article-content a:hover,
+.article-lead a:hover,
+.essay-content a:hover {
+  color: #fff;
+  text-decoration-color: var(--color-cult-turquoise);
+}
+
+/* Alinhamento de Texto Editorial (AC-1) */
+.text-left, [align="left"], p[align="left"], div[align="left"] {
+  text-align: left !important;
+}
+
+.text-center, [align="center"], p[align="center"], div[align="center"] {
+  text-align: center !important;
+}
+
+.text-right, [align="right"], p[align="right"], div[align="right"] {
+  text-align: right !important;
+}
+
+.text-justify, [align="justify"], p[align="justify"], div[align="justify"] {
+  text-align: justify !important;
+  text-justify: inter-word;
+}
+
 /* Imagens */
 img, picture, video, canvas, svg {
   display: block;

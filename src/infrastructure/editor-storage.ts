@@ -12,6 +12,11 @@ export interface CategoryItem {
   label: string;
 }
 
+export interface EssaySource {
+  title: string;
+  url?: string;
+}
+
 export interface EssayData {
   slug: string;
   title: string;
@@ -26,6 +31,7 @@ export interface EssayData {
   featured?: boolean;
   coverImage?: string;
   coverImagePosition?: string;
+  sources?: (string | EssaySource)[];
   body: string;
 }
 
@@ -135,6 +141,36 @@ export async function deleteCategory(value: string): Promise<CategoryItem[]> {
   return saveCategories(filtered);
 }
 
+/** Normaliza fontes em lista de objetos { title, url? } */
+export function normalizeSources(sources?: (string | EssaySource)[]): EssaySource[] {
+  if (!Array.isArray(sources)) return [];
+  return sources
+    .map((s) => {
+      if (typeof s === 'string') {
+        const trimmed = s.trim();
+        if (!trimmed) return null;
+        // Tenta capturar "Nome da Fonte - https://url" ou "Nome da Fonte: https://url"
+        const urlMatch = trimmed.match(/^(.*?)(?:\s*(?:[-–—:]|·)\s*|\s+)(https?:\/\/[^\s]+)$/i);
+        if (urlMatch) {
+          const title = urlMatch[1].trim() || urlMatch[2].trim();
+          return { title, url: urlMatch[2].trim() };
+        }
+        if (/^https?:\/\//i.test(trimmed)) {
+          return { title: trimmed, url: trimmed };
+        }
+        return { title: trimmed };
+      }
+      if (s && typeof s === 'object') {
+        const title = String(s.title || '').trim();
+        if (!title) return null;
+        const url = s.url ? String(s.url).trim() : undefined;
+        return { title, url: url || undefined };
+      }
+      return null;
+    })
+    .filter((s): s is EssaySource => Boolean(s && s.title));
+}
+
 /** Parse simples e determinístico de frontmatter YAML de um ensaio */
 export function parseEssayMarkdown(raw: string, slug: string): EssayData {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
@@ -149,6 +185,7 @@ export function parseEssayMarkdown(raw: string, slug: string): EssayData {
       author: 'Thalyson',
       tags: [],
       draft: false,
+      sources: [],
       body: raw
     };
   }
@@ -168,10 +205,51 @@ export function parseEssayMarkdown(raw: string, slug: string): EssayData {
   let featured = false;
   let coverImage: string | undefined;
   let coverImagePosition: string | undefined;
+  let sources: (string | EssaySource)[] = [];
+
+  let currentKey: string | null = null;
+  let currentSourceObj: Partial<EssaySource> | null = null;
 
   for (const line of frontmatterStr.split('\n')) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
+
+    // Se estivermos dentro da chave sources e a linha for um item
+    if (currentKey === 'sources' && (line.startsWith(' ') || line.startsWith('\t') || trimmed.startsWith('-'))) {
+      if (trimmed.startsWith('-')) {
+        if (currentSourceObj && currentSourceObj.title) {
+          sources.push(currentSourceObj as EssaySource);
+          currentSourceObj = null;
+        }
+        const itemContent = trimmed.replace(/^[-\s]+/, '').trim();
+        if (itemContent.startsWith('title:')) {
+          let tVal = itemContent.replace(/^title:\s*/, '').trim();
+          if ((tVal.startsWith('"') && tVal.endsWith('"')) || (tVal.startsWith("'") && tVal.endsWith("'"))) {
+            tVal = tVal.slice(1, -1);
+          }
+          currentSourceObj = { title: tVal };
+        } else {
+          let sVal = itemContent;
+          if ((sVal.startsWith('"') && sVal.endsWith('"')) || (sVal.startsWith("'") && sVal.endsWith("'"))) {
+            sVal = sVal.slice(1, -1);
+          }
+          if (sVal) sources.push(sVal);
+        }
+      } else if (trimmed.startsWith('url:') && currentSourceObj) {
+        let uVal = trimmed.replace(/^url:\s*/, '').trim();
+        if ((uVal.startsWith('"') && uVal.endsWith('"')) || (uVal.startsWith("'") && uVal.endsWith("'"))) {
+          uVal = uVal.slice(1, -1);
+        }
+        currentSourceObj.url = uVal;
+      }
+      continue;
+    }
+
+    // Se saiu de sources para outra chave, finaliza currentSourceObj
+    if (currentSourceObj && currentSourceObj.title) {
+      sources.push(currentSourceObj as EssaySource);
+      currentSourceObj = null;
+    }
 
     const colonIdx = trimmed.indexOf(':');
     if (colonIdx === -1) continue;
@@ -183,6 +261,8 @@ export function parseEssayMarkdown(raw: string, slug: string): EssayData {
     if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
       val = val.slice(1, -1);
     }
+
+    currentKey = key;
 
     switch (key) {
       case 'title':
@@ -236,7 +316,23 @@ export function parseEssayMarkdown(raw: string, slug: string): EssayData {
           tags = val.replace(/[\[\]"]/g, '').split(',').map((t) => t.trim()).filter(Boolean);
         }
         break;
+      case 'sources':
+        if (val.startsWith('[') && val.endsWith(']')) {
+          try {
+            const parsedSources = JSON.parse(val);
+            if (Array.isArray(parsedSources)) {
+              sources = parsedSources;
+            }
+          } catch {
+            sources = val.replace(/[\[\]"]/g, '').split(',').map((s) => s.trim()).filter(Boolean);
+          }
+        }
+        break;
     }
+  }
+
+  if (currentSourceObj && currentSourceObj.title) {
+    sources.push(currentSourceObj as EssaySource);
   }
 
   return {
@@ -253,6 +349,7 @@ export function parseEssayMarkdown(raw: string, slug: string): EssayData {
     featured,
     coverImage,
     coverImagePosition,
+    sources,
     body
   };
 }
@@ -287,6 +384,22 @@ export function formatEssayMarkdown(data: EssayData): string {
   }
   if (data.coverImagePosition && data.coverImagePosition.trim()) {
     fm += `coverImagePosition: "${data.coverImagePosition.trim()}"\n`;
+  }
+  if (data.sources && Array.isArray(data.sources) && data.sources.length > 0) {
+    fm += `sources:\n`;
+    for (const s of data.sources) {
+      if (typeof s === 'string') {
+        const trimmed = s.trim();
+        if (trimmed) {
+          fm += `  - "${trimmed.replace(/"/g, '\\"')}"\n`;
+        }
+      } else if (s && typeof s === 'object' && s.title) {
+        fm += `  - title: "${s.title.trim().replace(/"/g, '\\"')}"\n`;
+        if (s.url && s.url.trim()) {
+          fm += `    url: "${s.url.trim()}"\n`;
+        }
+      }
+    }
   }
   fm += `---\n\n`;
   fm += (data.body || '').trimStart();

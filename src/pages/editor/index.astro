@@ -385,6 +385,26 @@ const territories = [
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
             Inserir Link
           </button>
+
+          <span class="editor-toolbar-separator" aria-hidden="true"></span>
+
+          <!-- Botões de Alinhamento de Texto (AC-1) -->
+          <button class="editor-toolbar-btn" data-action="align-left" type="button" title="Alinhar à esquerda">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+            Esquerda
+          </button>
+          <button class="editor-toolbar-btn" data-action="align-center" type="button" title="Centralizar texto">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="10" x2="6" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
+            Centro
+          </button>
+          <button class="editor-toolbar-btn" data-action="align-right" type="button" title="Alinhar à direita">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
+            Direita
+          </button>
+          <button class="editor-toolbar-btn" data-action="align-justify" type="button" title="Justificar texto">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>
+            Justificar
+          </button>
         </div>
 
         <!-- Textarea do corpo -->
@@ -407,6 +427,27 @@ Continua o texto aqui..."
             lang="pt"
           ></textarea>
           <div class="editor-char-count" id="char-count">0 caracteres</div>
+        </div>
+      </div>
+
+      <!-- ------------------------------------------------------------------
+           SEÇÃO 4: Fontes & Referências Consultadas (AC-3)
+           ------------------------------------------------------------------ -->
+      <div class="editor-section">
+        <h2 class="editor-section-title">Fontes &amp; Referências Consultadas</h2>
+
+        <div class="editor-field">
+          <label for="field-sources" class="editor-label">
+            Fontes utilizadas na pesquisa
+            <span class="editor-label-tip">Uma fonte por linha (ex: "Iphan Pará - https://gov.br/iphan" ou "Livro X, Autor Y")</span>
+          </label>
+          <textarea
+            id="field-sources"
+            class="editor-textarea editor-textarea-sources"
+            rows="4"
+            placeholder="Iphan — Instituto do Patrimônio Histórico e Artístico Nacional - https://www.gov.br/iphan&#10;Basílica Santuário de Nazaré - https://basilicadenazare.com.br&#10;Acervo Pessoal e Memória Oral, 2026"
+            spellcheck="false"
+          ></textarea>
         </div>
       </div>
 
@@ -698,6 +739,7 @@ function saveDraft() {
     featured: (/** @type {HTMLInputElement} */ (document.getElementById('field-featured')))?.checked || false,
     coverPath: state.coverImagePath,
     coverPosition: state.coverImagePosition,
+    sources: getVal('field-sources'),
   };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
@@ -719,6 +761,7 @@ function restoreDraft() {
     setVal('field-author', draft.author || 'Thalyson');
     setVal('field-pubdate', draft.pubdate || '');
     setVal('field-body', draft.body || '');
+    setVal('field-sources', draft.sources || '');
     const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
     if (draftCheck) draftCheck.checked = draft.draft || false;
     const featCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-featured'));
@@ -1281,6 +1324,18 @@ document.querySelectorAll('.editor-toolbar-btn[data-action]').forEach(btn => {
       case 'link':
         openLinkDialog();
         break;
+      case 'align-left':
+        insertAtCursor(textarea, '<p align="left">', '</p>');
+        break;
+      case 'align-center':
+        insertAtCursor(textarea, '<p align="center">', '</p>');
+        break;
+      case 'align-right':
+        insertAtCursor(textarea, '<p align="right">', '</p>');
+        break;
+      case 'align-justify':
+        insertAtCursor(textarea, '<p align="justify">', '</p>');
+        break;
     }
   });
 });
@@ -1416,7 +1471,36 @@ function updatePreview() {
           ? marked.parse((title ? `# ${title}\n\n` : '') + body)
           : `<h1>${title}</h1><p>${body}</p>`;
         // @ts-ignore — DOMPurify é carregado via CDN
-        const clean = typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(rendered) : rendered;
+        let clean = typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(rendered) : rendered;
+
+        // Renderizar bloco de fontes no preview se houver
+        const sourcesVal = getVal('field-sources');
+        const sourcesList = sourcesVal.split('\n').map(s => s.trim()).filter(Boolean);
+        if (sourcesList.length > 0) {
+          clean += `
+            <div class="editor-preview-sources">
+              <h4 class="preview-sources-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>Fontes &amp; Referências</span>
+              </h4>
+              <ul class="preview-sources-list">
+                ${sourcesList.map(s => {
+                  const urlMatch = s.match(/^(.*?)(?:\s*(?:[-–—:]|·)\s*|\s+)(https?:\/\/[^\s]+)$/i);
+                  if (urlMatch) {
+                    const st = urlMatch[1].trim() || urlMatch[2].trim();
+                    const su = urlMatch[2].trim();
+                    return `<li><a href="${su}" target="_blank" rel="noopener noreferrer">${st}</a></li>`;
+                  }
+                  if (/^https?:\/\//i.test(s)) {
+                    return `<li><a href="${s}" target="_blank" rel="noopener noreferrer">${s}</a></li>`;
+                  }
+                  return `<li>${s}</li>`;
+                }).join('')}
+              </ul>
+            </div>
+          `;
+        }
+
         previewContent.innerHTML = clean;
       }
     }
@@ -1462,6 +1546,14 @@ function generateFrontmatter() {
   if (state.coverImagePosition && state.coverImagePosition !== '50% 50%') {
     fm += `coverImagePosition: "${state.coverImagePosition}"\n`;
   }
+  const sourcesVal = getVal('field-sources');
+  const sourcesList = sourcesVal.split('\n').map(s => s.trim()).filter(Boolean);
+  if (sourcesList.length > 0) {
+    fm += `sources:\n`;
+    for (const s of sourcesList) {
+      fm += `  - "${s.replace(/"/g, '\\"')}"\n`;
+    }
+  }
   fm += `---`;
   return fm;
 }
@@ -1503,6 +1595,7 @@ async function saveLocalPublication() {
     featured: (/** @type {HTMLInputElement} */ (document.getElementById('field-featured')))?.checked || false,
     coverImage: state.coverImagePath,
     coverImagePosition: state.coverImagePosition || '50% 50%',
+    sources: getVal('field-sources').split('\n').map(s => s.trim()).filter(Boolean),
     body: getVal('field-body'),
     slug: state.currentSlug || '',
     originalSlug: state.originalSlug || ''
@@ -1608,6 +1701,13 @@ async function loadEssayToEdit(slug) {
     setVal('field-author', essay.author || 'Thalyson');
     setVal('field-body', essay.body || '');
 
+    const sourcesText = Array.isArray(essay.sources)
+      ? essay.sources
+          .map(s => typeof s === 'string' ? s : `${s.title}${s.url ? ' - ' + s.url : ''}`)
+          .join('\n')
+      : '';
+    setVal('field-sources', sourcesText);
+
     const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
     if (draftCheck) draftCheck.checked = Boolean(essay.draft);
 
@@ -1640,7 +1740,7 @@ async function loadEssayToEdit(slug) {
 }
 
 function resetToNewPublication() {
-  ['field-title','field-description','field-category','field-locality','field-body','field-cover-path'].forEach(id => setVal(id, ''));
+  ['field-title','field-description','field-category','field-locality','field-body','field-cover-path','field-sources'].forEach(id => setVal(id, ''));
   const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
   if (draftCheck) draftCheck.checked = false;
   const featCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-featured'));
@@ -1754,7 +1854,8 @@ function renderCategoriesSelect() {
 // ============================================================
 const liveInputs = [
   'field-title','field-description','field-category','field-territory',
-  'field-locality','field-author','field-body','field-draft','field-featured'
+  'field-locality','field-author','field-body','field-draft','field-featured',
+  'field-sources'
 ];
 liveInputs.forEach(id => {
   const el = document.getElementById(id);

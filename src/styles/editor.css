@@ -869,6 +869,77 @@
   flex-shrink: 0;
 }
 
+.editor-toolbar-separator {
+  width: 1px;
+  height: 22px;
+  background: var(--color-border);
+  align-self: center;
+  margin: 0 3px;
+}
+
+.editor-textarea-sources {
+  min-height: 110px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* Bloco de Fontes no Preview do Editor */
+.editor-preview-sources {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.preview-sources-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-cult-turquoise);
+  margin-bottom: var(--space-3);
+}
+
+.preview-sources-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.preview-sources-list li {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  position: relative;
+  padding-left: 14px;
+  line-height: 1.45;
+}
+
+.preview-sources-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--color-cult-turquoise);
+}
+
+.preview-sources-list a {
+  color: var(--color-cult-turquoise);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-fast);
+}
+
+.preview-sources-list a:hover {
+  color: #fff;
+}
+
 /* --------------------------------------------------------------------------
    Contador de Caracteres
    -------------------------------------------------------------------------- */
@@ -1044,11 +1115,45 @@
 .editor-preview-content a {
   color: var(--color-cult-turquoise);
   text-decoration: underline;
-  text-decoration-color: rgba(23, 169, 184, 0.4);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(23, 169, 184, 0.55);
+  font-weight: 500;
+  transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
 }
 
 .editor-preview-content a:hover {
+  color: #fff;
   text-decoration-color: var(--color-cult-turquoise);
+}
+
+.editor-preview-content .text-left,
+.editor-preview-content [align="left"],
+.editor-preview-content p[align="left"],
+.editor-preview-content div[align="left"] {
+  text-align: left !important;
+}
+
+.editor-preview-content .text-center,
+.editor-preview-content [align="center"],
+.editor-preview-content p[align="center"],
+.editor-preview-content div[align="center"] {
+  text-align: center !important;
+}
+
+.editor-preview-content .text-right,
+.editor-preview-content [align="right"],
+.editor-preview-content p[align="right"],
+.editor-preview-content div[align="right"] {
+  text-align: right !important;
+}
+
+.editor-preview-content .text-justify,
+.editor-preview-content [align="justify"],
+.editor-preview-content p[align="justify"],
+.editor-preview-content div[align="justify"] {
+  text-align: justify !important;
+  text-justify: inter-word;
 }
 
 .editor-preview-content blockquote {
