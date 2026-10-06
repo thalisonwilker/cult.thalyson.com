@@ -464,7 +464,7 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-cult-text-muted);
-  border-bottom: 1px solid var(--color-cult-border);
+  border-bottom: 1px solid rgba(155, 176, 214, 0.12);
   white-space: nowrap;
 }
 

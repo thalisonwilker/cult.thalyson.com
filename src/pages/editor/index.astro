@@ -876,7 +876,7 @@ function setImagePreview(file) {
   setVal('field-cover-path', state.coverImagePath);
 
   // Upload local automático para public/images/ via dev server
-  fetch('/api/editor/upload-image', {
+  fetch('/api/editor/upload-image/', {
     method: 'POST',
     headers: { 'x-filename': encodeURIComponent(file.name) },
     body: file
@@ -1186,7 +1186,7 @@ document.getElementById('btn-save-crop-file')?.addEventListener('click', async (
     const cleanName = rawName.replace(/-corte-\d+$/, '');
     const newFileName = `${cleanName}-corte-${Date.now().toString().slice(-4)}.jpg`;
 
-    const res = await fetch('/api/editor/upload-image', {
+    const res = await fetch('/api/editor/upload-image/', {
       method: 'POST',
       headers: { 'x-filename': encodeURIComponent(newFileName) },
       body: blob
@@ -1509,7 +1509,7 @@ async function saveLocalPublication() {
   };
 
   try {
-    const res = await fetch('/api/editor/save', {
+    const res = await fetch('/api/editor/save/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -1564,7 +1564,7 @@ function updateDeleteButtonVisibility() {
 
 async function loadLocalEssaysList(selectedSlug = state.currentSlug) {
   try {
-    const res = await fetch('/api/editor/essays');
+    const res = await fetch('/api/editor/essays/');
     const data = await res.json();
     if (data.ok && Array.isArray(data.essays)) {
       state.essays = data.essays;
@@ -1587,7 +1587,7 @@ async function loadLocalEssaysList(selectedSlug = state.currentSlug) {
 async function loadEssayToEdit(slug) {
   if (!slug) return;
   try {
-    const res = await fetch(`/api/editor/essay?slug=${encodeURIComponent(slug)}`);
+    const res = await fetch(`/api/editor/essay/?slug=${encodeURIComponent(slug)}`);
     const data = await res.json();
     if (!data.ok || !data.essay) {
       showFeedback(`Não foi possível carregar a publicação "${slug}".`, 'error');
@@ -1699,7 +1699,7 @@ btnConfirmDelete?.addEventListener('click', async () => {
   const slugToDelete = state.currentSlug;
   try {
     if (btnConfirmDelete) btnConfirmDelete.setAttribute('disabled', 'true');
-    const res = await fetch(`/api/editor/essay?slug=${encodeURIComponent(slugToDelete)}`, {
+    const res = await fetch(`/api/editor/essay/?slug=${encodeURIComponent(slugToDelete)}`, {
       method: 'DELETE'
     });
     const data = await res.json();
@@ -1724,7 +1724,7 @@ btnConfirmDelete?.addEventListener('click', async () => {
 // ============================================================
 async function loadCategories() {
   try {
-    const res = await fetch('/api/editor/categories');
+    const res = await fetch('/api/editor/categories/');
     const data = await res.json();
     if (data.ok && Array.isArray(data.categories)) {
       state.categories = data.categories;

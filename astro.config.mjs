@@ -12,8 +12,9 @@ export default defineConfig({
     plugins: [
       {
         name: 'cult-editor-dev-api',
+        enforce: 'pre',
         configureServer(server) {
-          server.middlewares.use(async (req, res, next) => {
+          const apiMiddleware = async (req, res, next) => {
             if (req.url && req.url.startsWith('/api/editor')) {
               try {
                 const { handleEditorApi } = await server.ssrLoadModule('./src/infrastructure/editor-dev-middleware.ts');
@@ -24,7 +25,13 @@ export default defineConfig({
               return;
             }
             next();
-          });
+          };
+
+          if (server.middlewares.stack) {
+            server.middlewares.stack.unshift({ route: '', handle: apiMiddleware });
+          } else {
+            server.middlewares.use(apiMiddleware);
+          }
         }
       }
     ]

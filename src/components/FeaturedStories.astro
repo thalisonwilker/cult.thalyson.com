@@ -19,42 +19,18 @@ const items: CollectionEntry<'ensaios'>[] = (
     : [featured, ...secondary].filter(Boolean) as CollectionEntry<'ensaios'>[]
 ).slice(0, 3);
 
-const categoryColors: Record<string, string> = {
-  musica: 'var(--color-cult-gold)',
-  patrimonio: 'var(--color-cult-coral)',
-  cinema: 'var(--color-cult-orange)',
-  literatura: 'var(--color-cult-turquoise)',
-  artes: 'var(--color-cult-cobalt)',
-  ensaios: 'var(--color-cult-turquoise)',
-  gastronomia: 'var(--color-cult-orange)'
-};
-
-const categoryNames: Record<string, string> = {
-  musica: 'Música',
-  patrimonio: 'Patrimônio',
-  cinema: 'Cinema',
-  literatura: 'Literatura',
-  artes: 'Artes',
-  ensaios: 'Ensaios',
-  gastronomia: 'Gastronomia'
-};
 ---
 
 {items.length > 0 && (
   <section id="em-destaque" class="featured-section" aria-label="Histórias em Destaque">
     <div class="section-header-editorial">
       <div class="header-title-wrap">
-        <span class="section-tag-editorial">
-          <i class="fa-solid fa-water" aria-hidden="true"></i> Histórias do Pará
-        </span>
         <h2 class="section-title-editorial">Em Destaque</h2>
       </div>
     </div>
 
     <div class="featured-grid">
       {items.map((story) => {
-        const catColor = categoryColors[story.data.category] || 'var(--color-cult-turquoise)';
-        const catName = categoryNames[story.data.category] || story.data.category;
         const storyUrl = getEssayUrl(story.data.category, story.slug);
         return (
           <article class="featured-story-card">
@@ -68,9 +44,6 @@ const categoryNames: Record<string, string> = {
                   style={story.data.coverImagePosition ? `object-position: ${story.data.coverImagePosition};` : undefined}
                 />
                 <div class="card-media-overlay" aria-hidden="true"></div>
-                <span class="category-pill-overlay" style={`--cat-color: ${catColor};`}>
-                  {catName}
-                </span>
               </div>
             </a>
 

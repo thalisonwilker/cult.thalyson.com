@@ -316,11 +316,11 @@ const initialEssays = await listEssays();
   </div>
 
   <!-- Script Client-Side -->
-  <script is:inline>
-    // Estado local
+  <script is:inline define:vars={{ initialEssays, initialCategories }}>
+    // Estado local pré-carregado com dados de servidor
     let state = {
-      essays: [],
-      categories: [],
+      essays: Array.isArray(initialEssays) ? initialEssays : [],
+      categories: Array.isArray(initialCategories) ? initialCategories : [],
       activeTab: 'publications',
       searchTerm: '',
       filterCategory: '',
@@ -356,8 +356,8 @@ const initialEssays = await listEssays();
     async function loadData() {
       try {
         const [resEssays, resCategories] = await Promise.all([
-          fetch('/api/editor/essays'),
-          fetch('/api/editor/categories')
+          fetch('/api/editor/essays/'),
+          fetch('/api/editor/categories/')
         ]);
 
         const dataEssays = await resEssays.json();
@@ -528,7 +528,7 @@ const initialEssays = await listEssays();
 
           try {
             btn.setAttribute('disabled', 'true');
-            const res = await fetch('/api/editor/featured', {
+            const res = await fetch('/api/editor/featured/', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ slug, featured: nextFeatured })
@@ -563,7 +563,7 @@ const initialEssays = await listEssays();
             title: 'Excluir Publicação',
             desc: `Tem certeza que deseja excluir permanentemente a publicação "${title}" (arquivo src/content/ensaios/${slug}.md)? Esta ação não pode ser desfeita.`,
             onConfirm: async () => {
-              const res = await fetch(`/api/editor/essay?slug=${encodeURIComponent(slug)}`, {
+              const res = await fetch(`/api/editor/essay/?slug=${encodeURIComponent(slug)}`, {
                 method: 'DELETE'
               });
               const data = await res.json();
@@ -631,7 +631,7 @@ const initialEssays = await listEssays();
             title: 'Excluir Categoria',
             desc: `Tem certeza que deseja excluir a categoria "${lab}" (${val}) de src/data/categories.json?${warning}`,
             onConfirm: async () => {
-              const res = await fetch('/api/editor/categories', {
+              const res = await fetch('/api/editor/categories/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'delete', value: val })
@@ -702,7 +702,7 @@ const initialEssays = await listEssays();
     }
 
     // --- Inicialização e Eventos ---
-    document.addEventListener('DOMContentLoaded', () => {
+    function initAdmin() {
       // Abas
       document.querySelectorAll('.admin-nav-tab').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -800,7 +800,7 @@ const initialEssays = await listEssays();
           }
 
           try {
-            const res = await fetch('/api/editor/categories', {
+            const res = await fetch('/api/editor/categories/', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ action: 'add', item: { value, label } })
@@ -842,7 +842,7 @@ const initialEssays = await listEssays();
         if (!newLabel || !currentEditingCatValue) return;
 
         try {
-          const res = await fetch('/api/editor/categories', {
+          const res = await fetch('/api/editor/categories/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'update', value: currentEditingCatValue, label: newLabel })
@@ -860,9 +860,21 @@ const initialEssays = await listEssays();
         }
       });
 
-      // Carrega dados iniciais
+      // Renderiza imediatamente os dados pré-carregados (zero delay, sem tela em branco)
+      updateStats();
+      renderPublications();
+      renderCategories();
+      updateCategoryFilterOptions();
+
+      // Sincroniza em segundo plano via API
       loadData();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAdmin);
+    } else {
+      initAdmin();
+    }
   </script>
 </body>
 </html>

@@ -28,7 +28,7 @@ export async function handleEditorApi(
   next: () => void
 ): Promise<void> {
   const url = new URL(req.url || '/', 'http://localhost');
-  const pathname = url.pathname;
+  const pathname = url.pathname.replace(/\/+$/, '') || '/';
 
   if (!pathname.startsWith('/api/editor')) {
     return next();
