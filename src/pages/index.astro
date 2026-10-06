@@ -5,7 +5,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import EditorialHero from '../components/EditorialHero.astro';
 import FeaturedStories from '../components/FeaturedStories.astro';
 import CategoryNavigation from '../components/CategoryNavigation.astro';
-import ParaSection from '../components/ParaSection.astro';
 import EssayCard from '../components/EssayCard.astro';
 import TerritoryFilter from '../components/TerritoryFilter.astro';
 import { calculateReadingTime } from '../domain/reading-time';
@@ -43,7 +42,6 @@ const featuredEssays = selectFeatured(
   3
 );
 const hasFeatured = featuredEssays.length > 0;
-const paraEssays = allEssays.filter((e) => e.data.territory === 'para');
 ---
 
 <BaseLayout
@@ -131,12 +129,7 @@ const paraEssays = allEssays.filter((e) => e.data.territory === 'para');
         {/* 3. Bloco Explore a Cultura (Vertentes Editoriais) */}
         <CategoryNavigation />
 
-        {/* 4. Bloco Temático Especial Belém & Pará */}
-        <ParaSection
-          paraEssays={paraEssays}
-        />
-
-        {/* 5. Bloco Últimas Histórias com Filtro Territorial */}
+        {/* 4. Bloco Últimas Histórias com Filtro Territorial */}
         <section id="todas-historias" class="latest-stories-section" aria-label="Todas as Histórias Recentes">
           <div class="section-header-editorial">
             <div class="header-title-wrap">

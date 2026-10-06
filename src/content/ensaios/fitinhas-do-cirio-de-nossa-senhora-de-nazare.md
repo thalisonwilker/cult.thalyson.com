@@ -8,7 +8,7 @@ locality: "Belém/PA"
 author: "Thalyson"
 tags: []
 draft: false
-featured: false
+featured: true
 coverImage: "/images/img_2478.jpeg"
 coverImagePosition: "50% 87%"
 ---

@@ -11,14 +11,13 @@ alwaysApply: true
 **Última atualização:** 2026-10-06 por Antigravity
 
 ## Em andamento / próximo passo
-- **Correção concluída:** **Layout do Painel Admin e Normalização de Rotas de API** (2026-10-06):
-  1. Identificada causa raiz da "linha branca" e tabela vazia: com a adição de `trailingSlash: 'always'` no `astro.config.mjs`, requisições internas de API sem barra final (`/api/editor/essays`) eram interceptadas pelo Astro e respondidas com HTML de redirecionamento 404, disparando exceção no parser JSON e travando a interface em "Carregando...".
-  2. Middleware de desenvolvimento (`src/infrastructure/editor-dev-middleware.ts`) e configuração do Vite no `astro.config.mjs` atualizados com `enforce: 'pre'` e normalização de caminho (`pathname.replace(/\/+$/, '')`) para atender com segurança chamadas com ou sem barra final.
-  3. Páginas `/admin/` e `/editor/` atualizadas para chamar endpoints normalizados com barra final (`/api/editor/essays/`, etc.) e `/admin/` agora conta com pré-carregamento imediato via SSR (`initialEssays` e `initialCategories`), garantindo renderização instantânea da tabela sem delay e sem tela em branco.
-  4. Suavizada a linha divisória inferior dos cabeçalhos da tabela (`.admin-table th`) no `src/styles/admin.css` para `rgba(155, 176, 214, 0.12)`, eliminando qualquer sensação de linha branca dura sobre o fundo escuro.
+- **Alteração concluída:** **Remoção da Seção "Território & Identidade Belém & Pará"** (2026-10-06):
+  1. Removida a seção temática `ParaSection` da página inicial ([src/pages/index.astro](file:///Users/thalysonwilker/Projects/Thalyson/cult.thalyson.com/src/pages/index.astro)), deixando a Home mais enxuta, focando diretamente em Destaques, Navegação por Categorias e Últimas Histórias.
+  2. Removido o componente não utilizado `src/components/ParaSection.astro`.
 - **Próximo passo:** Próxima feature do roadmap ou deploy da imagem atualizada no Fly.io.
 
 ## Decisões recentes
+- 2026-10-06: Remoção da seção "Território & Identidade Belém & Pará" da Home a pedido do usuário.
 - 2026-10-06: Correção de Layout e Resiliência de API no Painel Admin:
   1. **SSR Hydration no Admin (`src/pages/admin/index.astro`):** Injeção de `initialEssays` e `initialCategories` diretamente no template, garantindo renderização instantânea dos cards e da tabela de publicações no primeiro paint.
   2. **Intercepção de API no Vite (`astro.config.mjs`):** Plugin de middleware configurado com `enforce: 'pre'` e `server.middlewares.stack.unshift` para prioridade sobre o roteador estático de trailing slash do Astro.
