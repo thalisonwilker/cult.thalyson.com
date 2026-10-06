@@ -18,6 +18,7 @@ const ensaiosCollection = defineCollection({
     author: z.string().default('Thalyson'),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
+    featured: z.boolean().default(false),
     coverImage: z.string().optional(),
     coverImagePosition: z.string().optional()
   })

@@ -9,6 +9,7 @@ import ParaSection from '../components/ParaSection.astro';
 import EssayCard from '../components/EssayCard.astro';
 import TerritoryFilter from '../components/TerritoryFilter.astro';
 import { calculateReadingTime } from '../domain/reading-time';
+import { selectFeatured } from '../domain/featured';
 
 const allEssays = await getCollection('ensaios', ({ data }) => {
   return import.meta.env.PROD ? !data.draft : true;
@@ -31,9 +32,17 @@ const filteredEssays = allEssays.filter((essay) => {
 
 const isFilterActive = Boolean(currentCategory || (currentTerritory && currentTerritory !== 'all'));
 
-// Seleção de histórias para os blocos da Home padrão
-const featuredPrimary = allEssays.find((e) => e.slug === 'o-banzeiro-do-carimbo-e-a-voz-de-dona-onete') || allEssays[0];
-const secondaryStories = allEssays.filter((e) => e.slug !== featuredPrimary.slug).slice(0, 3);
+// Seleção manual de Destaques (AC-6, AC-7): até 3 itens publicados com featured: true
+const featuredEssays = selectFeatured(
+  allEssays.map((e) => ({
+    ...e,
+    pubDate: e.data.pubDate,
+    draft: e.data.draft,
+    featured: e.data.featured
+  })),
+  3
+);
+const hasFeatured = featuredEssays.length > 0;
 const paraEssays = allEssays.filter((e) => e.data.territory === 'para');
 ---
 
@@ -107,16 +116,17 @@ const paraEssays = allEssays.filter((e) => e.data.territory === 'para');
         headline="Belém entre arte, música e memória amazônica"
         lead="Das margens caudalosas do Guajará aos acordes elétricos das periferias: um mergulho nas sonoridades, saberes ribeirinhos e vanguardas estéticas do Pará."
         coverImage="/images/docas-belem-noite-estrelada.jpg"
-        ctaLink="#em-destaque"
+        ctaLink={hasFeatured ? '#em-destaque' : '#todas-historias'}
         ctaText="Explorar histórias"
       />
 
       <div class="site-container">
-        {/* 2. Bloco Em Destaque (Composição 2fr / 1fr) */}
-        <FeaturedStories
-          featured={featuredPrimary}
-          secondary={secondaryStories}
-        />
+        {/* 2. Bloco Em Destaque (Grade de até 3 cards de mesmo peso) */}
+        {hasFeatured && (
+          <FeaturedStories
+            stories={featuredEssays}
+          />
+        )}
 
         {/* 3. Bloco Explore a Cultura (Vertentes Editoriais) */}
         <CategoryNavigation />
@@ -130,10 +140,11 @@ const paraEssays = allEssays.filter((e) => e.data.territory === 'para');
         <section id="todas-historias" class="latest-stories-section" aria-label="Todas as Histórias Recentes">
           <div class="section-header-editorial">
             <div class="header-title-wrap">
-              <span class="section-tag-editorial">Arquivo Aberto</span>
+              <span class="section-tag-editorial">
+                <i class="fa-solid fa-feather-pointed" aria-hidden="true"></i> Arquivo Aberto
+              </span>
               <h2 class="section-title-editorial">Últimas Histórias</h2>
             </div>
-            <span class="section-note">Crítica &amp; Ensaios</span>
           </div>
 
           <TerritoryFilter

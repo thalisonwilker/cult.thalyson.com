@@ -138,5 +138,36 @@ Este é o corpo do ensaio com **negrito** e [links](https://exemplo.com).
       await saveCategories(original);
     }
   });
+
+  it('deve formatar, persistir e atualizar a flag featured corretamente', async () => {
+    const { setFeatured } = await import('./editor-storage');
+    const slug = 'ensaio-para-teste-de-featured';
+    const testData: EssayData = {
+      slug,
+      title: 'Ensaio com Destaque',
+      description: 'Testando featured flag.',
+      pubDate: '2026-10-05',
+      category: 'ensaios',
+      territory: 'para',
+      author: 'Thalyson',
+      tags: [],
+      draft: false,
+      featured: true,
+      body: 'Corpo do ensaio'
+    };
+
+    try {
+      await saveEssay(testData);
+      const fetched = await getEssay(slug);
+      expect(fetched?.featured).toBe(true);
+
+      // Desmarca o destaque usando setFeatured
+      await setFeatured(slug, false);
+      const fetchedAfter = await getEssay(slug);
+      expect(fetchedAfter?.featured).toBe(false);
+    } finally {
+      await deleteEssay(slug);
+    }
+  });
 });
 

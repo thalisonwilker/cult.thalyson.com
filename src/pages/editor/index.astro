@@ -218,11 +218,19 @@ const territories = [
           </div>
         </div>
 
-        <!-- Draft -->
+        <!-- Draft & Featured -->
         <div class="editor-field" style="flex-direction: row; align-items: center; gap: var(--space-3);">
           <input id="field-draft" type="checkbox" style="width: 16px; height: 16px; accent-color: var(--color-cult-cobalt); cursor: pointer;" />
           <label class="editor-label" for="field-draft" style="cursor: pointer; margin: 0;">
             Marcar como rascunho (draft: true)
+          </label>
+        </div>
+
+        <div class="editor-field" style="flex-direction: row; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+          <input id="field-featured" type="checkbox" style="width: 16px; height: 16px; accent-color: var(--color-cult-gold); cursor: pointer;" />
+          <label class="editor-label" for="field-featured" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-star" style="color: var(--color-cult-gold); font-size: 0.85rem;" aria-hidden="true"></i>
+            Destacar na Home (featured: true · máx. 3 no site)
           </label>
         </div>
       </div>
@@ -596,6 +604,7 @@ const state = {
   originalSlug: null,
   pubDate: '',
   categories: [],
+  essays: [],
   tags: [],
   coverImageFile: null,
   coverImagePath: '',
@@ -686,6 +695,7 @@ function saveDraft() {
     tags: [...state.tags],
     body: getVal('field-body'),
     draft: (/** @type {HTMLInputElement} */ (document.getElementById('field-draft')))?.checked || false,
+    featured: (/** @type {HTMLInputElement} */ (document.getElementById('field-featured')))?.checked || false,
     coverPath: state.coverImagePath,
     coverPosition: state.coverImagePosition,
   };
@@ -711,6 +721,8 @@ function restoreDraft() {
     setVal('field-body', draft.body || '');
     const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
     if (draftCheck) draftCheck.checked = draft.draft || false;
+    const featCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-featured'));
+    if (featCheck) featCheck.checked = draft.featured || false;
     // Restaurar tags
     state.tags = draft.tags || [];
     renderTags();
@@ -1431,6 +1443,7 @@ function generateFrontmatter() {
   const author = getVal('field-author') || 'Thalyson';
   const pubdate = getVal('field-pubdate') || new Date().toISOString().split('T')[0];
   const draft = (/** @type {HTMLInputElement} */ (document.getElementById('field-draft')))?.checked || false;
+  const featured = (/** @type {HTMLInputElement} */ (document.getElementById('field-featured')))?.checked || false;
   const tags = state.tags;
   const coverImage = state.coverImagePath;
 
@@ -1444,6 +1457,7 @@ function generateFrontmatter() {
   fm += `author: ${author}\n`;
   fm += `tags: [${tags.map(t => `"${t}"`).join(', ')}]\n`;
   fm += `draft: ${draft}\n`;
+  fm += `featured: ${featured}\n`;
   if (coverImage) fm += `coverImage: "${coverImage}"\n`;
   if (state.coverImagePosition && state.coverImagePosition !== '50% 50%') {
     fm += `coverImagePosition: "${state.coverImagePosition}"\n`;
@@ -1486,6 +1500,7 @@ async function saveLocalPublication() {
     pubDate: state.pubDate || getTodayDate(),
     tags: [...state.tags],
     draft: (/** @type {HTMLInputElement} */ (document.getElementById('field-draft')))?.checked || false,
+    featured: (/** @type {HTMLInputElement} */ (document.getElementById('field-featured')))?.checked || false,
     coverImage: state.coverImagePath,
     coverImagePosition: state.coverImagePosition || '50% 50%',
     body: getVal('field-body'),
@@ -1521,7 +1536,12 @@ async function saveLocalPublication() {
     // Limpa draft salvo no localStorage pois o conteúdo já está em disco
     clearDraft();
 
-    showToast(`Publicação salva em ${data.path}!`);
+    if (data.unfeatured && data.unfeatured.length > 0) {
+      const removedList = data.unfeatured.map(u => `"${u.title || u.slug}"`).join(', ');
+      showToast(`Publicação salva! ${removedList} saiu dos destaques (limite de 3).`, 4000);
+    } else {
+      showToast(`Publicação salva em ${data.path}!`);
+    }
   } catch (err) {
     showFeedback(err.message || 'Erro ao salvar a publicação localmente.', 'error');
   } finally {
@@ -1539,6 +1559,28 @@ function updateDeleteButtonVisibility() {
   const btnDelete = document.getElementById('btn-delete-local');
   if (btnDelete) {
     btnDelete.style.display = state.currentSlug ? 'inline-flex' : 'none';
+  }
+}
+
+async function loadLocalEssaysList(selectedSlug = state.currentSlug) {
+  try {
+    const res = await fetch('/api/editor/essays');
+    const data = await res.json();
+    if (data.ok && Array.isArray(data.essays)) {
+      state.essays = data.essays;
+    }
+  } catch {
+    // Silencioso em caso de falha de conexão
+  }
+
+  // Sincroniza query parameter ?slug na URL
+  const url = new URL(window.location.href);
+  if (selectedSlug) {
+    url.searchParams.set('slug', selectedSlug);
+    window.history.replaceState({}, '', url.toString());
+  } else {
+    url.searchParams.delete('slug');
+    window.history.replaceState({}, '', url.pathname);
   }
 }
 
@@ -1569,6 +1611,9 @@ async function loadEssayToEdit(slug) {
     const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
     if (draftCheck) draftCheck.checked = Boolean(essay.draft);
 
+    const featCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-featured'));
+    if (featCheck) featCheck.checked = Boolean(essay.featured);
+
     state.tags = Array.isArray(essay.tags) ? [...essay.tags] : [];
     renderTags();
 
@@ -1598,6 +1643,8 @@ function resetToNewPublication() {
   ['field-title','field-description','field-category','field-locality','field-body','field-cover-path'].forEach(id => setVal(id, ''));
   const draftCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-draft'));
   if (draftCheck) draftCheck.checked = false;
+  const featCheck = /** @type {HTMLInputElement} */ (document.getElementById('field-featured'));
+  if (featCheck) featCheck.checked = false;
   setVal('field-territory', 'para');
   setVal('field-author', 'Thalyson');
   state.tags = [];
@@ -1707,7 +1754,7 @@ function renderCategoriesSelect() {
 // ============================================================
 const liveInputs = [
   'field-title','field-description','field-category','field-territory',
-  'field-locality','field-author','field-body','field-draft'
+  'field-locality','field-author','field-body','field-draft','field-featured'
 ];
 liveInputs.forEach(id => {
   const el = document.getElementById(id);

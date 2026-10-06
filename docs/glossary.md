@@ -19,3 +19,4 @@ alwaysApply: false
 | **Referência Cruzada**    | Link conceitual que conecta duas obras ou um ensaio a uma obra citada.            | Link externo genérico para outra página web      | Taxonomia & Obras          |
 | **Resenha**               | Análise crítica focada especificamente em uma obra cultural única.                | Ensaio temático amplo / compilado                | Editorial & Ensaios        |
 | **Tempo de Leitura**      | Estimativa de minutos necessários para leitura integral em ritmo médio (WPM).     | Tempo de permanência do usuário na página        | Editorial & Ensaios        |
+| **Destaque**              | Publicação não-rascunho com `featured: true`, exibida no bloco Em Destaque da Home (máx. 3). | Ensaio qualquer do acervo ou rascunho com flag | Editorial & Ensaios        |

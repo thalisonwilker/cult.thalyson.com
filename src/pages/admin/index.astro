@@ -123,6 +123,21 @@ const initialEssays = await listEssays();
             <span>ativas no categories.json</span>
           </div>
         </div>
+
+        <!-- Card 5: Destaques -->
+        <div class="admin-stat-card">
+          <div class="admin-stat-top">
+            <span class="admin-stat-label">Destaques</span>
+            <div class="admin-stat-icon-wrapper gold" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+          </div>
+          <div class="admin-stat-number text-gold" id="stat-featured-count">{initialEssays.filter(e => e.featured && !e.draft).length} / 3</div>
+          <div class="admin-stat-footer">
+            <span class="stat-dot gold"></span>
+            <span>no bloco Em Destaque</span>
+          </div>
+        </div>
       </section>
 
       <!-- Painel 1: Publicações & Pesquisa -->
@@ -178,6 +193,7 @@ const initialEssays = await listEssays();
             <table class="admin-table">
               <thead>
                 <tr>
+                  <th style="width: 44px; text-align: center;" title="Destacar na Home (máx. 3)">★</th>
                   <th>Publicação</th>
                   <th>Categoria</th>
                   <th>Território</th>
@@ -370,14 +386,17 @@ const initialEssays = await listEssays();
       const elPublished = document.getElementById('stat-published-count');
       const elDrafts = document.getElementById('stat-drafts-count');
       const elCats = document.getElementById('stat-total-categories');
+      const elFeatured = document.getElementById('stat-featured-count');
 
       const published = state.essays.filter(e => !e.draft).length;
       const drafts = state.essays.filter(e => e.draft).length;
+      const featured = state.essays.filter(e => e.featured && !e.draft).length;
 
       if (elPubs) elPubs.textContent = state.essays.length;
       if (elPublished) elPublished.textContent = published;
       if (elDrafts) elDrafts.textContent = drafts;
       if (elCats) elCats.textContent = state.categories.length;
+      if (elFeatured) elFeatured.textContent = `${featured} / 3`;
     }
 
     // --- Navegação por Abas ---
@@ -451,6 +470,19 @@ const initialEssays = await listEssays();
 
         return `
           <tr data-slug="${pub.slug}">
+            <td style="text-align: center;">
+              <button
+                type="button"
+                class="admin-btn-star ${pub.featured ? 'is-featured' : ''}"
+                data-slug="${pub.slug}"
+                data-featured="${pub.featured ? 'true' : 'false'}"
+                data-title="${pub.title.replace(/"/g, '&quot;')}"
+                title="${pub.featured ? 'Remover dos destaques da Home' : 'Destacar na Home (máx. 3 no site)'}"
+                aria-label="${pub.featured ? 'Remover destaque' : 'Destacar'}"
+              >
+                <i class="${pub.featured ? 'fa-solid fa-star' : 'fa-regular fa-star'}" aria-hidden="true"></i>
+              </button>
+            </td>
             <td>
               <div class="admin-pub-info">
                 <a href="/editor/?slug=${pub.slug}" class="admin-pub-title">${pub.title}</a>
@@ -485,6 +517,42 @@ const initialEssays = await listEssays();
           </tr>
         `;
       }).join('');
+
+      // Liga eventos de estrela (toggle de destaque)
+      tbody.querySelectorAll('.admin-btn-star').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const slug = btn.getAttribute('data-slug');
+          const isFeatured = btn.getAttribute('data-featured') === 'true';
+          const title = btn.getAttribute('data-title');
+          const nextFeatured = !isFeatured;
+
+          try {
+            btn.setAttribute('disabled', 'true');
+            const res = await fetch('/api/editor/featured', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ slug, featured: nextFeatured })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.ok) {
+              throw new Error(data.error || 'Falha ao alterar destaque.');
+            }
+
+            if (data.unfeatured && data.unfeatured.length > 0) {
+              const unfeaturedTitles = data.unfeatured.map(u => `"${u.title || u.slug}"`).join(', ');
+              showToast(`"${title}" destacado! ${unfeaturedTitles} saiu dos destaques (limite de 3).`, 4000);
+            } else {
+              showToast(`"${title}" ${nextFeatured ? 'marcado como destaque!' : 'removido dos destaques.'}`);
+            }
+
+            await loadData();
+          } catch (err) {
+            showToast(err.message || 'Erro ao alterar destaque.', 3500);
+          } finally {
+            btn.removeAttribute('disabled');
+          }
+        });
+      });
 
       // Liga eventos de exclusão nas publicações
       tbody.querySelectorAll('.btn-delete-pub').forEach(btn => {

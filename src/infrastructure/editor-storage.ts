@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { slugsToUnfeature } from '../domain/featured';
 
 const ROOT_DIR = process.cwd();
 const CATEGORIES_PATH = path.join(ROOT_DIR, 'src', 'data', 'categories.json');
@@ -22,6 +23,7 @@ export interface EssayData {
   author: string;
   tags: string[];
   draft: boolean;
+  featured?: boolean;
   coverImage?: string;
   coverImagePosition?: string;
   body: string;
@@ -35,6 +37,7 @@ export interface EssaySummary {
   pubDate: string;
   author: string;
   draft: boolean;
+  featured: boolean;
 }
 
 /** Lê as categorias do arquivo JSON */
@@ -162,6 +165,7 @@ export function parseEssayMarkdown(raw: string, slug: string): EssayData {
   let author = 'Thalyson';
   let tags: string[] = [];
   let draft = false;
+  let featured = false;
   let coverImage: string | undefined;
   let coverImagePosition: string | undefined;
 
@@ -209,6 +213,9 @@ export function parseEssayMarkdown(raw: string, slug: string): EssayData {
       case 'draft':
         draft = val.toLowerCase() === 'true';
         break;
+      case 'featured':
+        featured = val.toLowerCase() === 'true';
+        break;
       case 'coverImage':
         coverImage = val || undefined;
         break;
@@ -243,6 +250,7 @@ export function parseEssayMarkdown(raw: string, slug: string): EssayData {
     author,
     tags,
     draft,
+    featured,
     coverImage,
     coverImagePosition,
     body
@@ -258,6 +266,7 @@ export function formatEssayMarkdown(data: EssayData): string {
   const safeTerritory = data.territory || 'para';
   const safePubDate = data.pubDate || new Date().toISOString().split('T')[0];
   const safeDraft = Boolean(data.draft);
+  const safeFeatured = Boolean(data.featured);
   const safeTags = (data.tags || []).map((t) => `"${t.replace(/"/g, '')}"`).join(', ');
 
   let fm = `---\n`;
@@ -272,6 +281,7 @@ export function formatEssayMarkdown(data: EssayData): string {
   fm += `author: "${safeAuthor}"\n`;
   fm += `tags: [${safeTags}]\n`;
   fm += `draft: ${safeDraft}\n`;
+  fm += `featured: ${safeFeatured}\n`;
   if (data.coverImage && data.coverImage.trim()) {
     fm += `coverImage: "${data.coverImage.trim()}"\n`;
   }
@@ -302,7 +312,8 @@ export async function listEssays(): Promise<EssaySummary[]> {
         territory: parsed.territory,
         pubDate: parsed.pubDate,
         author: parsed.author,
-        draft: parsed.draft
+        draft: parsed.draft,
+        featured: parsed.featured ?? false
       });
     }
 
@@ -330,7 +341,7 @@ export async function getEssay(slug: string): Promise<EssayData | null> {
 export async function saveEssay(
   data: EssayData,
   originalSlug?: string
-): Promise<{ ok: boolean; slug: string; path: string }> {
+): Promise<{ ok: boolean; slug: string; path: string; unfeatured?: { slug: string; title?: string }[] }> {
   if (!data.title || !data.title.trim()) {
     throw new Error('O título do ensaio é obrigatório.');
   }
@@ -369,11 +380,64 @@ export async function saveEssay(
     }
   }
 
+  // Se marcada como featured e não rascunho, garante limite de 3 substituindo o mais antigo
+  let unfeatured: { slug: string; title?: string }[] = [];
+  if (data.featured && !data.draft) {
+    const all = await listEssays();
+    unfeatured = slugsToUnfeature(all, safeSlug, Boolean(data.draft), 3);
+    for (const item of unfeatured) {
+      const toUpdate = await getEssay(item.slug);
+      if (toUpdate) {
+        toUpdate.featured = false;
+        await fs.writeFile(
+          path.join(ESSAYS_DIR, `${item.slug}.md`),
+          formatEssayMarkdown(toUpdate),
+          'utf-8'
+        );
+      }
+    }
+  }
+
   return {
     ok: true,
     slug: safeSlug,
-    path: `src/content/ensaios/${safeSlug}.md`
+    path: `src/content/ensaios/${safeSlug}.md`,
+    unfeatured
   };
+}
+
+/** Altera somente a flag featured de uma publicação existente */
+export async function setFeatured(
+  slug: string,
+  featured: boolean
+): Promise<{ ok: boolean; essay: EssayData; unfeatured?: { slug: string; title?: string }[] }> {
+  const essay = await getEssay(slug);
+  if (!essay) {
+    throw new Error(`Publicação "${slug}" não encontrada.`);
+  }
+
+  let unfeatured: { slug: string; title?: string }[] = [];
+  if (featured && !essay.draft) {
+    const all = await listEssays();
+    unfeatured = slugsToUnfeature(all, slug, Boolean(essay.draft), 3);
+    for (const item of unfeatured) {
+      const toUpdate = await getEssay(item.slug);
+      if (toUpdate) {
+        toUpdate.featured = false;
+        await fs.writeFile(
+          path.join(ESSAYS_DIR, `${item.slug}.md`),
+          formatEssayMarkdown(toUpdate),
+          'utf-8'
+        );
+      }
+    }
+  }
+
+  essay.featured = featured;
+  const targetPath = path.join(ESSAYS_DIR, `${slug}.md`);
+  await fs.writeFile(targetPath, formatEssayMarkdown(essay), 'utf-8');
+
+  return { ok: true, essay, unfeatured };
 }
 
 /** Salva uma imagem recebida via upload local em public/images/ */

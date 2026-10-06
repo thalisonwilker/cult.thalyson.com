@@ -8,6 +8,7 @@ import {
   listEssays,
   getEssay,
   saveEssay,
+  setFeatured,
   deleteEssay,
   saveImageLocally
 } from './editor-storage.ts';
@@ -140,6 +141,26 @@ export async function handleEditorApi(
       const { originalSlug, ...essayData } = data;
       const result = await saveEssay(essayData, originalSlug);
       res.end(JSON.stringify(result));
+      return;
+    }
+
+    if (pathname === '/api/editor/featured' && req.method === 'POST') {
+      const raw = await readBody(req);
+      const data = JSON.parse(raw.toString('utf-8'));
+      const slug = data.slug;
+      const featured = Boolean(data.featured);
+      if (!slug) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ ok: false, error: 'Parâmetro slug é obrigatório.' }));
+        return;
+      }
+      try {
+        const result = await setFeatured(slug, featured);
+        res.end(JSON.stringify(result));
+      } catch (err: any) {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ ok: false, error: err.message || 'Erro ao alterar destaque.' }));
+      }
       return;
     }
 
