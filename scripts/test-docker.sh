@@ -65,13 +65,22 @@ else
   exit 1
 fi
 
-# AC-3: Subpágina sem barra /ensaios/teste
-ENSAIO_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${TEST_PORT}/ensaios/teste/")
+# AC-3: Subpágina por categoria /patrimonio/as-14-procissoes-do-cirio-de-nazare/
+ENSAIO_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${TEST_PORT}/patrimonio/as-14-procissoes-do-cirio-de-nazare/")
 if [ "$ENSAIO_STATUS" = "200" ]; then
-  echo "    ✓ AC-3 (Subpágina): /ensaios/teste/ retornou 200 OK"
+  echo "    ✓ AC-3 (Subpágina por categoria): /patrimonio/.../ retornou 200 OK"
 else
-  echo "    ✗ FALHA AC-3: /ensaios/teste/ retornou $ENSAIO_STATUS"
+  echo "    ✗ FALHA AC-3: /patrimonio/.../ retornou $ENSAIO_STATUS"
   exit 1
+fi
+
+# AC-4: Redirecionamento sem barra não deve conter porta interna :8080
+REDIRECT_HEADER=$(curl -sI "http://localhost:${TEST_PORT}/patrimonio/as-14-procissoes-do-cirio-de-nazare" | grep -i "^location:" || true)
+if echo "$REDIRECT_HEADER" | grep -q ":8080"; then
+  echo "    ✗ FALHA AC-4: Redirecionamento contém porta interna 8080: $REDIRECT_HEADER"
+  exit 1
+else
+  echo "    ✓ AC-4 (Sem porta no redirect): Redirecionamento limpo sem :8080 ($REDIRECT_HEADER)"
 fi
 
 # AC-3: Página inexistente retorna 404

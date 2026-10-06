@@ -2,6 +2,7 @@
 // src/components/FeaturedStories.astro
 import type { CollectionEntry } from 'astro:content';
 import { calculateReadingTime, formatDate } from '../domain/reading-time';
+import { getEssayUrl } from '../domain/routes';
 
 interface Props {
   stories?: CollectionEntry<'ensaios'>[];
@@ -54,9 +55,10 @@ const categoryNames: Record<string, string> = {
       {items.map((story) => {
         const catColor = categoryColors[story.data.category] || 'var(--color-cult-turquoise)';
         const catName = categoryNames[story.data.category] || story.data.category;
+        const storyUrl = getEssayUrl(story.data.category, story.slug);
         return (
           <article class="featured-story-card">
-            <a href={`/ensaios/${story.slug}`} class="card-media-link" tabindex="-1" aria-hidden="true">
+            <a href={storyUrl} class="card-media-link" tabindex="-1" aria-hidden="true">
               <div class="card-img-frame">
                 <img
                   src={story.data.coverImage || '/images/carimbo-guitarrada-noite.jpg'}
@@ -88,7 +90,7 @@ const categoryNames: Record<string, string> = {
               </div>
 
               <h3 class="card-title">
-                <a href={`/ensaios/${story.slug}`} class="title-link">
+                <a href={storyUrl} class="title-link">
                   {story.data.title}
                 </a>
               </h3>
@@ -99,7 +101,7 @@ const categoryNames: Record<string, string> = {
 
               <div class="card-footer">
                 <span class="story-date">{formatDate(story.data.pubDate)}</span>
-                <a href={`/ensaios/${story.slug}`} class="read-more-link">
+                <a href={storyUrl} class="read-more-link">
                   <span>Ler ensaio</span>
                   <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 </a>

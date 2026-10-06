@@ -1,6 +1,7 @@
 ---
 // src/components/EssayCard.astro
 import { formatDate } from '../domain/reading-time';
+import { getEssayUrl } from '../domain/routes';
 
 interface Props {
   title: string;
@@ -55,10 +56,11 @@ const defaultImage = territory === 'para'
   : '/images/belem-noite-estrelada.jpg';
 
 const imageSrc = coverImage || defaultImage;
+const essayUrl = getEssayUrl(category, slug);
 ---
 
 <article class="editorial-story-card" data-category={category}>
-  <a href={`/ensaios/${slug}`} class="card-thumb-link" tabindex="-1" aria-hidden="true">
+  <a href={essayUrl} class="card-thumb-link" tabindex="-1" aria-hidden="true">
     <div class="card-thumb-frame">
       <img
         src={imageSrc}
@@ -98,7 +100,7 @@ const imageSrc = coverImage || defaultImage;
     </div>
 
     <h3 class="card-headline">
-      <a href={`/ensaios/${slug}`} class="headline-link">
+      <a href={essayUrl} class="headline-link">
         {title}
       </a>
     </h3>
@@ -108,7 +110,7 @@ const imageSrc = coverImage || defaultImage;
     </p>
 
     <div class="card-bottom-row">
-      <a href={`/ensaios/${slug}`} class="read-action-link">
+      <a href={essayUrl} class="read-action-link">
         <span>Ler ensaio</span>
         <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
       </a>

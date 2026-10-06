@@ -8,13 +8,23 @@ alwaysApply: true
 
 > Memória de trabalho entre sessões. É volátil e atualizada a cada etapa do desenvolvimento.
 
-**Última atualização:** 2026-10-05 por Antigravity
+**Última atualização:** 2026-10-06 por Antigravity
 
 ## Em andamento / próximo passo
-- **Feature concluída:** [`specs/0009-destaques-home/`](../specs/0009-destaques-home/spec.md) — **Destaques da Home**: Controle manual de destaques (`featured: true`) com limite de 3 itens publicados (substituição automática do mais antigo com aviso em toast); suporte a alternância no editor `/editor/` e no painel admin `/admin/` (botão de estrela por linha); novo layout da seção "Em Destaque" com grade responsiva proporcional de 3 colunas (cada card ocupa 1/3 do espaço, imagem compacta 16:9 de até 190px, tipografia e espaçamentos equilibrados); rascunhos não contam no limite nem aparecem no site; seção oculta automaticamente quando não houver destaques.
-- **Próximo passo:** Próxima feature do roadmap ou deploy da imagem no Fly.io.
+- **Feature concluída:** [`specs/0010-urls-por-categoria-e-correcao-portas/`](../specs/0010-urls-por-categoria-e-correcao-portas/spec.md) — **URLs por Categoria e Correção de Portas em Redirecionamentos**:
+  1. URLs canônicas organizadas pela categoria cultural (`/{category}/{slug}/`, ex: `/patrimonio/as-14-procissoes-do-cirio-de-nazare/`), implementadas em rota dinâmica `src/pages/[category]/[slug].astro` e função de domínio pura `src/domain/routes.ts` com trailing slash.
+  2. Redirecionamento retroativo de URLs legadas (`/ensaios/[slug]/`) com meta-refresh e substituição via script de cliente (`window.location.replace`) preservando links antigos.
+  3. Prevenção de anexação de portas de acesso internas (`:8080`, `:3000`) em produção através das diretivas `port_in_redirect off;` e `absolute_redirect off;` no `nginx.conf` e `trailingSlash: 'always'` no `astro.config.mjs`.
+  4. Todos os links internos e componentes (`EssayCard`, `FeaturedStories`, `/admin/`, `ParaHighlightHero`, `ParaSection`) atualizados com trailing slash e rotas válidas.
+- **Próximo passo:** Próxima feature do roadmap ou deploy da imagem atualizada no Fly.io.
 
 ## Decisões recentes
+- 2026-10-06: Implementação de URLs por Categoria e Correção de Portas (spec `0010`):
+  1. **Roteamento Canônico por Categoria:** Criação de `src/pages/[category]/[slug].astro` e módulo de domínio `src/domain/routes.ts` com testes unitários em `src/domain/routes.test.ts`.
+  2. **Prevenção de Portas no Nginx:** Adicionado `port_in_redirect off;` e `absolute_redirect off;` no bloco `server` de `nginx.conf`, garantindo que diretórios sem barra recebam redirecionamentos relativos sem incluir a porta de escuta interna `:8080`.
+  3. **Trailing Slash no Astro:** Adicionado `trailingSlash: 'always'` em `astro.config.mjs`.
+  4. **Compatibilidade Retroativa:** `src/pages/ensaios/[slug].astro` emite página de redirecionamento imediato para `/{category}/{slug}/`.
+  5. **Validação Docker E2E:** Script `scripts/test-docker.sh` atualizado e validado testando 200 OK na subpágina e ausência de `:8080` no cabeçalho `Location` do redirecionamento.
 - 2026-10-05: Implementação dos Destaques da Home (spec `0009`):
   1. **Schema e Domínio (`src/content/config.ts` e `src/domain/featured.ts`):** Adicionado `featured: z.boolean().default(false)` ao schema do Astro. Módulo de domínio puro implementando `selectFeatured` (filtra não-rascunhos com `featured: true`, ordena por `pubDate` desc com desempate por slug e limita a 3) e `slugsToUnfeature` (substituição dos mais antigos ao ultrapassar 3).
   2. **Persistência e Middleware (`src/infrastructure/editor-storage.ts` e `editor-dev-middleware.ts`):** Leitura, escrita e atualização de `featured` no frontmatter; endpoint `POST /api/editor/featured` para toggle rápido por slug; `saveEssay` e `setFeatured` desmarcam automaticamente o destaque excedente mais antigo e retornam a lista de desmarcados.
