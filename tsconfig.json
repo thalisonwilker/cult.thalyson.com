@@ -6,5 +6,6 @@
       "@/*": ["src/*"]
     },
     "strict": true
-  }
+  },
+  "exclude": ["dist", "out", "node_modules"]
 }

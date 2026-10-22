@@ -274,6 +274,44 @@ const initialEssays = await listEssays();
         </div>
       </section>
 
+      <section class="admin-panel-card admin-drafts" aria-labelledby="draft-box-title">
+        <div class="admin-panel-header">
+          <div class="admin-panel-heading">
+            <h2 class="admin-panel-title" id="draft-box-title">Caixa de rascunhos</h2>
+            <p class="admin-panel-subtitle">Guarde ideias e textos para continuar depois. Salvos somente neste navegador; não são publicados.</p>
+          </div>
+          <button type="button" class="admin-btn-action" id="draft-new">Novo rascunho</button>
+        </div>
+        <div class="admin-drafts-grid">
+          <form id="draft-form" class="admin-draft-compose">
+            <div class="admin-draft-type-group">
+              <label class="admin-form-label" for="draft-type">Tipo de rascunho</label>
+              <select id="draft-type" class="admin-form-input admin-filter-select">
+                <option value="post">📝 Ideia de publicação</option>
+                <option value="system">🛠️ Melhoria do sistema</option>
+              </select>
+            </div>
+            <label class="admin-form-label" for="draft-title">Título</label>
+            <input id="draft-title" class="admin-form-input" maxlength="180" placeholder="Título da ideia ou melhoria…" required />
+            <label class="admin-form-label" for="draft-body">Texto do rascunho</label>
+            <textarea id="draft-body" class="admin-form-input" rows="6" placeholder="Escreva aqui suas ideias, notas de escopo ou o início do texto…" required></textarea>
+            <div class="admin-draft-controls">
+              <button type="submit" class="btn-primary-admin">Guardar rascunho</button>
+              <span id="draft-feedback" class="admin-panel-subtitle" role="status" aria-live="polite"></span>
+            </div>
+          </form>
+          <div class="admin-draft-library-container">
+            <!-- Filtro por tipo de rascunho -->
+            <div class="admin-draft-filters" role="tablist" aria-label="Filtrar rascunhos por tipo">
+              <button type="button" class="admin-draft-filter-btn active" data-filter="all">Todos (<span id="draft-count-all">0</span>)</button>
+              <button type="button" class="admin-draft-filter-btn" data-filter="post">📝 Ideias (<span id="draft-count-post">0</span>)</button>
+              <button type="button" class="admin-draft-filter-btn" data-filter="system">🛠️ Sistema (<span id="draft-count-system">0</span>)</button>
+            </div>
+            <div class="admin-draft-library" id="draft-library" aria-label="Rascunhos guardados"></div>
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <!-- Diálogo Modal de Exclusão (Publicação ou Categoria) -->
@@ -480,7 +518,7 @@ const initialEssays = await listEssays();
                 title="${pub.featured ? 'Remover dos destaques da Home' : 'Destacar na Home (máx. 3 no site)'}"
                 aria-label="${pub.featured ? 'Remover destaque' : 'Destacar'}"
               >
-                <i class="${pub.featured ? 'fa-solid fa-star' : 'fa-regular fa-star'}" aria-hidden="true"></i>
+                <span aria-hidden="true">${pub.featured ? '★' : '☆'}</span>
               </button>
             </td>
             <td>
@@ -859,6 +897,185 @@ const initialEssays = await listEssays();
           console.error('Erro ao editar categoria:', err);
         }
       });
+
+      const draftKey = 'cult_admin_drafts_v1';
+      const draftForm = /** @type {HTMLFormElement} */ (document.getElementById('draft-form'));
+      const draftType = /** @type {HTMLSelectElement} */ (document.getElementById('draft-type'));
+      const draftTitle = /** @type {HTMLInputElement} */ (document.getElementById('draft-title'));
+      const draftBody = /** @type {HTMLTextAreaElement} */ (document.getElementById('draft-body'));
+      const draftFeedback = document.getElementById('draft-feedback');
+      const draftLibrary = document.getElementById('draft-library');
+      const draftCountAll = document.getElementById('draft-count-all');
+      const draftCountPost = document.getElementById('draft-count-post');
+      const draftCountSystem = document.getElementById('draft-count-system');
+      let activeDraftId = null;
+      let dirtyDraft = false;
+      let currentDraftFilter = 'all';
+
+      function readDrafts() {
+        const drafts = JSON.parse(localStorage.getItem(draftKey) || '[]');
+        if (!Array.isArray(drafts) || !drafts.every(d => d && typeof d.id === 'string' && typeof d.title === 'string' && typeof d.body === 'string')) {
+          throw new Error('Dados de rascunhos inválidos');
+        }
+        return drafts.map(d => ({
+          ...d,
+          type: d.type === 'system' ? 'system' : 'post'
+        }));
+      }
+
+      function updateDraftCounts(drafts) {
+        if (draftCountAll) draftCountAll.textContent = String(drafts.length);
+        if (draftCountPost) draftCountPost.textContent = String(drafts.filter(d => d.type === 'post').length);
+        if (draftCountSystem) draftCountSystem.textContent = String(drafts.filter(d => d.type === 'system').length);
+      }
+
+      function renderDraftBox() {
+        try {
+          const allDrafts = readDrafts();
+          updateDraftCounts(allDrafts);
+          const filteredDrafts = currentDraftFilter === 'all'
+            ? allDrafts
+            : allDrafts.filter(d => d.type === currentDraftFilter);
+
+          draftLibrary.replaceChildren();
+          if (!filteredDrafts.length) {
+            const empty = document.createElement('p');
+            empty.className = 'admin-panel-subtitle';
+            empty.textContent = currentDraftFilter === 'all'
+              ? 'Seus rascunhos aparecerão aqui. Guarde o primeiro texto ao lado.'
+              : currentDraftFilter === 'post'
+                ? 'Nenhuma ideia de publicação guardada no momento.'
+                : 'Nenhuma melhoria do sistema guardada no momento.';
+            draftLibrary.append(empty);
+            return;
+          }
+
+          filteredDrafts.forEach(draft => {
+            const card = document.createElement('article');
+            card.className = 'admin-draft-item';
+
+            const header = document.createElement('div');
+            header.className = 'admin-draft-item-header';
+
+            const badge = document.createElement('span');
+            badge.className = 'admin-draft-badge ' + (draft.type === 'system' ? 'badge-system' : 'badge-post');
+            badge.textContent = draft.type === 'system' ? '🛠️ Melhoria do sistema' : '📝 Ideia de publicação';
+
+            header.append(badge);
+
+            const title = document.createElement('h3');
+            title.textContent = draft.title;
+
+            const preview = document.createElement('p');
+            preview.textContent = draft.body.slice(0, 160);
+
+            const actions = document.createElement('div');
+            actions.className = 'admin-draft-controls';
+
+            const edit = document.createElement('button');
+            edit.type = 'button';
+            edit.className = 'admin-btn-action';
+            edit.textContent = 'Reabrir';
+            edit.addEventListener('click', () => {
+              if (dirtyDraft && !confirm('Há alterações não guardadas. Trocar de rascunho?')) return;
+              activeDraftId = draft.id;
+              if (draftType) draftType.value = draft.type;
+              draftTitle.value = draft.title;
+              draftBody.value = draft.body;
+              dirtyDraft = false;
+              draftFeedback.textContent = 'Editando rascunho (' + (draft.type === 'system' ? 'Melhoria' : 'Publicação') + ')';
+              draftTitle.focus();
+            });
+
+            const open = document.createElement('a');
+            open.className = 'admin-btn-action edit';
+            open.href = '/editor/?draft=' + encodeURIComponent(draft.id);
+            open.textContent = 'Abrir no editor';
+
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'admin-btn-action delete';
+            remove.textContent = 'Excluir';
+            remove.setAttribute('aria-label', 'Excluir rascunho: ' + draft.title);
+            remove.addEventListener('click', () => {
+              openConfirmModal({
+                title: 'Excluir rascunho',
+                desc: `Excluir “${draft.title}” deste navegador? Esta ação não pode ser desfeita.`,
+                onConfirm: () => {
+                  try {
+                    const drafts = readDrafts();
+                    localStorage.setItem(draftKey, JSON.stringify(drafts.filter(item => item.id !== draft.id)));
+                    if (activeDraftId === draft.id) {
+                      activeDraftId = null;
+                      dirtyDraft = true;
+                    }
+                    renderDraftBox();
+                    draftFeedback.textContent = activeDraftId === null && dirtyDraft
+                      ? 'Rascunho excluído. O texto aberto ainda não está guardado.'
+                      : 'Rascunho excluído.';
+                  } catch {
+                    draftFeedback.textContent = 'Não foi possível excluir o rascunho. Tente novamente.';
+                  }
+                }
+              });
+            });
+
+            actions.append(edit, open, remove);
+            card.append(header, title, preview, actions);
+            draftLibrary.append(card);
+          });
+        } catch {
+          draftFeedback.textContent = 'Não foi possível ler os rascunhos deste navegador.';
+        }
+      }
+
+      document.querySelectorAll('.admin-draft-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.admin-draft-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentDraftFilter = btn.getAttribute('data-filter') || 'all';
+          renderDraftBox();
+        });
+      });
+
+      draftForm.addEventListener('input', () => { dirtyDraft = true; draftFeedback.textContent = 'Alterações não guardadas'; });
+      window.addEventListener('beforeunload', event => {
+        if (dirtyDraft) { event.preventDefault(); event.returnValue = ''; }
+      });
+      document.getElementById('draft-new').addEventListener('click', () => {
+        if (dirtyDraft && !confirm('Há alterações não guardadas. Iniciar outro rascunho?')) return;
+        draftForm.reset();
+        if (draftType) draftType.value = 'post';
+        activeDraftId = null;
+        dirtyDraft = false;
+        draftFeedback.textContent = '';
+        draftTitle.focus();
+      });
+      draftForm.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!draftTitle.value.trim() || !draftBody.value.trim()) {
+          draftFeedback.textContent = 'Preencha o título e o texto.'; return;
+        }
+        try {
+          const drafts = readDrafts();
+          const id = activeDraftId || crypto.randomUUID();
+          const type = draftType ? draftType.value : 'post';
+          const draft = {
+            id,
+            type,
+            title: draftTitle.value.trim(),
+            body: draftBody.value,
+            updatedAt: new Date().toISOString()
+          };
+          localStorage.setItem(draftKey, JSON.stringify([draft, ...drafts.filter(d => d.id !== id)]));
+          activeDraftId = id; dirtyDraft = false;
+          renderDraftBox();
+          draftFeedback.textContent = 'Rascunho guardado neste navegador.';
+        } catch {
+          draftFeedback.textContent = 'Não foi possível guardar. Copie seu texto e tente novamente.';
+        }
+      });
+      renderDraftBox();
 
       // Renderiza imediatamente os dados pré-carregados (zero delay, sem tela em branco)
       updateStats();

@@ -11,15 +11,21 @@ alwaysApply: true
 **Última atualização:** 2026-10-06 por Antigravity
 
 ## Em andamento / próximo passo
-- **Feature concluída:** [`specs/0011-alinhamento-links-fontes-editor/`](../specs/0011-alinhamento-links-fontes-editor/spec.md) — **Alinhamento de Texto, Destaque de Links e Seção de Fontes no Editor**:
-  1. **Alinhamento de Texto na Toolbar:** 4 botões dedicados (Esquerda, Centro, Direita e Justificar) inserindo tags com atributos/classes suportados no Markdown, com estilização correspondente no preview e na página final.
-  2. **Destaque Automático de Links Sublinhados:** Links no corpo dos artigos (`.prose a`, `.article-content a`, `.editor-preview-content a`) agora têm destaque visual automático com cor turquesa (`var(--color-cult-turquoise)`), sublinhado com offset de 3px e transição no hover.
-  3. **Seção de Fontes no Editor:** Nova Seção 4 "Fontes & Referências Consultadas" com textarea multi-linhas (uma fonte por linha, com suporte a título e URL), sincronizado com rascunhos em `localStorage` e preenchido na restauração.
-  4. **Persistência no Frontmatter:** Campo `sources` suportado no schema Zod (`src/content/config.ts`), funções de normalização (`normalizeSources`), parse e formatação em `src/infrastructure/editor-storage.ts` com testes unitários.
-  5. **Renderização nos Artigos:** Bloco estruturado "Fontes & Referências" no final dos artigos em `src/pages/[category]/[slug].astro` com ícones e links externos seguros, além de preview instantâneo no editor.
+- **Feature concluída:** [`specs/0013-editor-markdown-profissional/`](../specs/0013-editor-markdown-profissional/spec.md) — **Editor Markdown Profissional com CodeMirror 6**:
+  1. **Instalação e empacotamento:** Dependências oficiais do CodeMirror 6 (`codemirror`, `@codemirror/state`, `@codemirror/view`, `@codemirror/lang-markdown`, `@codemirror/language`, `@codemirror/commands`, `@codemirror/search`, `@codemirror/theme-one-dark`) integradas e empacotadas via Vite.
+  2. **Substituição visual e inicialização:** CodeMirror 6 substitui o textarea padrão com syntax highlighting para Markdown, calha de numeração de linhas (gutters), line wrapping ativo e placeholder contextual, mantendo o textarea como fallback transparente e resiliente.
+  3. **Integração bidirecional com Toolbar e Link Dialog:** Ações da toolbar (Negrito, Itálico, H2, H3, Citação, Código, Lista, Divisor, Inserir Link, Alinhamentos) e seus atalhos (Ctrl/Cmd+B, Ctrl/Cmd+I, etc.) aplicam formatações granulares diretamente no CodeMirror 6 via API tipada `window.__cultEditor`, sincronizando com preview ao vivo e salvamento de rascunhos.
+  4. **Isolamento de histórico e busca:** Ações de desfazer (Ctrl/Cmd+Z) e refazer (Ctrl/Cmd+Shift+Z / Ctrl/Cmd+Y) operam de forma isolada; alternar artigos recria o estado e zera o histórico anterior. Painel avançado de busca e substituição (Ctrl/Cmd+F) integrado.
+  5. **Design System e Acessibilidade:** Tema visual customizado alinhado à paleta e tokens CULT (`--color-cult-navy-deep`, `--color-cult-turquoise`, `--color-cult-surface`), foco visível e responsividade perfeita de 320px até desktops.
 - **Próximo passo:** Próxima feature do roadmap ou deploy da imagem atualizada no Fly.io.
 
 ## Decisões recentes
+- 2026-10-07: Editor visual com Milkdown Crepe (spec `0014`): seletor `Editor | Markdown`, título em destaque, artigos com HTML legado abrem em Markdown (visual só com confirmação). Typecheck, 30 testes e build OK. **Pendente:** validação interativa no navegador (ferramenta do agente indisponível).
+- 2026-10-06: Caixa de rascunhos no Admin atualizada com suporte a dois tipos estruturados: "📝 Ideia de publicação" e "🛠️ Melhoria do sistema", acompanhados de badges distintivas (`badge-post` e `badge-system`), contadores dinâmicos e abas de filtragem rápida ("Todos", "Ideias", "Sistema"). Retrocompatibilidade garantida para rascunhos já existentes no localStorage.
+- 2026-10-06: Implementação completa do Editor Markdown Profissional com CodeMirror 6 (spec `0013`). Substituição do textarea por editor de código completo, toolbar integrada, atalhos de teclado, painel de busca e isolamento de histórico por publicação. Verificados typecheck (0 erros), 30 testes unitários passando e build de produção bem-sucedido.
+- 2026-10-06: Caixa de rascunhos recebeu botão Excluir por item com confirmação, tratamento de falhas e preservação do texto aberto. Abertura e cancelamento do diálogo verificados no navegador.
+- 2026-10-06: Admin reorganizado com tabela legível, ações sem compressão, estrelas independentes de fontes externas e caixa de múltiplos rascunhos no navegador, integrada ao editor via ?draft=. Ver spec 0012. Validados persistência/reabertura, modo draft no editor, larguras 320–1440 px e 30 testes; typecheck sem erros (um hint de compatibilidade beforeunload).
+- 2026-10-06: Corrigido overflow do admin com reset CSS independente, cabeçalho em duas linhas no celular e quebra de linha nos itens de categorias. Validação no navegador: Publicações sem overflow em 320, 375, 805 e 1280 px; Categorias em 320 e 375 px.
 - 2026-10-06: Implementação de Alinhamento, Destaque de Links e Fontes no Editor (spec `0011`).
 - 2026-10-06: Simplificação do rodapé: remoção das colunas de navegação repetitivas e do filete ornamental conforme solicitação do usuário.
 - 2026-10-06: Remoção da seção "Território & Identidade Belém & Pará" da Home a pedido do usuário.

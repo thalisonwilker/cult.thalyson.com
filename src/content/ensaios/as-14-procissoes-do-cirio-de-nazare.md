@@ -1,4 +1,6 @@
 ---
+name: as-14-procissoes-do-cirio-de-nazare
+alwaysApply: false
 title: "As 14 procissões do Círio de Nazaré 2026"
 description: "Você sabia que além da trasladação do Círio existem mais 13 procissões que compõem o Círio de Nazaré ?"
 pubDate: 2026-10-06
@@ -10,17 +12,19 @@ draft: false
 featured: true
 coverImage: "/images/cirio5-pedronunes-1_8d0f84078e7ff83a756d614afbf22fce.webp"
 coverImagePosition: "50% 53%"
+sources:
+  - "Site oficial do Círio de Nazaré - https://www.ciriodenazare.com.br"
 ---
 
-O Círio é uma grandiosa manifestação de fé e devoção à Nossa Senhora de Nazaré. Realizado há mais de 200 anos em Belém/PA foi reconhecido como Patrimônio Cultural Imaterial pelo Iphan e declarado Patrimônio Cultural da Humanidade pela UNESCO.
+<p align="justify">O Círio é uma grandiosa manifestação de fé e devoção à Nossa Senhora de Nazaré. Realizado há mais de 200 anos em Belém/PA foi reconhecido como Patrimônio Cultural Imaterial pelo Iphan e declarado Patrimônio Cultural da Humanidade pela UNESCO.</p>
 
-A história do Círio começa em 1700 com o achado da Imagem de Nossa Senhora de Nazaré pelo Caboclo Plácido, às margens de um riacho localizado próximo de onde hoje se ergue a Basílica Santuário de Nossa Senhora de Nazaré. 
+<p align="justify">A história do Círio começa em 1700 com o achado da Imagem de Nossa Senhora de Nazaré pelo Caboclo Plácido, às margens de um riacho localizado próximo de onde hoje se ergue a Basílica Santuário de Nossa Senhora de Nazaré.</p> 
 
-A devoção à Virgem foi crescendo e, em 1793, aconteceu a primeira procissão em homenagem à Padroeira dos paraenses. Desde então, o Círio acontece anualmente, reunindo sempre um número maior de fiéis.
+<p align="justify">A devoção à Virgem foi crescendo e, em 1793, aconteceu a primeira procissão em homenagem à Padroeira dos paraenses. Desde então, o Círio acontece anualmente, reunindo sempre um número maior de fiéis.</p>
 
-A Festividade de  Nossa Senhora de Nazaré ocorre no mês de outubro com a realização do Círio e de outras doze procissões, como a Trasladação, a Romaria Rodoviária, a Romaria Fluvial, o Círio das Crianças e o Recírio, dentre outras. São milhões de pessoas nas ruas de Belém durante toda a quinzena festiva, que também conta com uma extensa programação de eventos: missas,  vigílias de oração, o Arraial de Nazaré, o Círio Musical e a descida da Imagem do  Achado, do Glória para o Altar da Basílica Santuário, onde fica durante os quinze dias de festa para visitação.
+<p align="justify">A Festividade de  Nossa Senhora de Nazaré ocorre no mês de outubro com a realização do Círio e de outras doze procissões, como a Trasladação, a Romaria Rodoviária, a Romaria Fluvial, o Círio das Crianças e o Recírio, dentre outras. São milhões de pessoas nas ruas de Belém durante toda a quinzena festiva, que também conta com uma extensa programação de eventos: missas,  vigílias de oração, o Arraial de Nazaré, o Círio Musical e a descida da Imagem do  Achado, do Glória para o Altar da Basílica Santuário, onde fica durante os quinze dias de festa para visitação.</p>
 
-Em 2026 o mês de outubro contará com 13 procissões, vamos conhecer um pouco mais sobre cada uma delas.
+<p align="justify">Em 2026 o mês de outubro contará com 13 procissões, vamos conhecer um pouco mais sobre cada uma delas.</p>
 
 
 ---
@@ -237,8 +241,3 @@ PERCURSO
 Distância: 800 m, Tempo estimado: 1h, Público estimado: 50.000  pessoas
 
 ---
-
-
-Fontes:
-
-[Site oficial do Círio de Nazaré](https://www.ciriodenazare.com.br)

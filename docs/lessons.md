@@ -27,6 +27,7 @@ alwaysApply: false
 | Gotcha que ainda não estabilizou | **fica aqui** | — |
 
 ## Aprendizados ativos
+- 2026-10-06 · Admin CSS · Páginas independentes que não importam global.css precisam de reset próprio (border-box e margens zeradas); validar overflow nas abas Publicações e Categorias em telas estreitas.
 > Formato: `- <YYYY-MM-DD> · <área/arquivo> · o gotcha em 1 linha · como evitar/mitigar`.
 > Mantenha acionável e curto. Se não é acionável, não é uma lição — é desabafo.
 

@@ -3,6 +3,8 @@ import { defineCollection, z } from 'astro:content';
 const ensaiosCollection = defineCollection({
   type: 'content',
   schema: z.object({
+    name: z.string().optional(),
+    alwaysApply: z.boolean().optional(),
     title: z.string({
       required_error: 'O título do ensaio é obrigatório'
     }),

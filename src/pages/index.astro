@@ -20,9 +20,21 @@ allEssays.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 const currentCategory = Astro.url.searchParams.get('categoria') || undefined;
 const currentTerritory = Astro.url.searchParams.get('territorio') || undefined;
 
+const categoryLabels: Record<string, string> = {
+  musica: 'Música & Ritmos',
+  patrimonio: 'Círio & Patrimônio',
+  artes: 'Arte, Cinema & Imagem',
+  cinema: 'Arte, Cinema & Imagem',
+  literatura: 'Literatura Paraense'
+};
+
 // Filtragem
 const filteredEssays = allEssays.filter((essay) => {
-  const matchCategory = currentCategory ? essay.data.category === currentCategory : true;
+  const matchCategory = currentCategory
+    ? (currentCategory === 'artes'
+        ? (essay.data.category === 'artes' || essay.data.category === 'cinema')
+        : essay.data.category === currentCategory)
+    : true;
   const matchTerritory = currentTerritory && currentTerritory !== 'all'
     ? essay.data.territory === currentTerritory
     : true;
@@ -57,7 +69,7 @@ const hasFeatured = featuredEssays.length > 0;
           <a href="/" class="crumb-link">Início</a>
           <span class="crumb-divider">/</span>
           <span class="crumb-current">
-            {currentCategory ? `Categoria: ${currentCategory}` : ''}
+            {currentCategory ? `Categoria: ${categoryLabels[currentCategory] || currentCategory}` : ''}
             {currentCategory && currentTerritory ? ' · ' : ''}
             {currentTerritory ? `Território: ${currentTerritory}` : ''}
           </span>
@@ -67,7 +79,7 @@ const hasFeatured = featuredEssays.length > 0;
           {currentTerritory === 'para' && 'Acervo do Pará & Belém'}
           {currentTerritory === 'nacional' && 'Arte Nacional Contemporânea'}
           {currentTerritory === 'global' && 'Mundo & Clássicos Universais'}
-          {currentCategory && !currentTerritory && `Vertente: ${currentCategory.toUpperCase()}`}
+          {currentCategory && !currentTerritory && `Vertente: ${(categoryLabels[currentCategory] || currentCategory).toUpperCase()}`}
         </h1>
 
         <span class="filtered-count">

@@ -1,5 +1,6 @@
 # Build & Dist
 dist/
+out/
 .astro/
 
 # Dependencies

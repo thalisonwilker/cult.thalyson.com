@@ -10,11 +10,10 @@ interface Props {
 const { currentCategory } = Astro.props;
 
 const categories = [
-  { slug: 'musica', label: 'Música', accent: 'var(--color-cult-gold)' },
-  { slug: 'patrimonio', label: 'Patrimônio', accent: 'var(--color-cult-coral)' },
-  { slug: 'cinema', label: 'Cinema', accent: 'var(--color-cult-orange)' },
-  { slug: 'literatura', label: 'Literatura', accent: 'var(--color-cult-turquoise)' },
-  { slug: 'artes', label: 'Artes', accent: 'var(--color-cult-cobalt)' }
+  { slug: 'musica', label: 'Música & Ritmos', accent: 'var(--color-cult-gold)' },
+  { slug: 'patrimonio', label: 'Círio & Patrimônio', accent: 'var(--color-cult-coral)' },
+  { slug: 'artes', label: 'Arte, Cinema & Imagem', accent: 'var(--color-cult-cobalt)' },
+  { slug: 'literatura', label: 'Literatura Paraense', accent: 'var(--color-cult-turquoise)' }
 ];
 ---
 
@@ -29,7 +28,7 @@ const categories = [
     <nav class="editorial-nav-desktop" aria-label="Navegação editorial principal">
       <ul class="nav-list">
         {categories.map((cat) => {
-          const isActive = currentCategory === cat.slug;
+          const isActive = currentCategory === cat.slug || (cat.slug === 'artes' && currentCategory === 'cinema');
           return (
             <li class="nav-item">
               <a
@@ -97,7 +96,7 @@ const categories = [
             </a>
           </li>
           {categories.map((cat) => {
-            const isActive = currentCategory === cat.slug;
+            const isActive = currentCategory === cat.slug || (cat.slug === 'artes' && currentCategory === 'cinema');
             return (
               <li>
                 <a

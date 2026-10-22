@@ -93,24 +93,10 @@ const territories = [
       <!-- ------------------------------------------------------------------
            SEÇÃO 1: Metadados da Publicação
            ------------------------------------------------------------------ -->
-      <div class="editor-section">
-        <h2 class="editor-section-title">Metadados</h2>
+      <details class="editor-section editor-settings">
+        <summary class="editor-section-title">Metadados</summary>
 
-        <!-- Título -->
-        <div class="editor-field">
-          <label class="editor-label" for="field-title">
-            Título <span class="required">*</span>
-          </label>
-          <input
-            id="field-title"
-            class="editor-input"
-            type="text"
-            placeholder="O título principal da publicação…"
-            autocomplete="off"
-            spellcheck="true"
-            lang="pt"
-          />
-        </div>
+        <!-- O título fica na área de escrita (abaixo) -->
 
         <!-- Descrição / Lead -->
         <div class="editor-field">
@@ -233,13 +219,13 @@ const territories = [
             Destacar na Home (featured: true · máx. 3 no site)
           </label>
         </div>
-      </div>
+      </details>
 
       <!-- ------------------------------------------------------------------
            SEÇÃO 2: Imagem em Destaque
            ------------------------------------------------------------------ -->
-      <div class="editor-section">
-        <h2 class="editor-section-title">Imagem em Destaque</h2>
+      <details class="editor-section editor-settings">
+        <summary class="editor-section-title">Imagem em Destaque</summary>
 
         <div class="editor-image-upload">
           <!-- Preview da imagem selecionada -->
@@ -342,73 +328,33 @@ const territories = [
             />
           </div>
         </div>
-      </div>
+      </details>
 
       <!-- ------------------------------------------------------------------
            SEÇÃO 3: Corpo da Publicação
            ------------------------------------------------------------------ -->
-      <div class="editor-section">
-        <h2 class="editor-section-title">Corpo da Publicação</h2>
-
-        <!-- Toolbar de atalhos Markdown -->
-        <div class="editor-toolbar" role="toolbar" aria-label="Atalhos de formatação Markdown">
-          <button class="editor-toolbar-btn" data-action="bold" type="button" title="Negrito (Ctrl+B)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 15.5H10v-3h3.5a1.5 1.5 0 010 3zm-3.5-9h3a1.5 1.5 0 010 3H10V6.5zM5 18V6h5.5a4 4 0 013.167 6.5A4 4 0 0113.5 18H5z"/></svg>
-            Bold
-          </button>
-          <button class="editor-toolbar-btn" data-action="italic" type="button" title="Itálico (Ctrl+I)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4v3h2.21l-3.42 10H6v3h8v-3h-2.21l3.42-10H18V4z"/></svg>
-            Italic
-          </button>
-          <button class="editor-toolbar-btn" data-action="h2" type="button">
-            H2
-          </button>
-          <button class="editor-toolbar-btn" data-action="h3" type="button">
-            H3
-          </button>
-          <button class="editor-toolbar-btn" data-action="quote" type="button" title="Bloco de citação">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            Quote
-          </button>
-          <button class="editor-toolbar-btn" data-action="code" type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-            Code
-          </button>
-          <button class="editor-toolbar-btn" data-action="ul" type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            Lista
-          </button>
-          <button class="editor-toolbar-btn" data-action="hr" type="button">
-            — Divisor
-          </button>
-          <button class="editor-toolbar-btn" data-action="link" id="btn-insert-link" type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-            Inserir Link
-          </button>
-
-          <span class="editor-toolbar-separator" aria-hidden="true"></span>
-
-          <!-- Botões de Alinhamento de Texto (AC-1) -->
-          <button class="editor-toolbar-btn" data-action="align-left" type="button" title="Alinhar à esquerda">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
-            Esquerda
-          </button>
-          <button class="editor-toolbar-btn" data-action="align-center" type="button" title="Centralizar texto">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="10" x2="6" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
-            Centro
-          </button>
-          <button class="editor-toolbar-btn" data-action="align-right" type="button" title="Alinhar à direita">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
-            Direita
-          </button>
-          <button class="editor-toolbar-btn" data-action="align-justify" type="button" title="Justificar texto">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>
-            Justificar
-          </button>
+      <div class="editor-section editor-writing-section">
+        <div class="editor-writing-guide">
+          <p id="editor-mode-hint">Preparando seu espaço de escrita…</p>
+          <div class="editor-mode-switch" role="group" aria-label="Modo de edição">
+            <button type="button" id="editor-mode-visual" class="editor-mode-option" aria-pressed="true">Editor</button>
+            <button type="button" id="editor-mode-source" class="editor-mode-option" aria-pressed="false">Markdown</button>
+          </div>
         </div>
-
-        <!-- Textarea do corpo -->
+        <label class="visually-hidden" for="field-title">Título da publicação</label>
+        <input
+          id="field-title"
+          class="editor-title-input"
+          type="text"
+          placeholder="Título da publicação"
+          autocomplete="off"
+          spellcheck="true"
+          lang="pt"
+        />
+        <!-- Textarea do corpo: adaptador e fallback do editor Markdown -->
         <div class="editor-field">
+          <div id="markdown-editor" class="visual-editor" hidden></div>
+          <div id="markdown-source" class="markdown-editor" hidden></div>
           <textarea
             id="field-body"
             class="editor-textarea editor-textarea-body"
@@ -433,8 +379,8 @@ Continua o texto aqui..."
       <!-- ------------------------------------------------------------------
            SEÇÃO 4: Fontes & Referências Consultadas (AC-3)
            ------------------------------------------------------------------ -->
-      <div class="editor-section">
-        <h2 class="editor-section-title">Fontes &amp; Referências Consultadas</h2>
+      <details class="editor-section editor-settings">
+        <summary class="editor-section-title">Fontes &amp; Referências Consultadas</summary>
 
         <div class="editor-field">
           <label for="field-sources" class="editor-label">
@@ -449,7 +395,7 @@ Continua o texto aqui..."
             spellcheck="false"
           ></textarea>
         </div>
-      </div>
+      </details>
 
     </section>
 
@@ -636,6 +582,10 @@ Continua o texto aqui..."
 <!-- =====================================================================
      SCRIPTS CLIENT-SIDE
      ===================================================================== -->
+<script>
+  import '../../scripts/markdown-editor';
+</script>
+
 <script is:inline>
 // ============================================================
 // ESTADO CENTRAL DO EDITOR
@@ -709,6 +659,7 @@ function clearFeedback() {
 
 /** Retorna o valor de um input por ID */
 function getVal(id) {
+  if (id === 'field-body') document.getElementById(id)?.dispatchEvent(new Event('editor-flush'));
   const el = /** @type {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} */ (document.getElementById(id));
   return el ? el.value.trim() : '';
 }
@@ -716,7 +667,10 @@ function getVal(id) {
 /** Define o valor de um input por ID */
 function setVal(id, value) {
   const el = /** @type {HTMLInputElement|HTMLTextAreaElement} */ (document.getElementById(id));
-  if (el) el.value = value;
+  if (el) {
+    el.value = value;
+    if (id === 'field-body') el.dispatchEvent(new Event('markdown-load'));
+  }
 }
 
 // ============================================================
@@ -1269,129 +1223,6 @@ dropzone?.addEventListener('drop', (e) => {
 });
 
 // ============================================================
-// TOOLBAR DE FORMATAÇÃO (AC-5)
-// ============================================================
-function insertAtCursor(textarea, before, after = '') {
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const selected = textarea.value.substring(start, end);
-  const newText = before + (selected || 'texto') + after;
-  textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
-  // Reposiciona o cursor
-  const newStart = start + before.length;
-  const newEnd = newStart + (selected || 'texto').length;
-  textarea.setSelectionRange(newStart, newEnd);
-  textarea.focus();
-  updatePreview();
-  debouncedSave();
-}
-
-function insertLinePrefix(textarea, prefix) {
-  const start = textarea.selectionStart;
-  const lineStart = textarea.value.lastIndexOf('\n', start - 1) + 1;
-  const before = textarea.value.substring(0, lineStart);
-  const after = textarea.value.substring(lineStart);
-  textarea.value = before + prefix + after;
-  const newPos = lineStart + prefix.length;
-  textarea.setSelectionRange(newPos, newPos);
-  textarea.focus();
-  updatePreview();
-  debouncedSave();
-}
-
-document.querySelectorAll('.editor-toolbar-btn[data-action]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const textarea = /** @type {HTMLTextAreaElement} */ (document.getElementById('field-body'));
-    if (!textarea) return;
-    const action = btn.getAttribute('data-action');
-    switch (action) {
-      case 'bold':   insertAtCursor(textarea, '**', '**'); break;
-      case 'italic': insertAtCursor(textarea, '_', '_'); break;
-      case 'h2':     insertLinePrefix(textarea, '## '); break;
-      case 'h3':     insertLinePrefix(textarea, '### '); break;
-      case 'quote':  insertLinePrefix(textarea, '> '); break;
-      case 'code':   insertAtCursor(textarea, '`', '`'); break;
-      case 'ul':     insertLinePrefix(textarea, '- '); break;
-      case 'hr':
-        const curPos = textarea.selectionStart;
-        const ins = '\n\n---\n\n';
-        textarea.value = textarea.value.substring(0, curPos) + ins + textarea.value.substring(curPos);
-        textarea.setSelectionRange(curPos + ins.length, curPos + ins.length);
-        textarea.focus();
-        updatePreview();
-        debouncedSave();
-        break;
-      case 'link':
-        openLinkDialog();
-        break;
-      case 'align-left':
-        insertAtCursor(textarea, '<p align="left">', '</p>');
-        break;
-      case 'align-center':
-        insertAtCursor(textarea, '<p align="center">', '</p>');
-        break;
-      case 'align-right':
-        insertAtCursor(textarea, '<p align="right">', '</p>');
-        break;
-      case 'align-justify':
-        insertAtCursor(textarea, '<p align="justify">', '</p>');
-        break;
-    }
-  });
-});
-
-// ============================================================
-// DIALOG DE LINK (AC-5)
-// ============================================================
-let linkInsertTarget = 0;
-let linkInsertEnd = 0;
-
-function openLinkDialog() {
-  const textarea = /** @type {HTMLTextAreaElement} */ (document.getElementById('field-body'));
-  if (textarea) {
-    linkInsertTarget = textarea.selectionStart;
-    linkInsertEnd = textarea.selectionEnd;
-    const selected = textarea.value.substring(linkInsertTarget, linkInsertEnd);
-    setVal('link-text', selected || '');
-    setVal('link-url', '');
-  }
-  const overlay = document.getElementById('link-dialog-overlay');
-  if (overlay) overlay.classList.add('open');
-  document.getElementById('link-text')?.focus();
-}
-
-function closeLinkDialog() {
-  const overlay = document.getElementById('link-dialog-overlay');
-  if (overlay) overlay.classList.remove('open');
-}
-
-document.getElementById('btn-cancel-link')?.addEventListener('click', closeLinkDialog);
-document.getElementById('link-dialog-overlay')?.addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closeLinkDialog();
-});
-// Também abre via toolbar
-document.getElementById('btn-insert-link')?.addEventListener('click', openLinkDialog);
-
-document.getElementById('btn-confirm-link')?.addEventListener('click', () => {
-  const text = getVal('link-text') || 'link';
-  const url = getVal('link-url') || '#';
-  const textarea = /** @type {HTMLTextAreaElement} */ (document.getElementById('field-body'));
-  if (textarea) {
-    const markdown = `[${text}](${url})`;
-    textarea.value =
-      textarea.value.substring(0, linkInsertTarget) +
-      markdown +
-      textarea.value.substring(linkInsertEnd);
-    const newPos = linkInsertTarget + markdown.length;
-    textarea.setSelectionRange(newPos, newPos);
-    textarea.focus();
-    updatePreview();
-    debouncedSave();
-  }
-  closeLinkDialog();
-});
-
-// ============================================================
 // PREVIEW EM TEMPO REAL (AC-7)
 // ============================================================
 let previewTimer;
@@ -1878,6 +1709,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (targetSlug) {
     await loadEssayToEdit(targetSlug);
+  } else if (urlParams.has('draft')) {
+    try {
+      const drafts = JSON.parse(localStorage.getItem('cult_admin_drafts_v1') || '[]');
+      const draft = drafts.find(item => item.id === urlParams.get('draft'));
+      if (!draft || typeof draft.title !== 'string' || typeof draft.body !== 'string') throw new Error('Rascunho não encontrado');
+      setVal('field-title', draft.title);
+      setVal('field-body', draft.body);
+      document.getElementById('field-draft').checked = true;
+      renderTags();
+      updatePreview();
+    } catch {
+      alert('Não foi possível abrir o rascunho. Volte à caixa de rascunhos no painel.');
+    }
   } else {
     // Restaura rascunho se houver
     restoreDraft();

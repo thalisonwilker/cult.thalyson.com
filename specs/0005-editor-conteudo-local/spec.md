@@ -38,7 +38,7 @@ O sistema passa a ter uma interface de edição de conteúdo acessível **apenas
 ### AC-5: Links no corpo do texto
 - **Dado** que o editor está aberto e o autor está escrevendo no campo de corpo (textarea)
 - **Quando** o autor clica em "Inserir Link" e preenche texto + URL
-- **Então** o trecho `[texto](url)` é inserido no cursor do textarea
+- **Então** o trecho `[texto](<url>)` é inserido no cursor do textarea
 
 ### AC-6: Geração e download de arquivo Markdown
 - **Dado** que todos os campos obrigatórios (AC-3) estão preenchidos

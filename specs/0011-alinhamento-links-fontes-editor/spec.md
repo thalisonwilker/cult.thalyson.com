@@ -28,7 +28,7 @@ Aprimorar a experiência editorial do portal CULT fornecendo:
 - **Então** o texto no textarea é atualizado com a formatação e o preview ao vivo renderiza o parágrafo ou bloco imediatamente com o respectivo alinhamento CSS (`text-align`).
 
 ### AC-2: Destaque Automático de Links Sublinhados no Conteúdo
-- **Dado** qualquer link inserido no corpo de um artigo (Markdown `[texto](url)` ou tag `<a>`)
+- **Dado** qualquer link inserido no corpo de um artigo (Markdown `[texto](<url>)` ou tag `<a>`)
 - **Quando** o artigo for visualizado na página pública (`/[categoria]/[slug]/`) ou no painel de preview do editor
 - **Então** o link deve receber destaque visual automático com cor turquesa (`var(--color-cult-turquoise)`), sublinhado visível (`text-decoration: underline`, `text-underline-offset: 3px`) e transição suave no hover, diferenciando-o claramente do texto comum.
 

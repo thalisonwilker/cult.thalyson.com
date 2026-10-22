@@ -1,3 +1,9 @@
+---
+name: tasks
+description: Tasks da feature 0008 - Identidade visual abridores de letras.
+alwaysApply: false
+---
+
 # Tasks — 0008: Identidade Visual Inspirada nos Abridores de Letras Fluviais
 
 > **Gate executável:** `npm run typecheck && npm run test:unit && npm run build`
