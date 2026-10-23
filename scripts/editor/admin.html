@@ -7,186 +7,289 @@
   <link rel="stylesheet" href="/admin.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
-<body>
-  <div class="admin-shell">
-    <!-- Barra Superior de Navegação -->
-    <header class="admin-nav-bar">
-      <div class="nav-brand">
+<body class="spur-body">
+  <div class="spur-layout" id="spur-layout">
+    
+    <!-- Sidebar Escura Lateral (Estilo Spur) -->
+    <aside class="spur-sidebar" id="spur-sidebar">
+      <div class="sidebar-brand">
         <a href="/admin" class="brand-link">
-          <span class="brand-badge">DEV</span>
-          <span class="brand-title">CULT Admin</span>
+          <span class="brand-icon"><i class="fa-solid fa-bolt"></i></span>
+          <span class="brand-text">CULT <span>Admin</span></span>
         </a>
       </div>
 
-      <nav class="nav-tabs" aria-label="Navegação do Painel">
-        <a href="/admin" class="nav-tab active">
-          <i class="fa-solid fa-chart-pie"></i>
+      <nav class="sidebar-nav" aria-label="Navegação Principal">
+        <div class="nav-section-title">PAINEL LOCAL</div>
+        <a href="/admin" class="sidebar-link active">
+          <i class="fa-solid fa-house"></i>
           <span>Dashboard</span>
         </a>
-        <a href="/" class="nav-tab">
+        <a href="#section-stats" class="sidebar-link">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Estatísticas</span>
+        </a>
+        <a href="#section-table" class="sidebar-link">
+          <i class="fa-solid fa-book-bookmark"></i>
+          <span>Publicações</span>
+        </a>
+        <a href="#section-ideas" class="sidebar-link">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span>Ideias & Pautas</span>
+        </a>
+
+        <div class="nav-section-title">FERRAMENTAS</div>
+        <a href="/" class="sidebar-link">
           <i class="fa-solid fa-pen-nib"></i>
           <span>Editor de Ensaios</span>
         </a>
-      </nav>
-
-      <div class="nav-extras">
-        <a href="http://127.0.0.1:3000" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" title="Visualizar site público">
+        <a href="http://127.0.0.1:3000" target="_blank" rel="noopener noreferrer" class="sidebar-link">
           <i class="fa-solid fa-arrow-up-right-from-square"></i>
           <span>Ver Site Público (:3000)</span>
         </a>
-      </div>
-    </header>
+      </nav>
 
-    <!-- Conteúdo Principal -->
-    <main class="admin-content">
-      <div class="page-header">
-        <div class="page-title-wrap">
-          <span class="section-tag">Painel de Controle Local</span>
-          <h1 class="page-title">Gestão do Acervo Editorial</h1>
-        </div>
-        <div class="page-actions">
-          <a href="/?novo=true" class="btn btn-primary">
-            <i class="fa-solid fa-plus"></i>
-            <span>Nova Publicação</span>
-          </a>
+      <div class="sidebar-footer">
+        <div class="server-status">
+          <span class="status-indicator"></span>
+          <span>127.0.0.1:3001 [LOCAL]</span>
         </div>
       </div>
+    </aside>
 
-      <!-- Grade de Métricas -->
-      <section class="metrics-grid" id="metrics-container">
-        <div class="metric-card">
-          <div class="metric-icon" style="background: rgba(23, 169, 184, 0.15); color: #17A9B8;">
-            <i class="fa-solid fa-book-open"></i>
-          </div>
-          <div class="metric-data">
-            <span class="metric-label">Ensaios Publicados</span>
-            <span class="metric-value" id="val-published">-</span>
-          </div>
-        </div>
+    <!-- Overlay para telas mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <div class="metric-card">
-          <div class="metric-icon" style="background: rgba(244, 182, 63, 0.15); color: #F4B63F;">
-            <i class="fa-solid fa-star"></i>
-          </div>
-          <div class="metric-data">
-            <span class="metric-label">Destaques na Home</span>
-            <div class="metric-value-row">
-              <span class="metric-value" id="val-featured">- / 3</span>
-              <span class="metric-badge" id="badge-featured-status">OK</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon" style="background: rgba(252, 92, 101, 0.15); color: #FC5C65;">
-            <i class="fa-solid fa-file-pen"></i>
-          </div>
-          <div class="metric-data">
-            <span class="metric-label">Rascunhos em Progresso</span>
-            <span class="metric-value" id="val-drafts">-</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon" style="background: rgba(155, 176, 214, 0.15); color: #9BB0D6;">
-            <i class="fa-solid fa-clock"></i>
-          </div>
-          <div class="metric-data">
-            <span class="metric-label">Média de Leitura</span>
-            <span class="metric-value" id="val-reading-time">- min</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Distribuição por Categorias e Territórios -->
-      <section class="distribution-row">
-        <div class="distribution-card">
-          <h2 class="card-heading">Vertentes Culturais</h2>
-          <div class="pills-cluster" id="categories-cluster"></div>
-        </div>
-        <div class="distribution-card">
-          <h2 class="card-heading">Escopo Territorial</h2>
-          <div class="pills-cluster" id="territories-cluster"></div>
-        </div>
-      </section>
-
-      <!-- Tabela Principal de Ensaios -->
-      <section class="table-card">
-        <div class="table-header">
-          <div class="table-title-area">
-            <h2 class="card-heading">Publicações no Acervo</h2>
-            <span class="table-count" id="table-total-count">- publicações</span>
-          </div>
-
-          <div class="table-controls">
-            <div class="search-wrap">
-              <i class="fa-solid fa-magnifying-glass search-icon"></i>
-              <input type="text" id="filter-search" placeholder="Buscar por título ou slug..." />
-            </div>
-            <div class="filter-tabs" id="status-filter-tabs">
-              <button class="filter-tab active" data-filter="all">Todas</button>
-              <button class="filter-tab" data-filter="published">Publicadas</button>
-              <button class="filter-tab" data-filter="drafts">Rascunhos</button>
-              <button class="filter-tab" data-filter="featured">Destaques</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-responsive">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th style="width: 50px; text-align: center;">Destaque</th>
-                <th>Título</th>
-                <th>Categoria</th>
-                <th>Território</th>
-                <th>Data</th>
-                <th>Leitura</th>
-                <th>Status</th>
-                <th style="text-align: right;">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="essays-tbody">
-              <tr>
-                <td colspan="8" style="text-align: center; padding: 2.5rem;">Carregando publicações...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Caixa de Ideias e Pautas Rápidas -->
-      <section class="ideas-section">
-        <div class="section-header-row">
-          <div class="header-left">
-            <span class="section-tag">Staging Local</span>
-            <h2 class="card-heading">Ideias & Pautas para Ensaios</h2>
-          </div>
-          <button id="btn-toggle-new-idea" class="btn btn-secondary">
-            <i class="fa-solid fa-plus"></i>
-            <span>Anotar Ideia</span>
+    <!-- Painel de Conteúdo Principal -->
+    <div class="spur-main">
+      
+      <!-- Topbar Clara (Estilo Spur) -->
+      <header class="spur-topbar">
+        <div class="topbar-left">
+          <button class="topbar-btn sidebar-toggle-btn" id="btn-sidebar-toggle" title="Alternar menu lateral">
+            <i class="fa-solid fa-bars"></i>
           </button>
+          
+          <div class="topbar-search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="topbar-search-input" placeholder="Buscar no acervo..." autocomplete="off" />
+          </div>
         </div>
 
-        <!-- Formulário recolhível de nova ideia -->
-        <form id="idea-form" class="idea-form" style="display: none;">
-          <div class="form-row form-row--2">
-            <input type="text" id="idea-title" required placeholder="Título da ideia (ex: Os Mestres da Guitarrada de Barcarena)" />
-            <select id="idea-type">
-              <option value="post">📝 Ideia de Publicação</option>
-              <option value="system">🛠️ Ideia de Melhoria</option>
-            </select>
-          </div>
-          <textarea id="idea-notes" rows="2" placeholder="Anotações rápidas, referências ou links a pesquisar..."></textarea>
-          <div class="form-actions-right">
-            <button type="button" id="btn-cancel-idea" class="btn btn-ghost">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Salvar Ideia</button>
-          </div>
-        </form>
+        <div class="topbar-right">
+          <a href="http://127.0.0.1:3000" target="_blank" rel="noopener noreferrer" class="topbar-icon-link" title="Visualizar site na porta 3000">
+            <i class="fa-solid fa-globe"></i>
+          </a>
 
-        <div id="ideas-list" class="ideas-grid"></div>
-      </section>
-    </main>
+          <div class="notifications-wrapper">
+            <button class="topbar-icon-link" id="btn-notifications-toggle" title="Alertas do acervo">
+              <i class="fa-solid fa-bell"></i>
+              <span class="notification-badge" id="notification-badge">0</span>
+            </button>
+            <div class="notifications-dropdown" id="notifications-dropdown" style="display: none;">
+              <div class="dropdown-header">Alertas do Acervo</div>
+              <ul class="dropdown-list" id="notifications-list"></ul>
+            </div>
+          </div>
+
+          <div class="topbar-user">
+            <div class="user-avatar" title="Autor Editorial: Thalyson">T</div>
+            <span class="user-name">Thalyson</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Conteúdo Interno com fundo cinza-azulado suave -->
+      <main class="spur-content">
+        
+        <!-- Breadcrumbs e Ações de Topo -->
+        <div class="content-header">
+          <div class="content-heading">
+            <h1 class="page-title">Dashboard Editorial</h1>
+            <p class="page-subtitle">Gestão do acervo cultural amazônico, estatísticas e pautas em tempo real</p>
+          </div>
+          <div class="content-actions">
+            <a href="/?novo=true" class="btn btn-action-new">
+              <i class="fa-solid fa-plus"></i>
+              <span>Novo Ensaio</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Grade de Cards de Métricas no Estilo Spur (4 cards sólidos) -->
+        <section class="spur-metrics-grid" id="section-metrics">
+          
+          <!-- Card Azul: Ensaios Publicados -->
+          <div class="spur-card-metric spur-card--blue">
+            <div class="metric-top">
+              <span class="metric-title">Ensaios Publicados</span>
+              <span class="metric-number" id="val-published">-</span>
+            </div>
+            <div class="metric-bottom">
+              <i class="fa-solid fa-book-open metric-icon"></i>
+              <span class="metric-sub" id="sub-published">No acervo ativo</span>
+            </div>
+          </div>
+
+          <!-- Card Verde: Destaques na Home -->
+          <div class="spur-card-metric spur-card--green">
+            <div class="metric-top">
+              <span class="metric-title">Destaques na Home</span>
+              <span class="metric-number" id="val-featured">- / 3</span>
+            </div>
+            <div class="metric-bottom">
+              <i class="fa-solid fa-star metric-icon"></i>
+              <span class="metric-sub" id="sub-featured">Vagas na Home</span>
+            </div>
+          </div>
+
+          <!-- Card Vermelho: Rascunhos -->
+          <div class="spur-card-metric spur-card--red">
+            <div class="metric-top">
+              <span class="metric-title">Rascunhos</span>
+              <span class="metric-number" id="val-drafts">-</span>
+            </div>
+            <div class="metric-bottom">
+              <i class="fa-solid fa-file-pen metric-icon"></i>
+              <span class="metric-sub" id="sub-drafts">Não publicados</span>
+            </div>
+          </div>
+
+          <!-- Card Laranja: Média de Leitura -->
+          <div class="spur-card-metric spur-card--orange">
+            <div class="metric-top">
+              <span class="metric-title">Média de Leitura</span>
+              <span class="metric-number" id="val-reading-time">- min</span>
+            </div>
+            <div class="metric-bottom">
+              <i class="fa-solid fa-clock metric-icon"></i>
+              <span class="metric-sub">Por publicação</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Seção Central de Duas Colunas (Gráfico de Barras à esquerda + Alertas à direita) -->
+        <section class="spur-middle-row" id="section-stats">
+          
+          <!-- Coluna 1: Gráfico de Barras de Distribuição por Categoria -->
+          <div class="spur-box bar-chart-box">
+            <div class="box-header">
+              <div class="box-title">
+                <i class="fa-solid fa-chart-simple box-icon"></i>
+                <span>Distribuição por Vertentes Culturais</span>
+              </div>
+            </div>
+            <div class="box-body">
+              <div class="bar-chart-container" id="bar-chart-container">
+                <div class="chart-loading">Carregando métricas...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Notificações e Alertas Editoriais -->
+          <div class="spur-box notifications-box">
+            <div class="box-header">
+              <div class="box-title">
+                <i class="fa-solid fa-bell box-icon"></i>
+                <span>Alertas & Status Editorial</span>
+              </div>
+            </div>
+            <div class="box-body">
+              <div class="notifications-feed" id="notifications-feed">
+                <!-- Inserido dinamicamente via JS -->
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Tabela Principal de Publicações do Acervo -->
+        <section class="spur-box table-box" id="section-table">
+          <div class="box-header table-box-header">
+            <div class="table-header-left">
+              <div class="box-title">
+                <i class="fa-solid fa-table-list box-icon"></i>
+                <span>Publicações no Acervo</span>
+              </div>
+              <span class="table-badge-count" id="table-total-count">- itens</span>
+            </div>
+
+            <div class="table-header-right">
+              <div class="filter-tabs" id="status-filter-tabs">
+                <button class="filter-tab active" data-filter="all">Todas</button>
+                <button class="filter-tab" data-filter="published">Publicadas</button>
+                <button class="filter-tab" data-filter="drafts">Rascunhos</button>
+                <button class="filter-tab" data-filter="featured">Destaques</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="spur-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px; text-align: center;">Destaque</th>
+                  <th>Título & URL</th>
+                  <th>Categoria</th>
+                  <th>Território</th>
+                  <th>Data</th>
+                  <th>Leitura</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="essays-tbody">
+                <tr>
+                  <td colspan="8" class="table-empty-row">Carregando publicações...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Staging de Ideias & Pautas Locais -->
+        <section class="spur-box ideas-box" id="section-ideas">
+          <div class="box-header">
+            <div class="box-title">
+              <i class="fa-solid fa-lightbulb box-icon"></i>
+              <span>Ideias & Pautas Locais (Staging)</span>
+            </div>
+            <button id="btn-toggle-new-idea" class="btn btn-outline-primary btn-sm">
+              <i class="fa-solid fa-plus"></i>
+              <span>Anotar Ideia</span>
+            </button>
+          </div>
+
+          <div class="box-body">
+            <!-- Formulário recolhível de nova ideia -->
+            <form id="idea-form" class="spur-idea-form" style="display: none;">
+              <div class="form-grid-2">
+                <input type="text" id="idea-title" required placeholder="Título da ideia de pauta..." />
+                <select id="idea-type">
+                  <option value="post">📝 Ideia de Publicação</option>
+                  <option value="system">🛠️ Ideia de Melhoria</option>
+                </select>
+              </div>
+              <textarea id="idea-notes" rows="2" placeholder="Anotações contextuais, referências ou fontes..."></textarea>
+              <div class="form-btn-row">
+                <button type="button" id="btn-cancel-idea" class="btn btn-ghost btn-sm">Cancelar</button>
+                <button type="submit" class="btn btn-primary btn-sm">Salvar Pauta</button>
+              </div>
+            </form>
+
+            <div id="ideas-list" class="spur-ideas-grid"></div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Rodapé discreto -->
+      <footer class="spur-footer">
+        <span>CULT Editorial Admin • Ambiente Estritamente Localhost • Porta 3001</span>
+      </footer>
+
+    </div>
   </div>
 
   <script src="/admin.js"></script>

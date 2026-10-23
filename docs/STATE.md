@@ -12,9 +12,16 @@ alwaysApply: true
 
 ## Em andamento / próximo passo
 - **Próximo passo:** Backlog e próximas evoluções da plataforma.
-- **Spec concluída recentemente:** [`specs/0016-dashboard-admin-local/`](../specs/0016-dashboard-admin-local/spec.md) — **Dashboard Administrativo Local (127.0.0.1:3001/admin)** concluído com 100% dos critérios de aceite (AC-1 a AC-6) e gates executáveis passando.
+- **Spec concluída recentemente:** [`specs/0017-dashboard-admin-spur-layout/`](../specs/0017-dashboard-admin-spur-layout/spec.md) — **Dashboard Administrativo no Modelo Spur (127.0.0.1:3001/admin)** concluído com 100% dos critérios de aceite (AC-1 a AC-6) e gates executáveis passando.
 
 ## Decisões recentes
+- 2026-10-22: [0017-dashboard-admin-spur-layout](../specs/0017-dashboard-admin-spur-layout/spec.md) concluída com sucesso. Painel administrativo local reestruturado com a arquitetura de layout do template Spur:
+  1. **Sidebar Escura Vertical (`#1b2432`):** Brand CULT Admin [DEV], navegação estruturada (Dashboard, Estatísticas, Publicações, Ideias, Editor e Ver Site) e botão hamburger retrátil na topbar.
+  2. **Topbar Clara com Busca e Ações Rápidas:** Fundo `#ffffff`, pesquisa rápida integrada à tabela, sino com badge de alertas editoriais (vagas abertas na Home, rascunhos pendentes) e avatar de perfil.
+  3. **Cards de Métricas Estilo Spur:** 4 blocos sólidos e vibrantes (Azul para Ensaios Publicados, Verde para Destaques na Home, Vermelho para Rascunhos e Âmbar para Média de Leitura) com títulos no topo, valores grandes e rodapé informativo.
+  4. **Seção Intermediária em 2 Colunas:** Gráfico de barras visual em CSS proporcional às publicações por vertente cultural e feed de alertas e status editorial.
+  5. **Tabela e Ideias Integradas:** Card branco limpo para acervo com busca instantânea, abas de status, toggle de estrela e staging de ideias com botão "Transformar em Ensaio".
+  6. **Isolamento de Produção:** Testado `npm run build && test ! -e out/admin`, garantindo ausência de rotas administrativas no build do GitHub Pages.
 - 2026-10-22: [0016-dashboard-admin-local](../specs/0016-dashboard-admin-local/spec.md) concluída com sucesso. Painel administrativo local executando exclusivamente em localhost (`http://127.0.0.1:3001/admin` e `/dashboard`), oferecendo:
   1. **Cards de Métricas Editoriais em Tempo Real:** Ensaios publicados, destaques na Home (X/3 com indicador de vagas), rascunhos em progresso e média calculada de tempo de leitura.
   2. **Clusters de Distribuição:** Contadores visuais por vertentes culturais e escopo territorial.

@@ -46,7 +46,8 @@ alwaysApply: false
 - [`specs/0002-fundacao-editorial-astro/`](../specs/0002-fundacao-editorial-astro/spec.md) — Fundação Editorial Astro, Design System & Content Collections (implementada)
 - [`specs/0003-portal-cultura-paraense/`](../specs/0003-portal-cultura-paraense/spec.md) — Portal & Home da Cultura Paraense e Belém (implementada)
 - [`specs/0015-migracao-nextjs/`](../specs/0015-migracao-nextjs/spec.md) — Migração para Next.js App Router e static export no GitHub Pages (implementada)
-- [`specs/0016-dashboard-admin-local/`](../specs/0016-dashboard-admin-local/spec.md) — Dashboard Administrativo Local (127.0.0.1:3001) para métricas e gestão de acervo (ativa)
+- [`specs/0016-dashboard-admin-local/`](../specs/0016-dashboard-admin-local/spec.md) — Dashboard Administrativo Local (127.0.0.1:3001) para métricas e gestão de acervo (implementada)
+- [`specs/0017-dashboard-admin-spur-layout/`](../specs/0017-dashboard-admin-spur-layout/spec.md) — Dashboard Administrativo no Modelo Spur (ativa)
 
 ## 📖 Linguagem & convenções
 - **Glossário** (linguagem ubíqua) → [glossary.md](glossary.md)

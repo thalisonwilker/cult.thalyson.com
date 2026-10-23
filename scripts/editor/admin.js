@@ -7,10 +7,64 @@ let searchQuery = '';
 const IDEAS_STORAGE_KEY = 'cult_admin_ideas_v1';
 
 async function init() {
+  setupSidebarAndTopbar();
   setupEventListeners();
   loadIdeas();
   await refreshMetrics();
 }
+
+/* ==========================================================================
+   Controles da Sidebar e Topbar
+   ========================================================================== */
+
+function setupSidebarAndTopbar() {
+  const layout = document.getElementById('spur-layout');
+  const toggleBtn = document.getElementById('btn-sidebar-toggle');
+  const overlay = document.getElementById('sidebar-overlay');
+  const notifBtn = document.getElementById('btn-notifications-toggle');
+  const notifDropdown = document.getElementById('notifications-dropdown');
+
+  if (toggleBtn && layout) {
+    toggleBtn.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        layout.classList.toggle('sidebar-mobile-open');
+      } else {
+        layout.classList.toggle('sidebar-collapsed');
+      }
+    });
+  }
+
+  if (overlay && layout) {
+    overlay.addEventListener('click', () => {
+      layout.classList.remove('sidebar-mobile-open');
+    });
+  }
+
+  if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = notifDropdown.style.display === 'none';
+      notifDropdown.style.display = isHidden ? 'block' : 'none';
+    });
+
+    document.addEventListener('click', () => {
+      notifDropdown.style.display = 'none';
+    });
+  }
+
+  // Sincronizar busca da topbar
+  const topbarSearch = document.getElementById('topbar-search-input');
+  if (topbarSearch) {
+    topbarSearch.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderTable();
+    });
+  }
+}
+
+/* ==========================================================================
+   Carregamento de Dados da API Local
+   ========================================================================== */
 
 async function refreshMetrics() {
   try {
@@ -19,20 +73,25 @@ async function refreshMetrics() {
     const data = await res.json();
 
     sessionToken = data.token;
-    metricsData = data.metrics;
+    metricsData = data;
     allEssays = data.essays || [];
 
     renderMetricsCards();
-    renderDistribution();
+    renderBarChart();
+    renderNotifications();
     renderTable();
   } catch (err) {
     console.error('Erro ao carregar métricas:', err);
     const tbody = document.getElementById('essays-tbody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--color-danger); padding: 2rem;">Falha ao carregar dados do servidor: ${escapeHtml(err.message)}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--spur-red); padding: 2rem;">Falha de conexão com o servidor local: ${escapeHtml(err.message)}</td></tr>`;
     }
   }
 }
+
+/* ==========================================================================
+   Renderização dos Cards Spur
+   ========================================================================== */
 
 function renderMetricsCards() {
   if (!metricsData) return;
@@ -41,83 +100,150 @@ function renderMetricsCards() {
   if (elPub) elPub.textContent = metricsData.publishedCount ?? 0;
 
   const elFeat = document.getElementById('val-featured');
-  if (elFeat) elFeat.textContent = `${metricsData.featuredCount ?? 0} / 3`;
-
-  const badgeFeat = document.getElementById('badge-featured-status');
-  if (badgeFeat) {
-    const count = metricsData.featuredCount ?? 0;
-    if (count === 3) {
-      badgeFeat.textContent = 'Cheio (3/3)';
-      badgeFeat.style.background = 'rgba(244, 182, 63, 0.2)';
-      badgeFeat.style.color = '#f4b63f';
-    } else if (count === 0) {
-      badgeFeat.textContent = 'Nenhum';
-      badgeFeat.style.background = 'rgba(252, 92, 101, 0.2)';
-      badgeFeat.style.color = '#fc5c65';
-    } else {
-      badgeFeat.textContent = `${3 - count} vaga(s)`;
-      badgeFeat.style.background = 'rgba(46, 213, 115, 0.2)';
-      badgeFeat.style.color = '#2ed573';
-    }
+  const subFeat = document.getElementById('sub-featured');
+  const featCount = metricsData.featuredCount ?? 0;
+  if (elFeat) elFeat.textContent = `${featCount} / 3`;
+  if (subFeat) {
+    if (featCount === 3) subFeat.textContent = '3/3 preenchidos';
+    else if (featCount === 0) subFeat.textContent = '3 vagas abertas';
+    else subFeat.textContent = `${3 - featCount} vaga(s) na Home`;
   }
 
   const elDrafts = document.getElementById('val-drafts');
-  if (elDrafts) elDrafts.textContent = metricsData.draftCount ?? 0;
+  const subDrafts = document.getElementById('sub-drafts');
+  const draftCount = metricsData.draftCount ?? 0;
+  if (elDrafts) elDrafts.textContent = draftCount;
+  if (subDrafts) {
+    subDrafts.textContent = draftCount === 0 ? 'Tudo publicado' : `${draftCount} aguardando publicação`;
+  }
 
   const elReading = document.getElementById('val-reading-time');
   if (elReading) elReading.textContent = `${metricsData.avgReadingTimeMinutes ?? 0} min`;
 }
 
-function renderDistribution() {
+/* ==========================================================================
+   Gráfico de Barras Estilo Spur
+   ========================================================================== */
+
+function renderBarChart() {
+  const container = document.getElementById('bar-chart-container');
+  if (!container || !metricsData) return;
+
+  const byCat = metricsData.byCategory || {};
+  const entries = Object.entries(byCat);
+
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="chart-loading">Nenhuma publicação cadastrada por vertente.</div>';
+    return;
+  }
+
+  const maxVal = Math.max(...entries.map(([, v]) => v), 1);
+  const maxHeightPx = 150;
+
+  container.innerHTML = entries
+    .map(([cat, count]) => {
+      const heightPx = Math.max(16, Math.round((count / maxVal) * maxHeightPx));
+      return `
+        <div class="chart-bar-group">
+          <div class="chart-bar-wrap">
+            <div class="chart-bar" style="height: ${heightPx}px;">
+              <span class="chart-bar-val">${count}</span>
+            </div>
+          </div>
+          <span class="chart-bar-label">${escapeHtml(cat)}</span>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+/* ==========================================================================
+   Notificações e Alertas Editoriais
+   ========================================================================== */
+
+function renderNotifications() {
   if (!metricsData) return;
 
-  const catContainer = document.getElementById('categories-cluster');
-  if (catContainer) {
-    const cats = metricsData.byCategory || {};
-    const keys = Object.keys(cats);
-    if (keys.length === 0) {
-      catContainer.innerHTML = '<span class="text-muted">Nenhuma categoria registrada.</span>';
-    } else {
-      catContainer.innerHTML = keys
-        .sort((a, b) => cats[b] - cats[a])
-        .map(
-          (k) => `
-          <div class="pill-item">
-            <span class="pill-label">${escapeHtml(k)}</span>
-            <span class="pill-count">${cats[k]}</span>
-          </div>
-        `
-        )
-        .join('');
-    }
+  const feed = document.getElementById('notifications-feed');
+  const dropdownList = document.getElementById('notifications-list');
+  const badge = document.getElementById('notification-badge');
+
+  const alerts = [];
+  const featCount = metricsData.featuredCount ?? 0;
+  const draftCount = metricsData.draftCount ?? 0;
+
+  if (featCount < 3) {
+    alerts.push({
+      type: 'warning',
+      icon: 'fa-solid fa-triangle-exclamation',
+      title: 'Vagas de destaque na Home',
+      desc: `A Home possui ${featCount} de 3 destaques ativos. Clique na estrela de uma publicação para destacar.`,
+    });
+  } else {
+    alerts.push({
+      type: 'success',
+      icon: 'fa-solid fa-circle-check',
+      title: 'Vitrine da Home preenchida',
+      desc: '3 ensaios estão configurados em destaque simultâneo na Home.',
+    });
   }
 
-  const terContainer = document.getElementById('territories-cluster');
-  if (terContainer) {
-    const ters = metricsData.byTerritory || {};
-    const keys = Object.keys(ters);
-    const labels = {
-      para: 'Pará & Belém',
-      nacional: 'Arte Nacional',
-      global: 'Mundo & Clássicos',
-    };
-    if (keys.length === 0) {
-      terContainer.innerHTML = '<span class="text-muted">Nenhum território registrado.</span>';
-    } else {
-      terContainer.innerHTML = keys
-        .sort((a, b) => ters[b] - ters[a])
-        .map(
-          (k) => `
-          <div class="pill-item">
-            <span class="pill-label">${escapeHtml(labels[k] || k)}</span>
-            <span class="pill-count">${ters[k]}</span>
+  if (draftCount > 0) {
+    alerts.push({
+      type: 'info',
+      icon: 'fa-solid fa-file-pen',
+      title: 'Rascunhos pendentes',
+      desc: `Existem ${draftCount} rascunho(s) em edição local no acervo.`,
+    });
+  }
+
+  alerts.push({
+    type: 'info',
+    icon: 'fa-solid fa-circle-info',
+    title: 'Ambiente Local Protegido',
+    desc: 'O painel e os arquivos de edição rodam com segurança na porta 3001.',
+  });
+
+  if (badge) {
+    badge.textContent = alerts.length;
+  }
+
+  const html = alerts
+    .map(
+      (a) => `
+      <div class="alert-item alert-item--${a.type}">
+        <i class="${a.icon}"></i>
+        <div class="alert-text-wrap">
+          <div class="alert-title">${escapeHtml(a.title)}</div>
+          <div class="alert-desc">${escapeHtml(a.desc)}</div>
+        </div>
+      </div>
+    `
+    )
+    .join('');
+
+  if (feed) feed.innerHTML = html;
+
+  if (dropdownList) {
+    dropdownList.innerHTML = alerts
+      .map(
+        (a) => `
+        <li class="dropdown-item">
+          <i class="${a.icon}" style="color: var(--spur-${a.type === 'success' ? 'green' : a.type === 'warning' ? 'orange' : 'blue'});"></i>
+          <div>
+            <div style="font-weight: 600; font-size: 0.82rem;">${escapeHtml(a.title)}</div>
+            <div style="font-size: 0.75rem; color: #718096;">${escapeHtml(a.desc)}</div>
           </div>
-        `
-        )
-        .join('');
-    }
+        </li>
+      `
+      )
+      .join('');
   }
 }
+
+/* ==========================================================================
+   Renderização da Tabela de Ensaios
+   ========================================================================== */
 
 function renderTable() {
   const tbody = document.getElementById('essays-tbody');
@@ -127,12 +253,10 @@ function renderTable() {
   const query = searchQuery.toLowerCase().trim();
 
   const filtered = allEssays.filter((item) => {
-    // Filtro de aba de status
     if (currentFilter === 'published' && item.draft) return false;
     if (currentFilter === 'drafts' && !item.draft) return false;
     if (currentFilter === 'featured' && !item.featured) return false;
 
-    // Filtro de texto
     if (query) {
       const matchTitle = (item.title || '').toLowerCase().includes(query);
       const matchSlug = (item.slug || '').toLowerCase().includes(query);
@@ -144,14 +268,14 @@ function renderTable() {
   });
 
   if (countSpan) {
-    countSpan.textContent = `${filtered.length} de ${allEssays.length} ensaio(s)`;
+    countSpan.textContent = `${filtered.length} de ${allEssays.length} itens`;
   }
 
   if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--color-text-muted);">
-          Nenhum ensaio corresponde aos filtros selecionados.
+        <td colspan="8" class="table-empty-row">
+          Nenhuma publicação encontrada para o filtro informado.
         </td>
       </tr>
     `;
@@ -175,7 +299,7 @@ function renderTable() {
           <button
             class="star-btn ${isFeatured ? 'active' : ''}"
             data-slug="${escapeHtml(e.slug)}"
-            title="${isFeatured ? 'Remover dos destaques da Home' : 'Destacar na Home'}"
+            title="${isFeatured ? 'Remover destaque da Home' : 'Destacar na Home'}"
           >
             <i class="fa-${isFeatured ? 'solid' : 'regular'} fa-star"></i>
           </button>
@@ -183,20 +307,20 @@ function renderTable() {
         <td>
           <div class="title-cell">
             <span class="essay-main-title">${escapeHtml(e.title)}</span>
-            <span class="essay-slug-sub">/ensaios/${escapeHtml(e.slug)}</span>
+            <span class="essay-slug-sub">/${escapeHtml(e.category)}/${escapeHtml(e.slug)}</span>
           </div>
         </td>
         <td>
-          <span class="badge badge-category">${escapeHtml(e.category || '-')}</span>
+          <span class="badge-cat">${escapeHtml(e.category || '-')}</span>
         </td>
         <td>
-          <span class="territory-tag">${escapeHtml(territoryLabels[e.territory] || e.territory || '-')}</span>
+          <span class="territory-label">${escapeHtml(territoryLabels[e.territory] || e.territory || '-')}</span>
         </td>
         <td>
-          <span class="date-text">${escapeHtml(e.pubDate || '-')}</span>
+          <span style="font-size: 0.82rem; color: #718096;">${escapeHtml(e.pubDate || '-')}</span>
         </td>
         <td>
-          <span class="reading-tag">${e.readingTimeMinutes || 5} min</span>
+          <span style="font-size: 0.82rem; font-weight: 600;">${e.readingTimeMinutes || 5} min</span>
         </td>
         <td>
           ${
@@ -220,7 +344,7 @@ function renderTable() {
               </a>
             `
                 : `
-              <span class="btn-action btn-action--disabled" title="Rascunhos não são visíveis no site público">
+              <span class="btn-action btn-action--disabled" title="Rascunho não publicado">
                 <i class="fa-solid fa-eye-slash"></i>
                 <span>Rascunho</span>
               </span>
@@ -233,7 +357,6 @@ function renderTable() {
     })
     .join('');
 
-  // Adicionar listeners para os botões de toggle estrela
   tbody.querySelectorAll('.star-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const slug = btn.getAttribute('data-slug');
@@ -259,10 +382,9 @@ async function handleToggleFeatured(slug) {
       throw new Error(data.error || 'Erro ao alternar destaque');
     }
 
-    // Atualiza métricas e tabela
     await refreshMetrics();
   } catch (err) {
-    alert(`Erro ao alterar destaque: ${err.message}`);
+    alert(`Erro ao alternar destaque: ${err.message}`);
   }
 }
 
@@ -290,9 +412,9 @@ function loadIdeas() {
   const ideas = getIdeas();
   if (ideas.length === 0) {
     container.innerHTML = `
-      <div class="empty-ideas">
-        <i class="fa-regular fa-lightbulb"></i>
-        <p>Nenhuma ideia anotada ainda. Use este espaço como staging local para rascunhar temas antes de criar o ensaio.</p>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #a0aec0;">
+        <i class="fa-regular fa-lightbulb" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+        Nenhuma pauta rascunhada ainda. Use este espaço como staging local para rascunhar ideias antes de redigir.
       </div>
     `;
     return;
@@ -305,7 +427,7 @@ function loadIdeas() {
       <div class="idea-card">
         <div class="idea-header">
           <span class="idea-type-badge ${isPost ? 'badge-post' : 'badge-system'}">
-            ${isPost ? '📝 Ensaio' : '🛠️ Ideia Geral'}
+            ${isPost ? '📝 Ensaio' : '🛠️ Melhoria'}
           </span>
           <span class="idea-date">${escapeHtml(new Date(idea.createdAt).toLocaleDateString('pt-BR'))}</span>
         </div>
@@ -331,7 +453,6 @@ function loadIdeas() {
     })
     .join('');
 
-  // Ações nos cards de ideias
   container.querySelectorAll('.btn-delete-idea').forEach((btn) => {
     btn.addEventListener('click', () => {
       const id = Number(btn.getAttribute('data-id'));
@@ -368,16 +489,6 @@ function deleteIdea(id) {
 }
 
 function setupEventListeners() {
-  // Busca em tempo real na tabela
-  const searchInput = document.getElementById('filter-search');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      searchQuery = e.target.value;
-      renderTable();
-    });
-  }
-
-  // Abas de filtro de status
   const filterTabs = document.querySelectorAll('#status-filter-tabs .filter-tab');
   filterTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -388,7 +499,6 @@ function setupEventListeners() {
     });
   });
 
-  // Toggle do formulário de ideia
   const btnToggleIdea = document.getElementById('btn-toggle-new-idea');
   const ideaForm = document.getElementById('idea-form');
   const btnCancelIdea = document.getElementById('btn-cancel-idea');
@@ -413,13 +523,9 @@ function setupEventListeners() {
   if (ideaForm) {
     ideaForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const titleInput = document.getElementById('idea-title');
-      const typeSelect = document.getElementById('idea-type');
-      const notesInput = document.getElementById('idea-notes');
-
-      const title = titleInput.value.trim();
-      const type = typeSelect.value;
-      const notes = notesInput.value.trim();
+      const title = document.getElementById('idea-title').value.trim();
+      const type = document.getElementById('idea-type').value;
+      const notes = document.getElementById('idea-notes').value.trim();
 
       if (!title) return;
 
