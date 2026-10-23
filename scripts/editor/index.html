@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor Local — cult.thalyson.com</title>
+  <link rel="stylesheet" href="/editor.css" />
+</head>
+<body>
+  <div class="editor-app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>CULT Editor [DEV]</h1>
+        <button id="btn-new" class="btn btn-primary">+ Novo Ensaio</button>
+      </div>
+      <div class="sidebar-filter">
+        <input type="text" id="search-input" placeholder="Filtrar ensaios..." />
+      </div>
+      <ul id="essay-list" class="essay-list"></ul>
+    </aside>
+
+    <main class="main-panel">
+      <header class="top-bar">
+        <div class="top-title">
+          <span id="form-mode">Criando novo ensaio</span>
+        </div>
+        <div class="top-actions">
+          <button id="btn-delete" class="btn btn-danger" style="display: none;">Excluir</button>
+          <button id="btn-save" class="btn btn-success">Salvar Ensaio</button>
+        </div>
+      </header>
+
+      <form id="essay-form" class="editor-form">
+        <div class="form-row form-row--2">
+          <div class="form-group">
+            <label for="title">Título do Ensaio *</label>
+            <input type="text" id="title" required placeholder="Ex: As 14 Procissões do Círio de Nazaré" />
+          </div>
+          <div class="form-group">
+            <label for="slug">Slug (URL) *</label>
+            <input type="text" id="slug" required placeholder="as-14-procissoes-do-cirio-de-nazare" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descrição / Lead *</label>
+          <textarea id="description" rows="2" required placeholder="Resumo editorial impactante..."></textarea>
+        </div>
+
+        <div class="form-row form-row--3">
+          <div class="form-group">
+            <label for="category">Categoria Cultural *</label>
+            <select id="category" required></select>
+          </div>
+          <div class="form-group">
+            <label for="territory">Território</label>
+            <select id="territory">
+              <option value="para">Pará & Belém</option>
+              <option value="nacional">Arte Nacional</option>
+              <option value="global">Mundo & Clássicos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pubDate">Data de Publicação *</label>
+            <input type="date" id="pubDate" required />
+          </div>
+        </div>
+
+        <div class="form-row form-row--3">
+          <div class="form-group">
+            <label for="locality">Localidade (ex: Belém do Pará)</label>
+            <input type="text" id="locality" placeholder="Belém do Pará" />
+          </div>
+          <div class="form-group">
+            <label for="author">Autor</label>
+            <input type="text" id="author" value="Thalyson" />
+          </div>
+          <div class="form-group">
+            <label for="tags">Tags (separadas por vírgula)</label>
+            <input type="text" id="tags" placeholder="cirio, nazare, fe" />
+          </div>
+        </div>
+
+        <div class="form-row form-row--2">
+          <div class="form-group">
+            <label for="coverImage">Imagem de Capa (URL ou /images/...)</label>
+            <input type="text" id="coverImage" placeholder="/images/carimbo-guitarrada-noite.jpg" />
+          </div>
+          <div class="form-group">
+            <label for="coverImagePosition">Posição da Imagem (CSS object-position)</label>
+            <input type="text" id="coverImagePosition" placeholder="center 30%" />
+          </div>
+        </div>
+
+        <div class="form-row form-row--checkboxes">
+          <label class="checkbox-label">
+            <input type="checkbox" id="featured" />
+            <span>Destacar na Home (featured: true)</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="draft" />
+            <span>Rascunho (draft: true - não publica em produção)</span>
+          </label>
+        </div>
+
+        <div class="form-group form-group--body">
+          <label for="body">Corpo do Ensaio (Markdown) *</label>
+          <textarea id="body" rows="18" required placeholder="Escreva o texto completo do ensaio em Markdown..."></textarea>
+        </div>
+      </form>
+    </main>
+  </div>
+  <script src="/editor.js"></script>
+</body>
+</html>

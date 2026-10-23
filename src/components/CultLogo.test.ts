@@ -3,15 +3,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 describe('Identidade Visual: Nova Logo dos Abridores de Letras (CULT .thalyson.com)', () => {
-  const logoAstroPath = path.resolve(process.cwd(), 'src/components/CultLogo.astro');
+  const logoReactPath = path.resolve(process.cwd(), 'src/components/CultLogo.tsx');
   const logoPngPath = path.resolve(process.cwd(), 'public/images/cult-logo-fluvial.png');
 
-  it('deve possuir o arquivo de componente CultLogo.astro', () => {
-    expect(fs.existsSync(logoAstroPath)).toBe(true);
+  it('deve possuir o arquivo de componente CultLogo.tsx', () => {
+    expect(fs.existsSync(logoReactPath)).toBe(true);
   });
 
-  it('o componente CultLogo.astro deve renderizar a imagem oficial da logo fluvial com acessibilidade', () => {
-    const content = fs.readFileSync(logoAstroPath, 'utf-8');
+  it('o componente CultLogo.tsx deve renderizar a imagem oficial da logo fluvial com acessibilidade', () => {
+    const content = fs.readFileSync(logoReactPath, 'utf-8');
     
     // Contém atributo aria-label informativo
     expect(content).toContain('aria-label=');
@@ -45,11 +45,11 @@ describe('Identidade Visual: Nova Logo dos Abridores de Letras (CULT .thalyson.c
   });
 
   it('deve possuir favicons personalizados baseados na letra C vernacular', () => {
-    const baseLayout = fs.readFileSync(path.resolve(process.cwd(), 'src/layouts/BaseLayout.astro'), 'utf-8');
-    expect(baseLayout).toContain('href="/favicon.svg"');
-    expect(baseLayout).toContain('href="/favicon-32x32.png"');
-    expect(baseLayout).toContain('href="/apple-touch-icon.png"');
-    expect(baseLayout).toContain('href="/favicon.ico"');
+    const nextLayout = fs.readFileSync(path.resolve(process.cwd(), 'app/layout.tsx'), 'utf-8');
+    expect(nextLayout).toContain('/favicon.svg');
+    expect(nextLayout).toContain('/favicon-32x32.png');
+    expect(nextLayout).toContain('/apple-touch-icon.png');
+    expect(nextLayout).toContain('/favicon.ico');
 
     expect(fs.existsSync(path.resolve(process.cwd(), 'public/favicon.svg'))).toBe(true);
     expect(fs.existsSync(path.resolve(process.cwd(), 'public/favicon.png'))).toBe(true);

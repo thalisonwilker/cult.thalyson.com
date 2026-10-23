@@ -6,8 +6,8 @@ alwaysApply: false
 
 # ADR-0002: Adoção do Astro e TypeScript para a plataforma editorial
 
-- **Status:** aceito
-- **Data:** 2026-10-01
+- **Status:** substituído por [ADR-0006](0006-migracao-nextjs.md)
+- **Data:** 2026-10-01 (substituído em 2026-10-22)
 - **Decisores:** Antigravity, Thalyson
 
 ## Contexto

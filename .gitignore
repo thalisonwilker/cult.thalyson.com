@@ -1,6 +1,8 @@
 # Build & Dist
 dist/
 out/
+.next/
+*.tsbuildinfo
 .astro/
 
 # Dependencies

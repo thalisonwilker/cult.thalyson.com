@@ -17,3 +17,16 @@ export function getEssayUrl(category: string, slug: string): string {
 
   return `/${cleanCategory}/${cleanSlug}/`;
 }
+
+/**
+ * Prefixa um caminho relativo ao host com o NEXT_PUBLIC_BASE_PATH se configurado.
+ * Ideal para imagens e assets estáticos exportados.
+ */
+export function withBasePath(path: string): string {
+  if (!path || !path.startsWith('/') || path.startsWith('//')) {
+    return path;
+  }
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  return `${basePath}${path}`;
+}
+

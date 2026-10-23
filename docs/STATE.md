@@ -8,18 +8,17 @@ alwaysApply: true
 
 > Memória de trabalho entre sessões. É volátil e atualizada a cada etapa do desenvolvimento.
 
-**Última atualização:** 2026-10-06 por Antigravity
+**Última atualização:** 2026-10-22 por Antigravity
 
 ## Em andamento / próximo passo
-- **Feature concluída:** [`specs/0013-editor-markdown-profissional/`](../specs/0013-editor-markdown-profissional/spec.md) — **Editor Markdown Profissional com CodeMirror 6**:
-  1. **Instalação e empacotamento:** Dependências oficiais do CodeMirror 6 (`codemirror`, `@codemirror/state`, `@codemirror/view`, `@codemirror/lang-markdown`, `@codemirror/language`, `@codemirror/commands`, `@codemirror/search`, `@codemirror/theme-one-dark`) integradas e empacotadas via Vite.
-  2. **Substituição visual e inicialização:** CodeMirror 6 substitui o textarea padrão com syntax highlighting para Markdown, calha de numeração de linhas (gutters), line wrapping ativo e placeholder contextual, mantendo o textarea como fallback transparente e resiliente.
-  3. **Integração bidirecional com Toolbar e Link Dialog:** Ações da toolbar (Negrito, Itálico, H2, H3, Citação, Código, Lista, Divisor, Inserir Link, Alinhamentos) e seus atalhos (Ctrl/Cmd+B, Ctrl/Cmd+I, etc.) aplicam formatações granulares diretamente no CodeMirror 6 via API tipada `window.__cultEditor`, sincronizando com preview ao vivo e salvamento de rascunhos.
-  4. **Isolamento de histórico e busca:** Ações de desfazer (Ctrl/Cmd+Z) e refazer (Ctrl/Cmd+Shift+Z / Ctrl/Cmd+Y) operam de forma isolada; alternar artigos recria o estado e zera o histórico anterior. Painel avançado de busca e substituição (Ctrl/Cmd+F) integrado.
-  5. **Design System e Acessibilidade:** Tema visual customizado alinhado à paleta e tokens CULT (`--color-cult-navy-deep`, `--color-cult-turquoise`, `--color-cult-surface`), foco visível e responsividade perfeita de 320px até desktops.
-- **Próximo passo:** Próxima feature do roadmap ou deploy da imagem atualizada no Fly.io.
+- **Feature concluída:** [`specs/0015-migracao-nextjs/`](../specs/0015-migracao-nextjs/spec.md) — **Migração da plataforma editorial de Astro para Next.js**:
+  1. **Tier:** Arquitetural (substitui [ADR-0002](architecture/adr/0002-tech-stack-astro-typescript.md) pelo [ADR-0006](architecture/adr/0006-migracao-nextjs.md)).
+  2. **Gates cumpridos:** Todas as 6 tasks concluídas com 100% dos testes verdes (`npm run test:unit`, 38 testes), compilação estática perfeita (`npm run build`, export estático no `./out` com CNAME e .nojekyll) e typecheck sem erros (`npm run typecheck`).
+  3. **Próximo passo:** Deploy no GitHub Pages via push na branch principal e acompanhamento da pipeline de CI/CD.
 
 ## Decisões recentes
+- 2026-10-22: [0015-migracao-nextjs](../specs/0015-migracao-nextjs/spec.md) concluída com sucesso. Site migrado para Next.js 16 (App Router) com exportação estática pura (`output: 'export'`), suporte a `basePath`, preservação 1:1 de 100% do Vanilla CSS, filtros interativos na Home no cliente via `Suspense`, rotas canônicas `/[category]/[slug]`, editor isolado em processo local (`127.0.0.1:3001` via `scripts/dev.mjs`) e remoção integral de resíduos do Astro e Fly.io.
+- 2026-10-22: [ADR-0006](architecture/adr/0006-migracao-nextjs.md) — Migração arquitetural da plataforma editorial para Next.js App Router (export estático) com suporte a `basePath` no GitHub Pages e isolamento do editor local em `127.0.0.1:3001`. Substitui o ADR-0002.
 - 2026-10-07: Editor visual com Milkdown Crepe (spec `0014`): seletor `Editor | Markdown`, título em destaque, artigos com HTML legado abrem em Markdown (visual só com confirmação). Typecheck, 30 testes e build OK. **Pendente:** validação interativa no navegador (ferramenta do agente indisponível).
 - 2026-10-06: Caixa de rascunhos no Admin atualizada com suporte a dois tipos estruturados: "📝 Ideia de publicação" e "🛠️ Melhoria do sistema", acompanhados de badges distintivas (`badge-post` e `badge-system`), contadores dinâmicos e abas de filtragem rápida ("Todos", "Ideias", "Sistema"). Retrocompatibilidade garantida para rascunhos já existentes no localStorage.
 - 2026-10-06: Implementação completa do Editor Markdown Profissional com CodeMirror 6 (spec `0013`). Substituição do textarea por editor de código completo, toolbar integrada, atalhos de teclado, painel de busca e isolamento de histórico por publicação. Verificados typecheck (0 erros), 30 testes unitários passando e build de produção bem-sucedido.

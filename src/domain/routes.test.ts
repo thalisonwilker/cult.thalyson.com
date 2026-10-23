@@ -23,3 +23,24 @@ describe('getEssayUrl', () => {
     expect(() => getEssayUrl('categoria', '')).toThrow();
   });
 });
+
+describe('withBasePath', () => {
+  it('retorna o caminho original se começar com protocolo ou sem barra', async () => {
+    const { withBasePath } = await import('./routes');
+    expect(withBasePath('https://exemplo.com/foto.jpg')).toBe('https://exemplo.com/foto.jpg');
+    expect(withBasePath('foto.jpg')).toBe('foto.jpg');
+    expect(withBasePath('//cdn.exemplo.com/foto.jpg')).toBe('//cdn.exemplo.com/foto.jpg');
+  });
+
+  it('retorna o caminho com prefixo do process.env.NEXT_PUBLIC_BASE_PATH se definido', async () => {
+    const originalEnv = process.env.NEXT_PUBLIC_BASE_PATH;
+    try {
+      process.env.NEXT_PUBLIC_BASE_PATH = '/cult.thalyson.com';
+      const { withBasePath } = await import('./routes');
+      expect(withBasePath('/images/docas.jpg')).toBe('/cult.thalyson.com/images/docas.jpg');
+    } finally {
+      process.env.NEXT_PUBLIC_BASE_PATH = originalEnv;
+    }
+  });
+});
+

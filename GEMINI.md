@@ -71,7 +71,7 @@ interfaces → application → domain ← infrastructure
 - `interfaces/` é a borda (páginas Astro, layouts, componentes de UI).
 
 ## Stack Técnica & Comandos (cult.thalyson.com)
-- **Stack:** Astro (SSG) + TypeScript (strict) + Vanilla CSS + Docker / Fly.io.
+- **Stack:** Astro (SSG) + TypeScript (strict) + Vanilla CSS + GitHub Pages.
 - **Desenvolvimento local:** `npm run dev`
 - **Build estático:** `npm run build`
 - **Validação de tipos:** `npm run typecheck` (`astro check && tsc --noEmit`)
@@ -89,7 +89,7 @@ Cada doc declara no frontmatter sua política de carregamento (padrão estilo Cu
 pelo `description` quando a tarefa exigir (TESTING, glossary, context-map, ADRs, integrations…).
 
 > **Dois dialetos de frontmatter:** os **docs da esteira** usam `name`+`description`+`alwaysApply`;
-> as **skills** (`.gemini/commands/*/SKILL.md`) e os **templates de skill/subagente** usam o dialeto
+> as **skills** (`.agents/skills/*/SKILL.md`) e os **templates de skill/subagente** usam o dialeto
 > do alvo (`name`+`description`, sem `alwaysApply`) — porque são copiados para virar skills/agentes.
 
 - **Carregue sob demanda:** não leia o repo inteiro — puxe o on-demand conforme a task atual.

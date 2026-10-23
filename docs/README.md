@@ -28,10 +28,11 @@ alwaysApply: false
 - **Diagramas** (Mermaid) → [architecture/diagrams.md](architecture/diagrams.md)
 - **ADRs** (decisões duráveis e imutáveis) → [architecture/adr/](architecture/adr/)
   - [ADR-0001: Record Architecture Decisions](architecture/adr/0001-record-architecture-decisions.md)
-  - [ADR-0002: Tech Stack Astro e TypeScript](architecture/adr/0002-tech-stack-astro-typescript.md)
+  - [ADR-0002: Tech Stack Astro e TypeScript (substituído)](architecture/adr/0002-tech-stack-astro-typescript.md)
   - [ADR-0003: Conteúdo Local com Content Collections](architecture/adr/0003-conteudo-local-content-collections.md)
   - [ADR-0004: Design System Editorial em Vanilla CSS](architecture/adr/0004-design-system-vanilla-css-editorial.md)
   - [ADR-0005: Infraestrutura e Deploy com Docker no Fly.io](architecture/adr/0005-infra-docker-flyio.md)
+  - [ADR-0006: Migração para Next.js](architecture/adr/0006-migracao-nextjs.md)
 
 ## 🛠️ Engenharia — como construímos
 - **Testes e quality gates** → [engineering/TESTING.md](engineering/TESTING.md)
