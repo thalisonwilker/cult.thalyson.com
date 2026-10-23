@@ -27,7 +27,7 @@ body {
 
 .editor-app {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 61px);
 }
 
 .sidebar {

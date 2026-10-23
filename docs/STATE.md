@@ -11,12 +11,16 @@ alwaysApply: true
 **Última atualização:** 2026-10-22 por Antigravity
 
 ## Em andamento / próximo passo
-- **Feature concluída:** [`specs/0015-migracao-nextjs/`](../specs/0015-migracao-nextjs/spec.md) — **Migração da plataforma editorial de Astro para Next.js**:
-  1. **Tier:** Arquitetural (substitui [ADR-0002](architecture/adr/0002-tech-stack-astro-typescript.md) pelo [ADR-0006](architecture/adr/0006-migracao-nextjs.md)).
-  2. **Gates cumpridos:** Todas as 6 tasks concluídas com 100% dos testes verdes (`npm run test:unit`, 38 testes), compilação estática perfeita (`npm run build`, export estático no `./out` com CNAME e .nojekyll) e typecheck sem erros (`npm run typecheck`).
-  3. **Próximo passo:** Deploy no GitHub Pages via push na branch principal e acompanhamento da pipeline de CI/CD.
+- **Próximo passo:** Backlog e próximas evoluções da plataforma.
+- **Spec concluída recentemente:** [`specs/0016-dashboard-admin-local/`](../specs/0016-dashboard-admin-local/spec.md) — **Dashboard Administrativo Local (127.0.0.1:3001/admin)** concluído com 100% dos critérios de aceite (AC-1 a AC-6) e gates executáveis passando.
 
 ## Decisões recentes
+- 2026-10-22: [0016-dashboard-admin-local](../specs/0016-dashboard-admin-local/spec.md) concluída com sucesso. Painel administrativo local executando exclusivamente em localhost (`http://127.0.0.1:3001/admin` e `/dashboard`), oferecendo:
+  1. **Cards de Métricas Editoriais em Tempo Real:** Ensaios publicados, destaques na Home (X/3 com indicador de vagas), rascunhos em progresso e média calculada de tempo de leitura.
+  2. **Clusters de Distribuição:** Contadores visuais por vertentes culturais e escopo territorial.
+  3. **Tabela de Gestão do Acervo:** Busca instantânea, filtros por abas (Todas, Publicadas, Rascunhos, Destaques), toggle de estrela em 1 clique para destaques na Home (respeitando regra determinística de máx. 3 itens ativos), link "Editar" que abre direto no editor local (`:3001/?slug=...`) e link "Ver Site" que abre a publicação renderizada no Next.js (`:3000/ensaios/...`).
+  4. **Staging de Ideias & Pautas Locais:** Bloco para anotações rápidas com opção de "Transformar em Ensaio" que abre o editor com título pré-preenchido e slug automático.
+  5. **Navegação Integrada e Isolamento:** Barra de navegação unificada entre Dashboard e Editor (`scripts/editor/index.html` e `admin.html`), e validação de que `npm run build` não gera rotas de admin na pasta de exportação `./out`.
 - 2026-10-22: [0015-migracao-nextjs](../specs/0015-migracao-nextjs/spec.md) concluída com sucesso. Site migrado para Next.js 16 (App Router) com exportação estática pura (`output: 'export'`), suporte a `basePath`, preservação 1:1 de 100% do Vanilla CSS, filtros interativos na Home no cliente via `Suspense`, rotas canônicas `/[category]/[slug]`, editor isolado em processo local (`127.0.0.1:3001` via `scripts/dev.mjs`) e remoção integral de resíduos do Astro e Fly.io.
 - 2026-10-22: [ADR-0006](architecture/adr/0006-migracao-nextjs.md) — Migração arquitetural da plataforma editorial para Next.js App Router (export estático) com suporte a `basePath` no GitHub Pages e isolamento do editor local em `127.0.0.1:3001`. Substitui o ADR-0002.
 - 2026-10-07: Editor visual com Milkdown Crepe (spec `0014`): seletor `Editor | Markdown`, título em destaque, artigos com HTML legado abrem em Markdown (visual só com confirmação). Typecheck, 30 testes e build OK. **Pendente:** validação interativa no navegador (ferramenta do agente indisponível).

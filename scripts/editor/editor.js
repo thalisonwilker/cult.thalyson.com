@@ -9,8 +9,20 @@ async function init() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const requestedSlug = urlParams.get('slug');
+  const newTitle = urlParams.get('new_title');
+  const isNovo = urlParams.get('novo');
+
   if (requestedSlug) {
     selectEssay(requestedSlug);
+  } else if (newTitle) {
+    resetForm();
+    const titleInput = document.getElementById('title');
+    if (titleInput) {
+      titleInput.value = newTitle;
+      titleInput.dispatchEvent(new Event('input'));
+    }
+  } else if (isNovo) {
+    resetForm();
   }
 }
 

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Administrativo — CULT [DEV]</title>
+  <link rel="stylesheet" href="/admin.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <div class="admin-shell">
+    <!-- Barra Superior de Navegação -->
+    <header class="admin-nav-bar">
+      <div class="nav-brand">
+        <a href="/admin" class="brand-link">
+          <span class="brand-badge">DEV</span>
+          <span class="brand-title">CULT Admin</span>
+        </a>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Navegação do Painel">
+        <a href="/admin" class="nav-tab active">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="/" class="nav-tab">
+          <i class="fa-solid fa-pen-nib"></i>
+          <span>Editor de Ensaios</span>
+        </a>
+      </nav>
+
+      <div class="nav-extras">
+        <a href="http://127.0.0.1:3000" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" title="Visualizar site público">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Ver Site Público (:3000)</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="admin-content">
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <span class="section-tag">Painel de Controle Local</span>
+          <h1 class="page-title">Gestão do Acervo Editorial</h1>
+        </div>
+        <div class="page-actions">
+          <a href="/?novo=true" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nova Publicação</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Grade de Métricas -->
+      <section class="metrics-grid" id="metrics-container">
+        <div class="metric-card">
+          <div class="metric-icon" style="background: rgba(23, 169, 184, 0.15); color: #17A9B8;">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div class="metric-data">
+            <span class="metric-label">Ensaios Publicados</span>
+            <span class="metric-value" id="val-published">-</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="background: rgba(244, 182, 63, 0.15); color: #F4B63F;">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="metric-data">
+            <span class="metric-label">Destaques na Home</span>
+            <div class="metric-value-row">
+              <span class="metric-value" id="val-featured">- / 3</span>
+              <span class="metric-badge" id="badge-featured-status">OK</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="background: rgba(252, 92, 101, 0.15); color: #FC5C65;">
+            <i class="fa-solid fa-file-pen"></i>
+          </div>
+          <div class="metric-data">
+            <span class="metric-label">Rascunhos em Progresso</span>
+            <span class="metric-value" id="val-drafts">-</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="background: rgba(155, 176, 214, 0.15); color: #9BB0D6;">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div class="metric-data">
+            <span class="metric-label">Média de Leitura</span>
+            <span class="metric-value" id="val-reading-time">- min</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Distribuição por Categorias e Territórios -->
+      <section class="distribution-row">
+        <div class="distribution-card">
+          <h2 class="card-heading">Vertentes Culturais</h2>
+          <div class="pills-cluster" id="categories-cluster"></div>
+        </div>
+        <div class="distribution-card">
+          <h2 class="card-heading">Escopo Territorial</h2>
+          <div class="pills-cluster" id="territories-cluster"></div>
+        </div>
+      </section>
+
+      <!-- Tabela Principal de Ensaios -->
+      <section class="table-card">
+        <div class="table-header">
+          <div class="table-title-area">
+            <h2 class="card-heading">Publicações no Acervo</h2>
+            <span class="table-count" id="table-total-count">- publicações</span>
+          </div>
+
+          <div class="table-controls">
+            <div class="search-wrap">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" id="filter-search" placeholder="Buscar por título ou slug..." />
+            </div>
+            <div class="filter-tabs" id="status-filter-tabs">
+              <button class="filter-tab active" data-filter="all">Todas</button>
+              <button class="filter-tab" data-filter="published">Publicadas</button>
+              <button class="filter-tab" data-filter="drafts">Rascunhos</button>
+              <button class="filter-tab" data-filter="featured">Destaques</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align: center;">Destaque</th>
+                <th>Título</th>
+                <th>Categoria</th>
+                <th>Território</th>
+                <th>Data</th>
+                <th>Leitura</th>
+                <th>Status</th>
+                <th style="text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="essays-tbody">
+              <tr>
+                <td colspan="8" style="text-align: center; padding: 2.5rem;">Carregando publicações...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Caixa de Ideias e Pautas Rápidas -->
+      <section class="ideas-section">
+        <div class="section-header-row">
+          <div class="header-left">
+            <span class="section-tag">Staging Local</span>
+            <h2 class="card-heading">Ideias & Pautas para Ensaios</h2>
+          </div>
+          <button id="btn-toggle-new-idea" class="btn btn-secondary">
+            <i class="fa-solid fa-plus"></i>
+            <span>Anotar Ideia</span>
+          </button>
+        </div>
+
+        <!-- Formulário recolhível de nova ideia -->
+        <form id="idea-form" class="idea-form" style="display: none;">
+          <div class="form-row form-row--2">
+            <input type="text" id="idea-title" required placeholder="Título da ideia (ex: Os Mestres da Guitarrada de Barcarena)" />
+            <select id="idea-type">
+              <option value="post">📝 Ideia de Publicação</option>
+              <option value="system">🛠️ Ideia de Melhoria</option>
+            </select>
+          </div>
+          <textarea id="idea-notes" rows="2" placeholder="Anotações rápidas, referências ou links a pesquisar..."></textarea>
+          <div class="form-actions-right">
+            <button type="button" id="btn-cancel-idea" class="btn btn-ghost">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Ideia</button>
+          </div>
+        </form>
+
+        <div id="ideas-list" class="ideas-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

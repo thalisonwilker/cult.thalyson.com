@@ -147,5 +147,91 @@ export function createStore(contentDir) {
     return { success: true };
   }
 
-  return { list, get, save, remove };
+  async function metrics() {
+    const essays = await list();
+    const fullEssays = [];
+    let totalReadingTime = 0;
+
+    for (const item of essays) {
+      const full = await get(item.slug);
+      if (full) {
+        const words = (full.body || '').trim().split(/\s+/).filter(Boolean).length;
+        const minutes = Math.max(1, Math.ceil(words / 200));
+        totalReadingTime += minutes;
+        fullEssays.push({
+          ...item,
+          locality: full.locality,
+          readingTimeMinutes: minutes,
+          author: full.author,
+        });
+      }
+    }
+
+    const published = fullEssays.filter((e) => !e.draft);
+    const drafts = fullEssays.filter((e) => e.draft);
+    const featured = fullEssays.filter((e) => e.featured);
+
+    const byCategory = {};
+    const byTerritory = {};
+
+    for (const e of fullEssays) {
+      byCategory[e.category] = (byCategory[e.category] || 0) + 1;
+      byTerritory[e.territory] = (byTerritory[e.territory] || 0) + 1;
+    }
+
+    return {
+      total: fullEssays.length,
+      publishedCount: published.length,
+      draftCount: drafts.length,
+      featuredCount: featured.length,
+      featuredSlugs: featured.map((e) => e.slug),
+      byCategory,
+      byTerritory,
+      avgReadingTimeMinutes: fullEssays.length > 0 ? Math.round(totalReadingTime / fullEssays.length) : 0,
+      essays: fullEssays,
+    };
+  }
+
+  async function toggleFeatured(slug) {
+    const target = await get(slug);
+    if (!target) {
+      fail('Ensaio não encontrado.');
+    }
+
+    const nextState = !target.featured;
+    let unfeatured = [];
+
+    if (nextState) {
+      const all = await list();
+      const currentFeatured = all.filter((e) => e.slug !== slug && !e.draft && e.featured);
+
+      if (currentFeatured.length >= 3) {
+        // Ordena por data crescente para desmarcar os mais antigos
+        currentFeatured.sort((a, b) => new Date(a.pubDate).getTime() - new Date(b.pubDate).getTime());
+        const toUnfeature = currentFeatured.slice(0, currentFeatured.length - 2);
+
+        for (const item of toUnfeature) {
+          const itemFull = await get(item.slug);
+          if (itemFull) {
+            itemFull.featured = false;
+            await save(itemFull);
+            unfeatured.push(item.slug);
+          }
+        }
+      }
+    }
+
+    target.featured = nextState;
+    await save(target);
+
+    return {
+      success: true,
+      slug,
+      featured: nextState,
+      unfeatured,
+    };
+  }
+
+  return { list, get, save, remove, metrics, toggleFeatured };
 }
+

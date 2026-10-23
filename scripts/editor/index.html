@@ -4,9 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Editor Local — cult.thalyson.com</title>
+  <link rel="stylesheet" href="/admin.css" />
   <link rel="stylesheet" href="/editor.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+  <!-- Barra Superior de Navegação Compartilhada -->
+  <header class="admin-nav-bar">
+    <div class="nav-brand">
+      <a href="/admin" class="brand-link">
+        <span class="brand-badge">DEV</span>
+        <span class="brand-title">CULT Admin</span>
+      </a>
+    </div>
+
+    <nav class="nav-tabs" aria-label="Navegação do Painel">
+      <a href="/admin" class="nav-tab">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/" class="nav-tab active">
+        <i class="fa-solid fa-pen-nib"></i>
+        <span>Editor de Ensaios</span>
+      </a>
+    </nav>
+
+    <div class="nav-extras">
+      <a href="http://127.0.0.1:3000" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" title="Visualizar site público">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>Ver Site Público (:3000)</span>
+      </a>
+    </div>
+  </header>
+
   <div class="editor-app">
     <aside class="sidebar">
       <div class="sidebar-header">

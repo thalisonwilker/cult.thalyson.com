@@ -76,4 +76,64 @@ describe('scripts/editor', () => {
       server.close();
     }
   });
+
+  it('AC-2: server responde com métricas detalhadas em /api/admin/metrics', async () => {
+    const { dir, store } = await createTempFixture();
+    await store.save(sampleEssay);
+
+    const server = createEditorServer({ contentDir: dir });
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+    try {
+      const port = server.address().port;
+      const res = await fetch(`http://127.0.0.1:${port}/api/admin/metrics`);
+      expect(res.status).toBe(200);
+
+      const data = await res.json();
+      expect(data.total).toBe(1);
+      expect(data.publishedCount).toBe(1);
+      expect(data.byCategory.musica).toBe(1);
+      expect(data.byTerritory.para).toBe(1);
+      expect(Array.isArray(data.essays)).toBe(true);
+    } finally {
+      server.close();
+    }
+  });
+
+  it('AC-4: server executa toggle rápido de featured respeitando o limite de 3', async () => {
+    const { dir, store } = await createTempFixture();
+    await store.save({ ...sampleEssay, slug: 'e1', pubDate: '2026-10-01', featured: true });
+    await store.save({ ...sampleEssay, slug: 'e2', pubDate: '2026-10-02', featured: true });
+    await store.save({ ...sampleEssay, slug: 'e3', pubDate: '2026-10-03', featured: true });
+    await store.save({ ...sampleEssay, slug: 'e4', pubDate: '2026-10-04', featured: false });
+
+    const server = createEditorServer({ contentDir: dir });
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+    try {
+      const port = server.address().port;
+      const tokenRes = await fetch(`http://127.0.0.1:${port}/api/admin/metrics`);
+      const { token } = await tokenRes.json();
+
+      const toggleRes = await fetch(`http://127.0.0.1:${port}/api/admin/featured`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-editor-token': token,
+        },
+        body: JSON.stringify({ slug: 'e4' }),
+      });
+
+      expect(toggleRes.status).toBe(200);
+      const toggleData = await toggleRes.json();
+      expect(toggleData.featured).toBe(true);
+      expect(toggleData.unfeatured).toContain('e1'); // o mais antigo deve ter sido desmarcado
+
+      const metricsRes = await fetch(`http://127.0.0.1:${port}/api/admin/metrics`);
+      const metricsData = await metricsRes.json();
+      expect(metricsData.featuredCount).toBe(3);
+    } finally {
+      server.close();
+    }
+  });
 });

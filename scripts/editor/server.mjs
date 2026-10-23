@@ -31,11 +31,15 @@ export function createEditorServer({ contentDir = DEFAULT_CONTENT_DIR } = {}) {
         return send(403, { error: 'Acesse pelo endereço 127.0.0.1 exibido no terminal.' });
       }
 
-      // Servir arquivos estáticos do editor
+      // Servir arquivos estáticos do editor e dashboard
       const assets = {
         '/': ['index.html', 'text/html'],
         '/editor.js': ['editor.js', 'text/javascript'],
         '/editor.css': ['editor.css', 'text/css'],
+        '/admin': ['admin.html', 'text/html'],
+        '/dashboard': ['admin.html', 'text/html'],
+        '/admin.js': ['admin.js', 'text/javascript'],
+        '/admin.css': ['admin.css', 'text/css'],
       };
 
       if (req.method === 'GET' && assets[pathname]) {
@@ -58,6 +62,39 @@ export function createEditorServer({ contentDir = DEFAULT_CONTENT_DIR } = {}) {
         } catch {
           return send(200, []);
         }
+      }
+
+      // API: Métricas do Dashboard Admin
+      if (pathname === '/api/admin/metrics' && req.method === 'GET') {
+        const data = await store.metrics();
+        return send(200, { ...data, token });
+      }
+
+      // API: Toggle de Destaque na Home
+      if (pathname === '/api/admin/featured' && req.method === 'POST') {
+        if (req.headers['x-editor-token'] !== token) {
+          return send(403, { error: 'Token de sessão inválido ou expirado.' });
+        }
+
+        let body = '';
+        req.setEncoding('utf8');
+        for await (const chunk of req) {
+          body += chunk;
+        }
+
+        let payload;
+        try {
+          payload = JSON.parse(body);
+        } catch {
+          return send(400, { error: 'JSON inválido.' });
+        }
+
+        if (!payload.slug) {
+          return send(400, { error: 'Slug do ensaio é obrigatório.' });
+        }
+
+        const result = await store.toggleFeatured(payload.slug);
+        return send(200, result);
       }
 
       // API: Lista de Ensaios / Obter Token
